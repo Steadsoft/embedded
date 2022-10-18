@@ -38,51 +38,39 @@ int main(void)
 	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStructure.Pull = GPIO_NOPULL;
 	
-	GPIO_InitStructure.Pin = GPIO_PIN_0;
+	// Init the pins for port A
+	
+	GPIO_InitStructure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
 	
-	GPIO_InitStructure.Pin = GPIO_PIN_1;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
-	
-	GPIO_InitStructure.Pin = GPIO_PIN_4;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
+	// Init the pin for port B
 	
 	GPIO_InitStructure.Pin = GPIO_PIN_0;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
+	
+	// Init the pins for port C
 
-	GPIO_InitStructure.Pin = GPIO_PIN_1;
+	GPIO_InitStructure.Pin = GPIO_PIN_0 | GPIO_PIN_1;
 	HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
 	
-	GPIO_InitStructure.Pin = GPIO_PIN_0;
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
-
 	GPIO_PinState state = GPIO_PIN_RESET;
 	
 	while (true)
 	{
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, invert(&state));
+		state = GPIO_PIN_RESET;
+			
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4, state);
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0 | GPIO_PIN_1, state);
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, state);
 		HAL_Delay(120);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, invert(&state));
 		
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, invert(&state));
+		state = GPIO_PIN_SET;
+			
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4, state);
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0 | GPIO_PIN_1, state);
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, state);
 		HAL_Delay(120);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, invert(&state));
 
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, invert(&state));
-		HAL_Delay(120);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, invert(&state));
-
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, invert(&state));
-		HAL_Delay(120);
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, invert(&state));
-
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, invert(&state));
-		HAL_Delay(120);
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, invert(&state));
-
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, invert(&state));
-		HAL_Delay(120);
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, invert(&state));
 	}
 }
 
