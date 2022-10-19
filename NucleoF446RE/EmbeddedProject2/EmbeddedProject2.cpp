@@ -1,13 +1,20 @@
+
 #include <stm32f4xx_hal.h>
 #include <stm32_hal_legacy.h>
 
 #ifdef __cplusplus
 extern "C"
 #endif
+	
+void SysTick_Handler(void);
+
+void multiplex();	
+	
 void SysTick_Handler(void)
 {
 	HAL_IncTick();
 	HAL_SYSTICK_IRQHandler();
+	multiplex();
 }
 
 #define A 0
@@ -25,9 +32,11 @@ typedef struct
 } Segment;
 
 Segment segment[7];
-
+GPIO_PinState place = GPIO_PIN_RESET;
 void write(int digit);
-
+uint16_t LSD;
+uint16_t MSD;
+uint16_t pos = 0;
 GPIO_PinState invert(GPIO_PinState * state);
 /*
 User LD2: the green LED is a user LED connected to ARDUINO® signal D13 corresponding
@@ -41,6 +50,8 @@ Table 11 to Table 23 when:
 	
 int main(void)
 {
+	
+		
 	HAL_Init();
 	
 	__GPIOA_CLK_ENABLE();
@@ -54,7 +65,7 @@ int main(void)
 	GPIO_InitStructure.Pull = GPIO_NOPULL;
 	
 	uint16_t PORT_A_PINS = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4;
-	uint16_t PORT_B_PINS = GPIO_PIN_0 | GPIO_PIN_8;
+	uint16_t PORT_B_PINS = GPIO_PIN_0 | GPIO_PIN_8 | GPIO_PIN_9;
 	uint16_t PORT_C_PINS = GPIO_PIN_0 | GPIO_PIN_1;
 
 	// Init the pins for port A
@@ -95,32 +106,17 @@ int main(void)
 	
 	GPIO_PinState state = GPIO_PIN_RESET;
 	
+	uint16_t nibble;
 	
 	while (true)
 	{
-		for (uint16_t idx = 0; idx < 16; idx++)
+		for (uint16_t idx = 0; idx < 256; idx++)
 		{
-			write(idx);
-			HAL_Delay(200);
+			LSD = idx % 16;
+			MSD = idx / 16;
+			HAL_Delay(100);
 		}
 	}
-	
-//	while (true)
-//	{
-//		state = GPIO_PIN_RESET;
-//			
-//		HAL_GPIO_WritePin(GPIOA, PORT_A_PINS, state);
-//		HAL_GPIO_WritePin(GPIOB, PORT_B_PINS, state);
-//		HAL_GPIO_WritePin(GPIOC, PORT_C_PINS, state);
-//		HAL_Delay(220);
-//		
-//		state = GPIO_PIN_SET;
-//			
-//		HAL_GPIO_WritePin(GPIOA, PORT_A_PINS, state);
-//		HAL_GPIO_WritePin(GPIOB, PORT_B_PINS, state);
-//		HAL_GPIO_WritePin(GPIOC, PORT_C_PINS, state);
-//		HAL_Delay(120);
-//	}
 }
 
 void write(int digit)
@@ -131,6 +127,7 @@ void write(int digit)
 		HAL_GPIO_WritePin(segment[idx].gpio_ptr, segment[idx].gpio_pin, GPIO_PIN_RESET);
 	}
 
+	
 	switch (digit)
 	{
 	case 0:
@@ -222,9 +219,7 @@ void write(int digit)
 			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
 			return;
-
 		}
-		
 	case 10:
 		{
 			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
@@ -234,7 +229,6 @@ void write(int digit)
 			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
 			return;
-
 		}
 	case 11:
 		{
@@ -245,7 +239,6 @@ void write(int digit)
 			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
 			return;
 		}
-
 	case 12:
 		{
 			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
@@ -253,7 +246,6 @@ void write(int digit)
 			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
 			return;
-
 		}
 	case 13:
 		{
@@ -263,7 +255,6 @@ void write(int digit)
 			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
 			return;
-
 		}
 	case 14:
 		{
@@ -273,7 +264,6 @@ void write(int digit)
 			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
 			return;
-
 		}
 	case 15:
 		{
@@ -282,10 +272,23 @@ void write(int digit)
 			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
 			return;
-
 		}
+	}
+}
 
-
+void multiplex()
+{
+	if (pos == 0)
+	{
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET);
+		write(MSD);
+		pos = 1;	
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
+		write(LSD);
+		pos = 0;
 	}
 }
 
