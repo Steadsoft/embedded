@@ -4,14 +4,29 @@
 #ifdef __cplusplus
 extern "C"
 #endif
-	
-	
-
 void SysTick_Handler(void)
 {
 	HAL_IncTick();
 	HAL_SYSTICK_IRQHandler();
 }
+
+#define A 0
+#define B 1
+#define C 2
+#define D 3
+#define E 4
+#define F 5
+#define G 6
+
+typedef struct 
+{
+	GPIO_TypeDef * gpio_ptr;
+	uint16_t	   gpio_pin;
+} Segment;
+
+Segment segment[7];
+
+void write(int digit);
 
 GPIO_PinState invert(GPIO_PinState * state);
 /*
@@ -38,38 +53,238 @@ int main(void)
 	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStructure.Pull = GPIO_NOPULL;
 	
+	uint16_t PORT_A_PINS = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4;
+	uint16_t PORT_B_PINS = GPIO_PIN_0 | GPIO_PIN_8;
+	uint16_t PORT_C_PINS = GPIO_PIN_0 | GPIO_PIN_1;
+
 	// Init the pins for port A
 	
-	GPIO_InitStructure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4;
+	GPIO_InitStructure.Pin = PORT_A_PINS;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
 	
 	// Init the pin for port B
 	
-	GPIO_InitStructure.Pin = GPIO_PIN_0;
+	GPIO_InitStructure.Pin = PORT_B_PINS;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
 	
 	// Init the pins for port C
 
-	GPIO_InitStructure.Pin = GPIO_PIN_0 | GPIO_PIN_1;
+	GPIO_InitStructure.Pin = PORT_C_PINS;
 	HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
+	
+	segment[0].gpio_ptr = GPIOA; // A
+	segment[0].gpio_pin = GPIO_PIN_0;
+	
+	segment[1].gpio_ptr = GPIOA; // B
+	segment[1].gpio_pin = GPIO_PIN_1;
+
+	segment[2].gpio_ptr = GPIOA; // C
+	segment[2].gpio_pin = GPIO_PIN_4;
+	
+	segment[3].gpio_ptr = GPIOB; // D
+	segment[3].gpio_pin = GPIO_PIN_0;
+	
+	segment[4].gpio_ptr = GPIOC; // E
+	segment[4].gpio_pin = GPIO_PIN_1;
+	
+	segment[5].gpio_ptr = GPIOC; // F
+	segment[5].gpio_pin = GPIO_PIN_0;
+	
+	segment[6].gpio_ptr = GPIOB; // G
+	segment[6].gpio_pin = GPIO_PIN_8;
 	
 	GPIO_PinState state = GPIO_PIN_RESET;
 	
+	
 	while (true)
 	{
-		state = GPIO_PIN_RESET;
-			
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4, state);
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0 | GPIO_PIN_1, state);
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, state);
-		HAL_Delay(120);
+		for (uint16_t idx = 0; idx < 16; idx++)
+		{
+			write(idx);
+			HAL_Delay(200);
+		}
+	}
+	
+//	while (true)
+//	{
+//		state = GPIO_PIN_RESET;
+//			
+//		HAL_GPIO_WritePin(GPIOA, PORT_A_PINS, state);
+//		HAL_GPIO_WritePin(GPIOB, PORT_B_PINS, state);
+//		HAL_GPIO_WritePin(GPIOC, PORT_C_PINS, state);
+//		HAL_Delay(220);
+//		
+//		state = GPIO_PIN_SET;
+//			
+//		HAL_GPIO_WritePin(GPIOA, PORT_A_PINS, state);
+//		HAL_GPIO_WritePin(GPIOB, PORT_B_PINS, state);
+//		HAL_GPIO_WritePin(GPIOC, PORT_C_PINS, state);
+//		HAL_Delay(120);
+//	}
+}
+
+void write(int digit)
+{
+	
+	for (uint16_t idx = 0; idx < 7; idx++)
+	{
+		HAL_GPIO_WritePin(segment[idx].gpio_ptr, segment[idx].gpio_pin, GPIO_PIN_RESET);
+	}
+
+	switch (digit)
+	{
+	case 0:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[B].gpio_ptr, segment[B].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[D].gpio_ptr, segment[D].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
+			return;
+		}
+	case 1:
+		{
+			HAL_GPIO_WritePin(segment[B].gpio_ptr, segment[B].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			return;
+		}
+	case 2:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[B].gpio_ptr, segment[B].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[D].gpio_ptr, segment[D].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+		}
+	case 3:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[B].gpio_ptr, segment[B].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[D].gpio_ptr, segment[D].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+		}
+	case 4:
+		{
+			HAL_GPIO_WritePin(segment[B].gpio_ptr, segment[B].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+		}
+	case 5:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[D].gpio_ptr, segment[D].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+		}
+	case 6:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[D].gpio_ptr, segment[D].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+		}
+
+	case 7:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[B].gpio_ptr, segment[B].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			return;
+		}
+	case 8:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[B].gpio_ptr, segment[B].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[D].gpio_ptr, segment[D].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+		}
+	case 9:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[B].gpio_ptr, segment[B].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[D].gpio_ptr, segment[D].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+
+		}
 		
-		state = GPIO_PIN_SET;
-			
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4, state);
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0 | GPIO_PIN_1, state);
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, state);
-		HAL_Delay(120);
+	case 10:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[B].gpio_ptr, segment[B].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+
+		}
+	case 11:
+		{
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[D].gpio_ptr, segment[D].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+		}
+
+	case 12:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[D].gpio_ptr, segment[D].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
+			return;
+
+		}
+	case 13:
+		{
+			HAL_GPIO_WritePin(segment[B].gpio_ptr, segment[B].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[C].gpio_ptr, segment[C].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[D].gpio_ptr, segment[D].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+
+		}
+	case 14:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[D].gpio_ptr, segment[D].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+
+		}
+	case 15:
+		{
+			HAL_GPIO_WritePin(segment[A].gpio_ptr, segment[A].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[E].gpio_ptr, segment[E].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[F].gpio_ptr, segment[F].gpio_pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(segment[G].gpio_ptr, segment[G].gpio_pin, GPIO_PIN_SET);
+			return;
+
+		}
+
 
 	}
 }
