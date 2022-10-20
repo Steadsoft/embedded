@@ -114,7 +114,7 @@ int main(void)
 		{
 			LSD = idx % 16;
 			MSD = idx / 16;
-			HAL_Delay(100);
+			HAL_Delay(250);
 		}
 	}
 }
