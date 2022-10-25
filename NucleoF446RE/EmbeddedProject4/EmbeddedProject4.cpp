@@ -21,6 +21,8 @@ void SysTick_Handler(void)
 void spi_cs_lo();
 void spi_cs_hi();
 
+// SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
+
 void GenerateTestSPISignal()
 {
 	
@@ -57,7 +59,9 @@ void GenerateTestSPISignal()
 	GPIO_InitStruct.Pin  = SPI_CS | NRF_CE;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
+	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, NRF_CE, GPIO_PIN_RESET);
+
 	char response[2];
 	char READ_R0[2] = { 0x00, 0x00 };
 	char READ_R1[2] = { 0x01, 0x00 };
@@ -76,25 +80,36 @@ void GenerateTestSPISignal()
 	uint8_t RX_ADDR_P3 = 13;
 	uint8_t RX_ADDR_P4 = 14;
 	uint8_t RX_ADDR_P5 = 15;
-
+	uint8_t RX_STATUS  = 7;
+	uint8_t NOP = 255;
+	
 	forever
 	{
-		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+    	spi_cs_lo();
 		spi_status = HAL_SPI_TransmitReceive(&spi, &RX_ADDR_P2, &status, 1, HAL_MAX_DELAY);
 		spi_status = HAL_SPI_Receive(&spi, &read_val, 1, HAL_MAX_DELAY);
-		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+		spi_cs_hi();
+		
+		spi_cs_lo();
 		spi_status = HAL_SPI_TransmitReceive(&spi, &RX_ADDR_P3, &status, 1, HAL_MAX_DELAY);
 		spi_status = HAL_SPI_Receive(&spi, &read_val, 1, HAL_MAX_DELAY);
-		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+		spi_cs_hi();
+		
+		spi_cs_lo();
 		spi_status = HAL_SPI_TransmitReceive(&spi, &RX_ADDR_P4, &status, 1, HAL_MAX_DELAY);
 		spi_status = HAL_SPI_Receive(&spi, &read_val, 1, HAL_MAX_DELAY);
-		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+		spi_cs_hi();
+		
+		spi_cs_lo();
 		spi_status = HAL_SPI_TransmitReceive(&spi, &RX_ADDR_P5, &status, 1, HAL_MAX_DELAY);
 		spi_status = HAL_SPI_Receive(&spi, &read_val, 1, HAL_MAX_DELAY);
-		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+		spi_cs_hi();
+		
+		spi_cs_lo();
+		spi_status = HAL_SPI_TransmitReceive(&spi, &RX_STATUS, &status, 1, HAL_MAX_DELAY);
+		spi_status = HAL_SPI_Receive(&spi, &read_val, 1, HAL_MAX_DELAY);
+		spi_cs_hi();
+
 
 		HAL_Delay(10);
 	}
