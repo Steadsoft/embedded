@@ -1,5 +1,7 @@
 #include <stm32f4xx_hal.h>
- 
+
+#define forever for(;;)
+
 #ifdef __cplusplus
 extern "C"
 #endif
@@ -12,6 +14,9 @@ void SysTick_Handler(void)
 #include <string.h>
  
 // This code works for the Nucleo F446RE board
+
+#define SPI_CS GPIO_PIN_4
+#define NRF_CE GPIO_PIN_1
 
 void GenerateTestSPISignal()
 {
@@ -28,6 +33,7 @@ void GenerateTestSPISignal()
 	spi.Init.NSS = SPI_NSS_SOFT;
 	spi.Init.TIMode = SPI_TIMODE_DISABLED;
 	spi.Init.Mode = SPI_MODE_MASTER; 
+	
 	if (HAL_SPI_Init(&spi) != HAL_OK)
 	{
 		asm("bkpt 255");
@@ -44,17 +50,58 @@ void GenerateTestSPISignal()
  
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
     
-	GPIO_InitStruct.Pin  = GPIO_PIN_4;
+	GPIO_InitStruct.Pin  = SPI_CS | NRF_CE;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	
     char message[] = "0123456789";
-	for (;;)
+	char READ_R0[] = { 0x04 };
+	char READ_R1[] = { 0x05 };
+	char READ_R2[] = { 0x06 };
+	char READ_R3[] = { 0x07 };
+	char READ_R4[] = { 0x08 };
+	char READ_R5[] = { 0x09 };
+	char READ_R6[] = { 0x0A };
+	char READ_R7[] = { 0x0B };
+
+	int w, x, y, z;
+	
+	forever
 	{
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-		HAL_SPI_Transmit(&spi, (uint8_t *)message, strlen(message), HAL_MAX_DELAY);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&spi, (uint8_t *)READ_R0, sizeof(READ_R0), HAL_MAX_DELAY);
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+		
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&spi, (uint8_t *)READ_R1, sizeof(READ_R0), HAL_MAX_DELAY);
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+		
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&spi, (uint8_t *)READ_R2, sizeof(READ_R0), HAL_MAX_DELAY);
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+		
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&spi, (uint8_t *)READ_R3, sizeof(READ_R0), HAL_MAX_DELAY);
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&spi, (uint8_t *)READ_R4, sizeof(READ_R0), HAL_MAX_DELAY);
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+		
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&spi, (uint8_t *)READ_R5, sizeof(READ_R0), HAL_MAX_DELAY);
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+		
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&spi, (uint8_t *)READ_R6, sizeof(READ_R0), HAL_MAX_DELAY);
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+		
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&spi, (uint8_t *)READ_R7, sizeof(READ_R0), HAL_MAX_DELAY);
+		HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+
 		HAL_Delay(10);
+
 	}
 }
  
