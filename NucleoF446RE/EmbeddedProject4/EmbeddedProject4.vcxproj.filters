@@ -702,5 +702,16 @@
     <None Include="stm32.xml">
       <Filter>VisualGDB settings</Filter>
     </None>
+    <ClCompile Include="NRF24L01.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="NRF24L01_calls.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="NRF24L01_types.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

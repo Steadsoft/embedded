@@ -40,7 +40,10 @@
     <ToolchainVersion>10.3.1/10.2.90/r1</ToolchainVersion>
     <MCUPropertyListFile>$(ProjectDir)stm32.props</MCUPropertyListFile>
   </PropertyGroup>
-  <ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
+    <ClCompile>
+      <InputLanguage>C</InputLanguage>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
   </ItemGroup>
@@ -49,6 +52,7 @@
   </ImportGroup>
   <ItemGroup>
     <ClCompile Include="EmbeddedProject4.cpp" />
+    <ClCompile Include="NRF24L01.c" />
     <ClCompile Include="system_stm32f4xx.c" />
     <None Include="stm32.props" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\StartupFiles\startup_stm32f446xx.c" />
@@ -142,6 +146,8 @@
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_tim.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_usart.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_utils.c" />
+    <ClInclude Include="NRF24L01_calls.h" />
+    <ClInclude Include="NRF24L01_types.h" />
     <ClInclude Include="stm32f4xx_hal_conf.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc.h" />
