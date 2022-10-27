@@ -1,6 +1,7 @@
 #include <stm32f4xx_hal.h>
 #include <stm32_hal_legacy.h>
 
+
 #ifdef __cplusplus
 extern "C"
 #endif
@@ -14,6 +15,12 @@ void SysTick_Handler(void)
 
 int main(void)
 {
+	unsigned long ID1 = (*(unsigned long *)0x1FFF7A10);
+	unsigned long ID2 = (*(unsigned long *)0x1FFF7A14);
+	unsigned long ID3 = (*(unsigned long *)0x1FFF7A18);
+
+	uint32_t ID = DBGMCU->IDCODE;
+
 	HAL_Init();
 
 	__GPIOA_CLK_ENABLE();
