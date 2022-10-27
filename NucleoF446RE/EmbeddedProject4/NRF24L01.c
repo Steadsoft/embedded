@@ -4,12 +4,19 @@
 #include <NRF24L01_types.h>
 #include <NRF24L01_calls.h>
 
-void spi_cs_lo(NrfSpi *);
-void spi_cs_hi(NrfSpi *);
+void spi_cs_lo(NrfSpiDevice *);
+void spi_cs_hi(NrfSpiDevice *);
 
 // SEE: https://www.mouser.com/datasheet/2/297/nRF24L01_Product_Specification_v2_0-9199.pdf
 
-void ReadSingleByteRegister(NrfSpi * SPI, uint8_t Register, void * Value, STATUS * NrfStatus)
+void InitializeDevice(SPI_HandleTypeDef * SpiPtr, GPIO_TypeDef * GpioPtr, uint8_t CsPin, uint8_t CePin, NrfSpiDevice * Device)
+{
+	Device->spi_ptr = SpiPtr;
+	Device->gpio_ptr = GpioPtr;
+	Device->cs_pin = CsPin;
+	Device->ce_pin = CePin;
+}
+void ReadSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, void * Value, STATUS * NrfStatus)
 {
 	uint8_t command = R_REGISTER | Register;
 	spi_cs_lo(SPI);
@@ -17,8 +24,7 @@ void ReadSingleByteRegister(NrfSpi * SPI, uint8_t Register, void * Value, STATUS
 	SPI->status = HAL_SPI_Receive(SPI->spi_ptr, Value, 1, HAL_MAX_DELAY);
 	spi_cs_hi(SPI);
 }
-
-void WriteSingleByteRegister(NrfSpi * SPI, uint8_t Register, void * Value, STATUS * NrfStatus)
+void WriteSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, void * Value, STATUS * NrfStatus)
 {
 	uint8_t command = W_REGISTER | Register;
 	spi_cs_lo(SPI);
@@ -26,8 +32,7 @@ void WriteSingleByteRegister(NrfSpi * SPI, uint8_t Register, void * Value, STATU
 	SPI->status = HAL_SPI_Transmit(SPI->spi_ptr, Value, 1, HAL_MAX_DELAY);
 	spi_cs_hi(SPI);
 }
-
-void ReadMultiBytesRegister(NrfSpi * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, STATUS * NrfStatus)
+void ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, STATUS * NrfStatus)
 {
 	uint8_t command = R_REGISTER | Register;
 	uint8_t width;
@@ -55,8 +60,7 @@ void ReadMultiBytesRegister(NrfSpi * SPI, uint8_t Register, uint8_t Value[], uin
 	SPI->status = HAL_SPI_Receive(SPI->spi_ptr, Value, bytes, HAL_MAX_DELAY);
 	spi_cs_hi(SPI);
 }
-
-void WriteMultiBytesRegister(NrfSpi * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, STATUS * NrfStatus)
+void WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, STATUS * NrfStatus)
 {
 	uint8_t command = W_REGISTER | Register;
 	uint8_t width;
@@ -84,14 +88,11 @@ void WriteMultiBytesRegister(NrfSpi * SPI, uint8_t Register, uint8_t Value[], ui
 	SPI->status = HAL_SPI_Transmit(SPI->spi_ptr, Value, bytes, HAL_MAX_DELAY);
 	spi_cs_hi(SPI);
 }
-
-
-void spi_cs_lo(NrfSpi * SPI)
+void spi_cs_lo(NrfSpiDevice * SPI)
 {
 	HAL_GPIO_WritePin(SPI->gpio_ptr, SPI->cs_pin, GPIO_PIN_RESET);
 }
-
-void spi_cs_hi(NrfSpi * SPI)
+void spi_cs_hi(NrfSpiDevice * SPI)
 {
 	HAL_GPIO_WritePin(SPI->gpio_ptr, SPI->cs_pin, GPIO_PIN_SET);
 }

@@ -68,7 +68,7 @@ typedef struct
 	uint8_t cs_pin;
 	uint8_t ce_pin;
 	
-} NrfSpi;
+} NrfSpiDevice;
 
 // This is the structure of the nRF24L01's STATUS register.
 typedef struct 

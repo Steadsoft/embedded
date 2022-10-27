@@ -28,6 +28,7 @@ void SysTick_Handler(void)
 void spi_cs_lo();
 void spi_cs_hi();
 
+
 // SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
 
 void GenerateTestSPISignal()
@@ -66,12 +67,17 @@ void GenerateTestSPISignal()
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	
 	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOA, NRF_CE, GPIO_PIN_RESET);
 
-	NrfSpi device = { .spi_ptr = &spi, .gpio_ptr = GPIOA, .cs_pin = SPI_CS, .ce_pin = NRF_CE };
+	NrfSpiDevice device; // = { .spi_ptr = &spi, .gpio_ptr = GPIOA, .cs_pin = SPI_CS, .ce_pin = NRF_CE };
 	
-	uint8_t RX_ADDR[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
+	InitializeDevice(&spi, GPIOA, SPI_CS, NRF_CE, &device);
+	
+	uint8_t RX_ADDR1[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
+	uint8_t RX_ADDR2[5] = { 0x04, 0x03, 0x02, 0x01, 0x00 };
+
 	uint8_t BUFFER[5];
 	
 	uint8_t regval;
@@ -95,9 +101,12 @@ void GenerateTestSPISignal()
 		ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
 		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
 		
-		WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR, &multisize, &status);
-		
+		WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
 		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		
+		WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
+		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+
 		HAL_Delay(1);
 	}
 }
