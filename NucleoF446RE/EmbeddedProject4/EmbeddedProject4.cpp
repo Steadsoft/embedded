@@ -60,39 +60,14 @@ void GenerateTestSPISignal()
     
 	GPIO_InitStruct.Pin  = NRF_CE | SPI_CS;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOA, NRF_CE, GPIO_PIN_RESET);
 
-	char response[2];
-	char READ_R0[2] = { 0x00, 0x00 };
-	char READ_R1[2] = { 0x01, 0x00 };
-	char READ_R2[2] = { 0x02, 0x00 };
-	char READ_R3[2] = { 0x03, 0x00 };
-	char READ_R4[2] = { 0x04, 0x00 };
-
-	int w, x, y, z;
-	
-	uint8_t H = NrfRegister.CONFIG;
-	
-	HAL_StatusTypeDef spi_status;
-	
 	NrfSpi device = { .spi_ptr = &spi, .gpio_ptr = GPIOA, .cs_pin = SPI_CS, .ce_pin = NRF_CE };
 	
-	uint8_t command = 13;
-	uint8_t status;
-	uint8_t read_val;
-	uint8_t RX_ADDR_P0 = 10;
-	uint8_t RX_SETUP_AW = 3;
-	uint8_t RX_ADDR_P1 = 11;
-	uint8_t RX_ADDR_P2 = 12;
-	uint8_t RX_ADDR_P3 = 13;
-	uint8_t RX_ADDR_P4 = 14;
-	uint8_t RX_ADDR_P5 = 15;
-	uint8_t RX_STATUS  = 7;
-	uint8_t WR_RX_ADDR_P0 = 0x20 | 0x0A;
-	uint8_t NOP = 255;
-	uint8_t RX_ADDR[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
+	//uint8_t RX_ADDR[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
 	uint8_t BUFFER[5];
 	
 	uint8_t regval;
@@ -107,9 +82,7 @@ void GenerateTestSPISignal()
 		ReadSingleByteRegister(&device, NrfRegister.EN_AA, &regval, &statval);
 		ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &regval, &statval);
 		ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &statval);
-		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR, &multisize, &statval);
-
-		//HAL_Delay(1);
+		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &statval);
 	}
 }
 
