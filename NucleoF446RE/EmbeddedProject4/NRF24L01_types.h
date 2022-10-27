@@ -28,6 +28,7 @@ typedef struct
 	uint8_t FEATURE;
 } nrf24L01_registers;
 
+// Create (in effect) a "namespace" for containing all of the register names.
 static nrf24L01_registers NrfRegister =
 { 
 	.CONFIG = 0x00,
@@ -58,6 +59,7 @@ static nrf24L01_registers NrfRegister =
 	.FEATURE = 0x1D,
 };
 
+// This type represents all of the hardware specific items needed by the library.
 typedef struct 
 {
 	SPI_HandleTypeDef * spi_ptr;
@@ -68,6 +70,7 @@ typedef struct
 	
 } NrfSpi;
 
+// This is the structure of the nRF24L01's STATUS register.
 typedef struct 
 {
 	unsigned int TX_FULL : 1;
@@ -79,6 +82,7 @@ typedef struct
 
 } STATUS;
 
+// This is the structure of the nRF24L01's CONFIG register.
 typedef struct 
 {
 	unsigned int PRIM_RX : 1;
@@ -92,6 +96,7 @@ typedef struct
 
 } CONFIG;
 
+// This is the structure of the nRF24L01's EN_AA register.
 typedef struct 
 {
 	unsigned int ENAA_P0 : 1;
@@ -104,6 +109,7 @@ typedef struct
 
 } EN_AA;
 
+// This is the structure of the nRF24L01's EN_RXADDR register.
 typedef struct 
 {
 	unsigned int ERX_P0 : 1;
