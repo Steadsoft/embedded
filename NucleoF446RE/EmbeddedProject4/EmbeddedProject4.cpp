@@ -97,66 +97,22 @@ void GenerateTestSPISignal()
 	
 	uint8_t regval;
 	uint8_t statval;
+	uint8_t multisize;
 	
 	forever
 	{
-//    	spi_cs_lo();
-//		spi_status = HAL_SPI_TransmitReceive(&spi, &RX_ADDR_P2, &status, 1, HAL_MAX_DELAY);
-//		spi_status = HAL_SPI_Receive(&spi, &read_val, 1, HAL_MAX_DELAY);
-//		spi_cs_hi();
-		
-		ReadRegister(&device, NrfRegister.RX_ADDR_P2, &regval, &statval);
-		ReadRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &statval);
-		ReadRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &statval);
+		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P2, &regval, &statval);
+		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &statval);
+		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &statval);
+		ReadSingleByteRegister(&device, NrfRegister.EN_AA, &regval, &statval);
+		ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &regval, &statval);
+		ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &statval);
+		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR, &multisize, &statval);
 
-//		spi_cs_lo();
-//		spi_status = HAL_SPI_TransmitReceive(&spi, &RX_ADDR_P3, &status, 1, HAL_MAX_DELAY);
-//		spi_status = HAL_SPI_Receive(&spi, &read_val, 1, HAL_MAX_DELAY);
-//		spi_cs_hi();
-//		
-//		spi_cs_lo();
-//		spi_status = HAL_SPI_TransmitReceive(&spi, &WR_RX_ADDR_P0, &status, 1, HAL_MAX_DELAY);
-//		spi_status = HAL_SPI_Transmit(&spi, RX_ADDR, 5, HAL_MAX_DELAY);
-//		spi_cs_hi();
-//		
-//		spi_cs_lo();
-//		spi_status = HAL_SPI_TransmitReceive(&spi, &RX_ADDR_P0, &status, 1, HAL_MAX_DELAY);
-//		spi_status = HAL_SPI_Receive(&spi, BUFFER, 5, HAL_MAX_DELAY);
-//		spi_cs_hi();
-//
-
-		
-//		
-//		spi_cs_lo();
-//		spi_status = HAL_SPI_TransmitReceive(&spi, &RX_ADDR_P4, &status, 1, HAL_MAX_DELAY);
-//		spi_status = HAL_SPI_Receive(&spi, &read_val, 1, HAL_MAX_DELAY);
-//		spi_cs_hi();
-//		
-//		spi_cs_lo();
-//		spi_status = HAL_SPI_TransmitReceive(&spi, &RX_ADDR_P5, &status, 1, HAL_MAX_DELAY);
-//		spi_status = HAL_SPI_Receive(&spi, &read_val, 1, HAL_MAX_DELAY);
-//		spi_cs_hi();
-//		
-//		spi_cs_lo();
-//		spi_status = HAL_SPI_TransmitReceive(&spi, &RX_STATUS, &status, 1, HAL_MAX_DELAY);
-//		spi_status = HAL_SPI_Receive(&spi, &read_val, 1, HAL_MAX_DELAY);
-//		spi_cs_hi();
-
-
-		HAL_Delay(1);
+		//HAL_Delay(1);
 	}
 }
 
-//void spi_cs_lo()
-//{
-//	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_RESET);
-//}
-//
-//void spi_cs_hi()
-//{
-//	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
-//}
- 
 int main(void)
 {
 	HAL_Init();
