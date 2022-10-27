@@ -7,6 +7,8 @@
 void spi_cs_lo(NrfSpi *);
 void spi_cs_hi(NrfSpi *);
 
+// SEE: https://www.mouser.com/datasheet/2/297/nRF24L01_Product_Specification_v2_0-9199.pdf
+
 void ReadSingleByteRegister(NrfSpi * SPI, uint8_t Register, void * Value, STATUS * NrfStatus)
 {
 	uint8_t command = R_REGISTER | Register;

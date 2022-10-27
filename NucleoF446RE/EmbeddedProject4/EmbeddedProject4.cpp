@@ -85,9 +85,6 @@ void GenerateTestSPISignal()
 	forever
 	{
 	
-		regval = 2;
-		
-		WriteSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
 		ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
 		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
 		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
@@ -95,8 +92,6 @@ void GenerateTestSPISignal()
 		ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
 		ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
 		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		
-		
 		
 		WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR, &multisize, &status);
 		
