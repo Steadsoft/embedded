@@ -713,5 +713,8 @@
     <ClInclude Include="NRF24L01_types.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="NRF24L01_defs.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -62,7 +62,44 @@ typedef struct
 {
 	SPI_HandleTypeDef * spi_ptr;
 	GPIO_TypeDef * gpio_ptr;
+	HAL_StatusTypeDef status;
 	uint8_t cs_pin;
 	uint8_t ce_pin;
 	
 } NrfSpi;
+
+typedef struct 
+{
+	unsigned int TX_FULL : 1;
+	unsigned int RX_P_NO : 3;
+	unsigned int MAX_RT : 1;
+	unsigned int TX_DS : 1;
+	unsigned int RX_DR : 1;
+	unsigned int RESERVED : 1;
+
+} NrfSTATUS;
+
+typedef struct 
+{
+	unsigned int PRIM_RX : 1;
+	unsigned int PWR_UP : 1;
+	unsigned int CRCO : 1;
+	unsigned int EN_CRC : 1;
+	unsigned int MASK_MAX_RT : 1;
+	unsigned int MASK_TX_DS : 1;
+	unsigned int MASK_RX_DR : 1;
+	unsigned int RESERVED : 1;
+
+} NrfCONFIG;
+
+typedef struct 
+{
+	unsigned int ENAA_P0 : 1;
+	unsigned int ENAA_P1 : 1;
+	unsigned int ENAA_P2 : 1;
+	unsigned int ENAA_P3 : 1;
+	unsigned int ENAA_P4 : 1;
+	unsigned int ENAA_P5 : 1;
+	unsigned int RESERVED : 2;
+
+} NrfEN_AA;

@@ -2,6 +2,9 @@
 
 #define forever for(;;)
 
+// SEE: http://blog.gorski.pm/stm32-unique-id
+
+
 #ifdef __cplusplus
 extern "C"
 #endif
@@ -12,6 +15,8 @@ void SysTick_Handler(void)
 }
  
 #include <string.h>
+
+#include <NRF24L01_defs.h>
 #include <NRF24L01_types.h>
 #include <NRF24L01_calls.h>
  
@@ -27,7 +32,6 @@ void spi_cs_hi();
 
 void GenerateTestSPISignal()
 {
-	
     __SPI1_CLK_ENABLE();
 	static SPI_HandleTypeDef spi = { .Instance = SPI1 };
 	spi.Init.Mode = SPI_MODE_MASTER; 
@@ -67,27 +71,44 @@ void GenerateTestSPISignal()
 
 	NrfSpi device = { .spi_ptr = &spi, .gpio_ptr = GPIOA, .cs_pin = SPI_CS, .ce_pin = NRF_CE };
 	
-	//uint8_t RX_ADDR[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
+	uint8_t RX_ADDR[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
 	uint8_t BUFFER[5];
 	
 	uint8_t regval;
-	uint8_t statval;
+	NrfSTATUS statval;
+	NrfCONFIG config;
+	NrfEN_AA enhburst;
 	uint8_t multisize;
 	
 	forever
 	{
-		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P2, &regval, &statval);
+	
+		regval = 2;
+		
+		WriteSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &statval);
+		ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &statval);
 		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &statval);
 		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &statval);
-		ReadSingleByteRegister(&device, NrfRegister.EN_AA, &regval, &statval);
+		ReadSingleByteRegister(&device, NrfRegister.EN_AA, &enhburst, &statval);
 		ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &regval, &statval);
 		ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &statval);
 		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &statval);
+		
+		
+		
+		WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR, &multisize, &statval);
+		
+		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &statval);
+		HAL_Delay(1);
 	}
 }
 
 int main(void)
 {
+	unsigned long ID1 = (*(unsigned long *)0x1FFF7A10);
+	unsigned long ID2 = (*(unsigned long *)0x1FFF7A14);
+	unsigned long ID3 = (*(unsigned long *)0x1FFF7A18);
+
 	HAL_Init();
 	GenerateTestSPISignal();
 }
