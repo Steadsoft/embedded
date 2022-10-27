@@ -82,6 +82,8 @@ void GenerateTestSPISignal()
 	
 	uint8_t multisize;
 	
+	// Just a bunch of test calls into the various register read/write functions.
+	
 	forever
 	{
 	
@@ -102,6 +104,8 @@ void GenerateTestSPISignal()
 
 int main(void)
 {
+	// This is the MCU's unique ID, these addresses are specific to the F4 family.
+	
 	unsigned long ID1 = (*(unsigned long *)0x1FFF7A10);
 	unsigned long ID2 = (*(unsigned long *)0x1FFF7A14);
 	unsigned long ID3 = (*(unsigned long *)0x1FFF7A18);
