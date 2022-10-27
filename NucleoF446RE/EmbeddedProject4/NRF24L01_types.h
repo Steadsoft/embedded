@@ -77,7 +77,7 @@ typedef struct
 	unsigned int RX_DR : 1;
 	unsigned int RESERVED : 1;
 
-} NrfSTATUS;
+} STATUS;
 
 typedef struct 
 {
@@ -90,7 +90,7 @@ typedef struct
 	unsigned int MASK_RX_DR : 1;
 	unsigned int RESERVED : 1;
 
-} NrfCONFIG;
+} CONFIG;
 
 typedef struct 
 {
@@ -102,4 +102,16 @@ typedef struct
 	unsigned int ENAA_P5 : 1;
 	unsigned int RESERVED : 2;
 
-} NrfEN_AA;
+} EN_AA;
+
+typedef struct 
+{
+	unsigned int ERX_P0 : 1;
+	unsigned int ERX_P1 : 1;
+	unsigned int ERX_P2 : 1;
+	unsigned int ERX_P3 : 1;
+	unsigned int ERX_P4 : 1;
+	unsigned int ERX_P5 : 1;
+	unsigned int RESERVED : 2;
+
+} EN_RXADDR;

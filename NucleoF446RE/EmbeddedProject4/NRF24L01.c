@@ -7,7 +7,7 @@
 void spi_cs_lo(NrfSpi *);
 void spi_cs_hi(NrfSpi *);
 
-void ReadSingleByteRegister(NrfSpi * SPI, uint8_t Register, void * Value, NrfSTATUS * NrfStatus)
+void ReadSingleByteRegister(NrfSpi * SPI, uint8_t Register, void * Value, STATUS * NrfStatus)
 {
 	uint8_t command = R_REGISTER | Register;
 	spi_cs_lo(SPI);
@@ -16,7 +16,7 @@ void ReadSingleByteRegister(NrfSpi * SPI, uint8_t Register, void * Value, NrfSTA
 	spi_cs_hi(SPI);
 }
 
-void WriteSingleByteRegister(NrfSpi * SPI, uint8_t Register, void * Value, NrfSTATUS * NrfStatus)
+void WriteSingleByteRegister(NrfSpi * SPI, uint8_t Register, void * Value, STATUS * NrfStatus)
 {
 	uint8_t command = W_REGISTER | Register;
 	spi_cs_lo(SPI);
@@ -25,7 +25,7 @@ void WriteSingleByteRegister(NrfSpi * SPI, uint8_t Register, void * Value, NrfST
 	spi_cs_hi(SPI);
 }
 
-void ReadMultiBytesRegister(NrfSpi * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfSTATUS * NrfStatus)
+void ReadMultiBytesRegister(NrfSpi * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, STATUS * NrfStatus)
 {
 	uint8_t command = R_REGISTER | Register;
 	uint8_t width;
@@ -54,7 +54,7 @@ void ReadMultiBytesRegister(NrfSpi * SPI, uint8_t Register, uint8_t Value[], uin
 	spi_cs_hi(SPI);
 }
 
-void WriteMultiBytesRegister(NrfSpi * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfSTATUS * NrfStatus)
+void WriteMultiBytesRegister(NrfSpi * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, STATUS * NrfStatus)
 {
 	uint8_t command = W_REGISTER | Register;
 	uint8_t width;

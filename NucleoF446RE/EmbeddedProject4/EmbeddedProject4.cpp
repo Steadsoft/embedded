@@ -75,9 +75,11 @@ void GenerateTestSPISignal()
 	uint8_t BUFFER[5];
 	
 	uint8_t regval;
-	NrfSTATUS statval;
-	NrfCONFIG config;
-	NrfEN_AA enhburst;
+	STATUS status;
+	CONFIG config;
+	EN_AA en_aa;
+	EN_RXADDR en_rxaddr;
+	
 	uint8_t multisize;
 	
 	forever
@@ -85,20 +87,20 @@ void GenerateTestSPISignal()
 	
 		regval = 2;
 		
-		WriteSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &statval);
-		ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &statval);
-		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &statval);
-		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &statval);
-		ReadSingleByteRegister(&device, NrfRegister.EN_AA, &enhburst, &statval);
-		ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &regval, &statval);
-		ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &statval);
-		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &statval);
+		WriteSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
+		ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
+		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
+		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
+		ReadSingleByteRegister(&device, NrfRegister.EN_AA, &en_aa, &status);
+		ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
+		ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
+		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
 		
 		
 		
-		WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR, &multisize, &statval);
+		WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR, &multisize, &status);
 		
-		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &statval);
+		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
 		HAL_Delay(1);
 	}
 }
