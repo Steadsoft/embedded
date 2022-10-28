@@ -30,15 +30,13 @@ NrfSpiDevice device;
 
 void spi_cs_lo();
 void spi_cs_hi();
-
+void nrf_init();
 
 // SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
 
 void GenerateTestSPISignal()
 {
 	
-	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA, NRF_CE, GPIO_PIN_RESET);
 	
 	uint8_t RX_ADDR1[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
 	uint8_t RX_ADDR2[5] = { 0x04, 0x03, 0x02, 0x01, 0x00 };
@@ -84,6 +82,7 @@ int main(void)
 	unsigned long ID2 = (*(unsigned long *)0x1FFF7A14);
 	unsigned long ID3 = (*(unsigned long *)0x1FFF7A18);
 	
+	HAL_Init();
 	
 	__SPI1_CLK_ENABLE();
 	static SPI_HandleTypeDef spi = { .Instance = SPI1 };
@@ -120,10 +119,32 @@ int main(void)
 
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, NRF_CE, GPIO_PIN_RESET);
+
 	InitializeLibrary(&library);
 
 	library.InitializeDevice(&spi, GPIOA, SPI_CS, NRF_CE, &device);
 
-	HAL_Init();
+	nrf_init(&library, &device);
+	
 	GenerateTestSPISignal();
+}
+
+void nrf_init(NrfLibrary * lib, NrfSpiDevice * device)
+{	STATUS status;
+
+	uint8_t arg = 0;
+	
+	lib->WriteSingleByteRegister(device, NrfRegister.CONFIG, &arg, &status);
+	lib->WriteSingleByteRegister(device, NrfRegister.EN_AA, &arg, &status);
+	lib->WriteSingleByteRegister(device, NrfRegister.EN_RXADDR, &arg, &status);
+	lib->WriteSingleByteRegister(device, NrfRegister.SETUP_RETR, &arg, &status);
+	lib->WriteSingleByteRegister(device, NrfRegister.RF_CH, &arg, &status);
+	lib->WriteSingleByteRegister(device, NrfRegister.RF_SETUP, &arg, &status);
+	
+	arg = 3;
+	
+	lib->WriteSingleByteRegister(device, NrfRegister.SETUP_AW, &arg, &status);
+
 }
