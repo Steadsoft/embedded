@@ -73,7 +73,7 @@ void GenerateTestSPISignal()
 
 	NrfSpiDevice device; // = { .spi_ptr = &spi, .gpio_ptr = GPIOA, .cs_pin = SPI_CS, .ce_pin = NRF_CE };
 	
-	InitializeDevice(&spi, GPIOA, SPI_CS, NRF_CE, &device);
+	NrfLibrary.InitializeDevice(&spi, GPIOA, SPI_CS, NRF_CE, &device);
 	
 	uint8_t RX_ADDR1[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
 	uint8_t RX_ADDR2[5] = { 0x04, 0x03, 0x02, 0x01, 0x00 };
@@ -93,19 +93,19 @@ void GenerateTestSPISignal()
 	forever
 	{
 	
-		ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
-		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
-		ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
-		ReadSingleByteRegister(&device, NrfRegister.EN_AA, &en_aa, &status);
-		ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
-		ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
-		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
+		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
+		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
+		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.EN_AA, &en_aa, &status);
+		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
+		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
+		NrfLibrary.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
 		
-		WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
-		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
+		NrfLibrary.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
 		
-		WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
-		ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
+		NrfLibrary.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
 
 		HAL_Delay(1);
 	}
