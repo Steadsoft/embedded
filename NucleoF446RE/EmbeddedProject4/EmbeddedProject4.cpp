@@ -30,49 +30,10 @@ NrfSpiDevice device;
 
 void spi_cs_lo();
 void spi_cs_hi();
-void nrf_init();
+void nrf_init(NrfLibrary * lib, NrfSpiDevice * device);
+void GenerateTestSPISignal();
 
 // SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
-
-void GenerateTestSPISignal()
-{
-	
-	
-	uint8_t RX_ADDR1[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
-	uint8_t RX_ADDR2[5] = { 0x04, 0x03, 0x02, 0x01, 0x00 };
-
-	uint8_t BUFFER[5];
-	
-	uint8_t regval;
-	STATUS status;
-	CONFIG config;
-	EN_AA en_aa;
-	EN_RXADDR en_rxaddr;
-	
-	uint8_t multisize;
-	
-	// Just a bunch of test calls into the various register read/write functions.
-	
-	forever
-	{
-	
-		library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
-		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
-		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
-		library.ReadSingleByteRegister(&device, NrfRegister.EN_AA, &en_aa, &status);
-		library.ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
-		library.ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
-		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		
-		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
-		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		
-		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
-		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-
-		HAL_Delay(1);
-	}
-}
 
 int main(void)
 {
@@ -130,6 +91,47 @@ int main(void)
 	
 	GenerateTestSPISignal();
 }
+
+void GenerateTestSPISignal()
+{
+	
+	
+	uint8_t RX_ADDR1[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
+	uint8_t RX_ADDR2[5] = { 0x04, 0x03, 0x02, 0x01, 0x00 };
+
+	uint8_t BUFFER[5];
+	
+	uint8_t regval;
+	STATUS status;
+	CONFIG config;
+	EN_AA en_aa;
+	EN_RXADDR en_rxaddr;
+	
+	uint8_t multisize;
+	
+	// Just a bunch of test calls into the various register read/write functions.
+	
+	forever
+	{
+	
+		library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
+		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
+		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
+		library.ReadSingleByteRegister(&device, NrfRegister.EN_AA, &en_aa, &status);
+		library.ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
+		library.ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
+		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		
+		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
+		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		
+		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
+		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+
+		HAL_Delay(1);
+	}
+}
+
 
 void nrf_init(NrfLibrary * lib, NrfSpiDevice * device)
 {	STATUS status;
