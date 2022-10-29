@@ -28,25 +28,70 @@ void SysTick_Handler(void)
 NrfLibrary library;
 NrfSpiDevice device; 
 
-void spi_cs_lo();
-void spi_cs_hi();
-void nrf_init(NrfLibrary * lib, NrfSpiDevice * device);
+typedef struct
+{
+	unsigned long fields[3];
+} BoardId;
+
+
+void init_peripherals()
+{
+	
+}
+void init_nrf_registers(NrfLibrary * lib, NrfSpiDevice * device);
+int get_board_id();
+
 void GenerateTestSPISignal();
 
 // SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
+
+int get_board_id()
+{
+	static int known = -1;
+	static BoardId board1 = { .fields[0] = 0x0039001E, .fields[1] = 0x31385119, .fields[2] = 0x36323738 };
+	static BoardId board2 = { .fields[0] = 0x0042002F, .fields[1] = 0x4633500F, .fields[2] = 0x20353836 };
+
+	if (known != -1)
+		return known;
+	
+	unsigned long ID0 = (*(unsigned long *)0x1FFF7A10);
+	unsigned long ID1 = (*(unsigned long *)0x1FFF7A14);
+	unsigned long ID2 = (*(unsigned long *)0x1FFF7A18);
+	
+	if (ID0 == board1.fields[0] && ID1 == board1.fields[1] && ID2 == board1.fields[2])
+	{
+		known = 1;
+		return known;
+	}
+	
+	if (ID0 == board2.fields[0] && ID1 == board2.fields[1] && ID2 == board2.fields[2])
+	{
+		known = 2;
+		return known;
+	}
+
+	known = 0;
+	return known;
+}
 
 int main(void)
 {
 	// This is the MCU's unique ID, these addresses are specific to the F4 family.
 	
-	unsigned long ID1 = (*(unsigned long *)0x1FFF7A10);
-	unsigned long ID2 = (*(unsigned long *)0x1FFF7A14);
-	unsigned long ID3 = (*(unsigned long *)0x1FFF7A18);
+	SPI_HandleTypeDef spi; 
+	GPIO_InitTypeDef  GPIO_InitStruct_spi;
+	GPIO_InitTypeDef  GPIO_InitStruct_ctrl;
+	BoardId id;
+	
+	int board = get_board_id();
 	
 	HAL_Init();
 	
+	board = get_board_id();
+	
 	__SPI1_CLK_ENABLE();
-	static SPI_HandleTypeDef spi = { .Instance = SPI1 };
+	
+	spi.Instance = SPI1;
 	spi.Init.Mode = SPI_MODE_MASTER; 
 	spi.Init.Direction = SPI_DIRECTION_2LINES;
 	spi.Init.DataSize = SPI_DATASIZE_8BIT;
@@ -59,26 +104,22 @@ int main(void)
 	spi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
 	spi.Init.CRCPolynomial = 10;
 	
-	if (HAL_SPI_Init(&spi) != HAL_OK)
-	{
-		asm("bkpt 255");
-	}
+	HAL_SPI_Init(&spi);
 	
 	__GPIOA_CLK_ENABLE();
-	GPIO_InitTypeDef  GPIO_InitStruct;
-  
-	GPIO_InitStruct.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
-	GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-	GPIO_InitStruct.Pull      = GPIO_PULLUP;
-	GPIO_InitStruct.Speed     = GPIO_SPEED_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
- 
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-    
-	GPIO_InitStruct.Pin  = NRF_CE | SPI_CS;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
+	GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
+	GPIO_InitStruct_spi.Pull      = GPIO_PULLUP;
+	GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
+	GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
+ 
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_spi);
+    
+	GPIO_InitStruct_ctrl.Pin  = NRF_CE | SPI_CS;
+	GPIO_InitStruct_ctrl.Mode = GPIO_MODE_OUTPUT_PP;
+
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_ctrl);
 
 	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOA, NRF_CE, GPIO_PIN_RESET);
@@ -87,7 +128,7 @@ int main(void)
 
 	library.InitializeDevice(&spi, GPIOA, SPI_CS, NRF_CE, &device);
 
-	nrf_init(&library, &device);
+	init_nrf_registers(&library, &device);
 	
 	GenerateTestSPISignal();
 }
@@ -114,8 +155,8 @@ void GenerateTestSPISignal()
 	forever
 	{
 	
-		library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
+		library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.EN_AA, &en_aa, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
@@ -133,7 +174,7 @@ void GenerateTestSPISignal()
 }
 
 
-void nrf_init(NrfLibrary * lib, NrfSpiDevice * device)
+void init_nrf_registers(NrfLibrary * lib, NrfSpiDevice * device)
 {	STATUS status;
 
 	uint8_t arg = 0;
