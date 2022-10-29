@@ -39,6 +39,8 @@ void init_peripherals()
 	
 }
 void init_nrf_registers(NrfLibrary * lib, NrfSpiDevice * device);
+void init_spi(SPI_HandleTypeDef *);
+
 int get_board_id();
 
 void GenerateTestSPISignal();
@@ -53,7 +55,9 @@ int get_board_id()
 
 	if (known != -1)
 		return known;
-	
+
+	// This is the MCU's unique ID, these addresses are specific to the F4 family.
+
 	unsigned long ID0 = (*(unsigned long *)0x1FFF7A10);
 	unsigned long ID1 = (*(unsigned long *)0x1FFF7A14);
 	unsigned long ID2 = (*(unsigned long *)0x1FFF7A18);
@@ -74,37 +78,26 @@ int get_board_id()
 	return known;
 }
 
-int main(void)
+void init_spi(SPI_HandleTypeDef * spi_ptr)
 {
-	// This is the MCU's unique ID, these addresses are specific to the F4 family.
-	
-	SPI_HandleTypeDef spi; 
 	GPIO_InitTypeDef  GPIO_InitStruct_spi;
-	GPIO_InitTypeDef  GPIO_InitStruct_ctrl;
-	BoardId id;
-	
-	int board = get_board_id();
-	
-	HAL_Init();
-	
-	board = get_board_id();
-	
+
 	__SPI1_CLK_ENABLE();
 	
-	spi.Instance = SPI1;
-	spi.Init.Mode = SPI_MODE_MASTER; 
-	spi.Init.Direction = SPI_DIRECTION_2LINES;
-	spi.Init.DataSize = SPI_DATASIZE_8BIT;
-	spi.Init.CLKPolarity = SPI_POLARITY_LOW;
-	spi.Init.CLKPhase = SPI_PHASE_1EDGE;
-	spi.Init.NSS = SPI_NSS_SOFT; // SPI_NSS_HARD_OUTPUT
-	spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
-	spi.Init.FirstBit = SPI_FIRSTBIT_MSB;
-	spi.Init.TIMode = SPI_TIMODE_DISABLED;
-	spi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
-	spi.Init.CRCPolynomial = 10;
+	spi_ptr->Instance = SPI1;
+	spi_ptr->Init.Mode = SPI_MODE_MASTER; 
+	spi_ptr->Init.Direction = SPI_DIRECTION_2LINES;
+	spi_ptr->Init.DataSize = SPI_DATASIZE_8BIT;
+	spi_ptr->Init.CLKPolarity = SPI_POLARITY_LOW;
+	spi_ptr->Init.CLKPhase = SPI_PHASE_1EDGE;
+	spi_ptr->Init.NSS = SPI_NSS_SOFT; // SPI_NSS_HARD_OUTPUT
+	spi_ptr->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+	spi_ptr->Init.FirstBit = SPI_FIRSTBIT_MSB;
+	spi_ptr->Init.TIMode = SPI_TIMODE_DISABLED;
+	spi_ptr->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
+	spi_ptr->Init.CRCPolynomial = 10;
 	
-	HAL_SPI_Init(&spi);
+	HAL_SPI_Init(spi_ptr);
 	
 	__GPIOA_CLK_ENABLE();
 
@@ -115,6 +108,24 @@ int main(void)
 	GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
  
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_spi);
+
+
+}
+
+int main(void)
+{
+	
+	SPI_HandleTypeDef spi; 
+	GPIO_InitTypeDef  GPIO_InitStruct_ctrl;
+	
+	int board = get_board_id();
+	
+	HAL_Init();
+	
+	board = get_board_id();
+	
+	init_spi(&spi);
+	
     
 	GPIO_InitStruct_ctrl.Pin  = NRF_CE | SPI_CS;
 	GPIO_InitStruct_ctrl.Mode = GPIO_MODE_OUTPUT_PP;
@@ -126,7 +137,7 @@ int main(void)
 
 	InitializeLibrary(&library);
 
-	library.InitializeDevice(&spi, GPIOA, SPI_CS, NRF_CE, &device);
+	library.InitDevice(&spi, GPIOA, SPI_CS, NRF_CE, &device);
 
 	init_nrf_registers(&library, &device);
 	

@@ -16,7 +16,7 @@ static void _WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8
 
 void InitializeLibrary(NrfLibrary * lib)
 {
-	lib->InitializeDevice = _InitializeDevice;
+	lib->InitDevice = _InitializeDevice;
 	lib->ReadSingleByteRegister = _ReadSingleByteRegister;
 	lib->WriteSingleByteRegister = _WriteSingleByteRegister;
 	lib->ReadMultiBytesRegister = _ReadMultiBytesRegister;
