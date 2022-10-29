@@ -105,7 +105,7 @@ void init_spi(SPI_HandleTypeDef * spi_ptr)
 	GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
 	GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
 	GPIO_InitStruct_spi.Pull      = GPIO_PULLUP;
-	GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
+	GPIO_InitStruct_spi.Speed     = GPIO_SPEED_MEDIUM;
 	GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
  
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_spi);
