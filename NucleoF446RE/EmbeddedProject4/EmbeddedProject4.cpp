@@ -45,6 +45,7 @@ void init_control_pins();
 int get_board_id();
 void sleep_100_uS();
 void send_commands();
+void trap();
 
 // SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
 
@@ -92,7 +93,7 @@ void init_spi(SPI_HandleTypeDef * spi_ptr)
 	spi_ptr->Init.CLKPolarity = SPI_POLARITY_LOW;
 	spi_ptr->Init.CLKPhase = SPI_PHASE_1EDGE;
 	spi_ptr->Init.NSS = SPI_NSS_SOFT; // SPI_NSS_HARD_OUTPUT
-	spi_ptr->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+	spi_ptr->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
 	spi_ptr->Init.FirstBit = SPI_FIRSTBIT_MSB;
 	spi_ptr->Init.TIMode = SPI_TIMODE_DISABLED;
 	spi_ptr->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
@@ -181,9 +182,17 @@ void send_commands()
 	{
 	
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P2, &regval, &status);
+		if (regval != 0xC3) trap();
+		
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
+		if (regval != 0xC4) trap();
+		
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
+		if (regval != 0xC5) trap();
+		
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P5, &regval, &status);
+		if (regval != 0xC6) trap();
+		
 //		library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
 //		library.ReadSingleByteRegister(&device, NrfRegister.EN_AA, &en_aa, &status);
 //		library.ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
@@ -204,7 +213,10 @@ void send_commands()
 	}
 }
 
-
+void trap()
+{
+	;
+}
 void init_nrf_registers(NrfLibrary * lib, NrfSpiDevice * device)
 {	STATUS status;
 
