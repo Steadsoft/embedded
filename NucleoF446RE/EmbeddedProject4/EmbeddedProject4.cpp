@@ -43,7 +43,7 @@ void init_spi(SPI_HandleTypeDef *);
 void init_control_pins();
 
 int get_board_id();
-
+void sleep_100_uS();
 void send_commands();
 
 // SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
@@ -104,7 +104,7 @@ void init_spi(SPI_HandleTypeDef * spi_ptr)
 
 	GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
 	GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
-	GPIO_InitStruct_spi.Pull      = GPIO_PULLUP;
+	GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
 	GPIO_InitStruct_spi.Speed     = GPIO_SPEED_MEDIUM;
 	GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
  
@@ -126,6 +126,14 @@ void init_control_pins()
 
 	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOA, NRF_CE, GPIO_PIN_RESET);
+}
+
+void sleep_100_uS()
+{
+	for (int X = 0; X < 122; X++)
+	{
+		;
+	}
 }
 
 int main(void)
@@ -172,11 +180,11 @@ void send_commands()
 	forever
 	{
 	
-		//library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P2, &regval, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P5, &regval, &status);
+//		library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
 //		library.ReadSingleByteRegister(&device, NrfRegister.EN_AA, &en_aa, &status);
 //		library.ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
 //		library.ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
@@ -190,7 +198,9 @@ void send_commands()
 //		if (regval != 0xC6)
 //			break;
 
-		HAL_Delay(1);
+		sleep_100_uS();
+		
+//		HAL_Delay(1);
 	}
 }
 
