@@ -172,21 +172,23 @@ void send_commands()
 	forever
 	{
 	
+		//library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
+		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P2, &regval, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
-		library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
-		library.ReadSingleByteRegister(&device, NrfRegister.EN_AA, &en_aa, &status);
-		library.ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
-		library.ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
-		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
-		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
-		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P5, &regval, &status);
-		
-		if (regval != 0xC6)
-			break;
+//		library.ReadSingleByteRegister(&device, NrfRegister.EN_AA, &en_aa, &status);
+//		library.ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
+//		library.ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
+//		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+//		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
+//		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+//		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
+//		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+//		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P5, &regval, &status);
+//		
+//		if (regval != 0xC6)
+//			break;
 
 		HAL_Delay(1);
 	}
