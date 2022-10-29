@@ -43,6 +43,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
     <ClCompile>
       <InputLanguage>C</InputLanguage>
+      <CLanguageStandard>GNU17</CLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
