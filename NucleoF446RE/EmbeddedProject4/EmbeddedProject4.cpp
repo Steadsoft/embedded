@@ -40,10 +40,11 @@ void init_peripherals()
 }
 void init_nrf_registers(NrfLibrary * lib, NrfSpiDevice * device);
 void init_spi(SPI_HandleTypeDef *);
+void init_control_pins();
 
 int get_board_id();
 
-void GenerateTestSPISignal();
+void send_commands();
 
 // SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
 
@@ -80,7 +81,7 @@ int get_board_id()
 
 void init_spi(SPI_HandleTypeDef * spi_ptr)
 {
-	GPIO_InitTypeDef  GPIO_InitStruct_spi;
+	GPIO_InitTypeDef  GPIO_InitStruct_spi = { 0 };
 
 	__SPI1_CLK_ENABLE();
 	
@@ -109,31 +110,36 @@ void init_spi(SPI_HandleTypeDef * spi_ptr)
  
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_spi);
 
+}
 
+void init_control_pins()
+{
+	GPIO_InitTypeDef  GPIO_InitStruct_ctrl = { 0 };
+	
+	GPIO_InitStruct_ctrl.Pin  = NRF_CE | SPI_CS;
+	GPIO_InitStruct_ctrl.Mode = GPIO_MODE_OUTPUT_PP;
+
+	GPIO_InitStruct_ctrl.Pull      = GPIO_PULLUP;
+	GPIO_InitStruct_ctrl.Speed     = GPIO_SPEED_HIGH;
+
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_ctrl);
+
+	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, NRF_CE, GPIO_PIN_RESET);
 }
 
 int main(void)
 {
 	
 	SPI_HandleTypeDef spi; 
-	GPIO_InitTypeDef  GPIO_InitStruct_ctrl;
 	
 	int board = get_board_id();
 	
 	HAL_Init();
 	
-	board = get_board_id();
-	
 	init_spi(&spi);
-	
-    
-	GPIO_InitStruct_ctrl.Pin  = NRF_CE | SPI_CS;
-	GPIO_InitStruct_ctrl.Mode = GPIO_MODE_OUTPUT_PP;
 
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_ctrl);
-
-	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA, NRF_CE, GPIO_PIN_RESET);
+	init_control_pins();
 
 	InitializeLibrary(&library);
 
@@ -141,10 +147,10 @@ int main(void)
 
 	init_nrf_registers(&library, &device);
 	
-	GenerateTestSPISignal();
+	send_commands();
 }
 
-void GenerateTestSPISignal()
+void send_commands()
 {
 	
 	
@@ -173,12 +179,14 @@ void GenerateTestSPISignal()
 		library.ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
 		library.ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
 		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		
 		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
 		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		
 		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
 		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P5, &regval, &status);
+		
+		if (regval != 0xC6)
+			break;
 
 		HAL_Delay(1);
 	}
