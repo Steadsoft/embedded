@@ -52,7 +52,12 @@ static void _ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_
 	uint8_t width;
 	uint8_t bytes;
 	
-	_ReadSingleByteRegister(SPI, NrfRegister.SETUP_AW, &width, NrfStatus);
+	*BytesRead = 0;
+	*NrfStatus = (STATUS){ 0 };
+	
+	SPI->callbacks_ptr->SendRecvSingle(SPI, Register, (uint8_t*)(Value), NrfStatus);
+
+	//_ReadSingleByteRegister(SPI, NrfRegister.SETUP_AW, &width, NrfStatus);
 	
 	switch (width)
 	{

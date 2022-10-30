@@ -62,15 +62,20 @@ static nrf24L01_registers NrfRegister =
 };
 
 // This type represents all of the hardware specific items needed by the library.
-typedef struct 
+
+typedef struct NrfIOCallBacks NrfIOCallBacks, * NrfIOCallBacks_ptr;
+typedef struct NrfSpiDevice NrfSpiDevice, * NrfSpiDevice_ptr;
+
+struct NrfSpiDevice
 {
+	NrfIOCallBacks_ptr callbacks_ptr;
 	SPI_HandleTypeDef * spi_ptr;
 	GPIO_TypeDef * gpio_ptr;
 	HAL_StatusTypeDef status;
 	uint8_t cs_pin;
 	uint8_t ce_pin;
 	
-} NrfSpiDevice;
+};
 
 // This is the structure of the nRF24L01's STATUS register.
 typedef struct 
@@ -126,9 +131,16 @@ typedef struct
 
 typedef struct
 {
+	NrfIOCallBacks_ptr ptr;
 	void(* InitDevice)(SPI_HandleTypeDef * SpiPtr, GPIO_TypeDef * GpioPtr, uint8_t CsPin, uint8_t CePin, NrfSpiDevice * Device);
 	void(* ReadSingleByteRegister)(NrfSpiDevice * SPI, uint8_t Register, void * Value, STATUS * NrfStatus);
 	void(* WriteSingleByteRegister)(NrfSpiDevice * SPI, uint8_t Register, void * Value, STATUS * NrfStatus);
 	void(* ReadMultiBytesRegister)(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, STATUS * NrfStatus);
 	void(* WriteMultiBytesRegister)(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, STATUS * NrfStatus);
 } NrfLibrary;
+
+struct NrfIOCallBacks
+{
+	void(* SendRecvSingle)(NrfSpiDevice_ptr device_ptr, uint8_t ByteOut, uint8_t * ByteIn, STATUS * status);
+	void(* SendRecvMultiple)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, STATUS * NrfStatus);
+};
