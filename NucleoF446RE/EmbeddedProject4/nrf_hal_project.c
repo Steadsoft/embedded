@@ -1,11 +1,11 @@
 #include <stm32f4xx_hal.h>
 #include <string.h>
 
-#include <NRF24L01_macros.h>
-#include <NRF24L01_typedefs.h>
-#include <NRF24L01_structs.h>
-#include <NRF24L01_externs.h>
-#include <NRF24L01_calls.h>
+#include <NRF24L01_library.h>
+
+#include <nrf_hal_typedefs.h>
+#include <nrf_hal_structs.h>
+#include <nrf_hal_functions.h>
 
 #define forever for(;;)
 
@@ -26,16 +26,6 @@ void SysTick_Handler(void)
 #define SPI_CS GPIO_PIN_4
 #define NRF_CE GPIO_PIN_1
 
-typedef struct nrf_io_descriptor NrfIoDescriptor, * NrfIoDescriptor_ptr;
-
-struct nrf_io_descriptor
-{
-	SPI_HandleTypeDef * spi_ptr;
-	GPIO_TypeDef * gpio_ptr;
-	HAL_StatusTypeDef status;
-	uint8_t cs_pin;
-	uint8_t ce_pin;
-};
 
 typedef struct
 {
@@ -56,11 +46,6 @@ void sleep_100_uS();
 void send_commands();
 void trap();
 
-static void spi_cs_lo(NrfIoDescriptor_ptr);
-static void spi_cs_hi(NrfIoDescriptor_ptr);
-static void exchange_bytes(NrfIoDescriptor_ptr, uint8_t[], uint8_t[], uint8_t);
-static void read_bytes(NrfIoDescriptor_ptr, uint8_t bytes_in_ptr[], uint8_t count);
-static void write_bytes(NrfIoDescriptor_ptr, uint8_t bytes_out_ptr[], uint8_t count);
 
 // SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
 
@@ -219,19 +204,19 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P5, &regval, &status);
 		if (regval != 0xC6) trap();
 		
-//		library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
-//		library.ReadSingleByteRegister(&device, NrfRegister.EN_AA, &en_aa, &status);
-//		library.ReadSingleByteRegister(&device, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
-//		library.ReadSingleByteRegister(&device, NrfRegister.SETUP_AW, &regval, &status);
-//		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-//		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
-//		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-//		library.WriteMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
-//		library.ReadMultiBytesRegister(&device, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-//		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P5, &regval, &status);
-//		
-//		if (regval != 0xC6)
-//			break;
+		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.CONFIG, &config, &status);
+		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.EN_AA, &en_aa, &status);
+		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
+		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &regval, &status);
+		NrfLibrary.ReadMultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.WriteMultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
+		NrfLibrary.ReadMultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.WriteMultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
+		NrfLibrary.ReadMultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P5, &regval, &status);
+		
+		if (regval != 0xC6)
+			break;
 
 		sleep_100_uS();
 		
@@ -261,25 +246,3 @@ void init_nrf_registers(NrfSpiDevice * device)
 
 }
 
-static void spi_cs_lo(NrfIoDescriptor_ptr ptr)
-{
-	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_RESET);
-}
-static void spi_cs_hi(NrfIoDescriptor_ptr ptr)
-{
-	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_SET);
-}
-static void exchange_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
-{
-	ptr->status = HAL_SPI_TransmitReceive(ptr->spi_ptr, bytes_out_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
-}
-
-static void read_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count)
-{
-	ptr->status = HAL_SPI_Receive(ptr->spi_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
-}
-
-static void write_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count)
-{
-	ptr->status = HAL_SPI_Receive(ptr->spi_ptr, bytes_out_ptr, count, HAL_MAX_DELAY);
-}

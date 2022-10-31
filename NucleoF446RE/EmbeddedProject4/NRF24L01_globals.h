@@ -1,5 +1,5 @@
 /* This file is for consumption only by library code. */
-/* Global items exposed by the NRF library.           */
+/* Global singletons exposed by the NRF library.      */
 
 NrfRegisters NrfRegister =
 { 

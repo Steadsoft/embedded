@@ -36,7 +36,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EmbeddedProject4.cpp">
+    <ClCompile Include="nrf_hal_project.c">
       <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="system_stm32f4xx.c">
@@ -705,9 +705,12 @@
     <ClCompile Include="NRF24L01.c">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="nrf_hal_io.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="NRF24L01_calls.h">
+    <ClInclude Include="NRF24L01_functions.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="NRF24L01_structs.h">
@@ -726,6 +729,18 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="NRF24L01_statics.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="nrf_hal_typedefs.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="nrf_hal_structs.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="nrf_hal_functions.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="NRF24L01_library.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

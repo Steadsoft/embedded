@@ -1,23 +1,13 @@
-#include <stm32f4xx_hal.h>
-
+#include <stdint.h>
 #include <NRF24L01_macros.h>
 #include <NRF24L01_typedefs.h>
 #include <NRF24L01_structs.h>
-#include <NRF24L01_calls.h>
 #include <NRF24L01_statics.h>
 #include <NRF24L01_globals.h>
-
+#include <NRF24L01_functions.h>
 
 // SEE: https://www.mouser.com/datasheet/2/297/nRF24L01_Product_Specification_v2_0-9199.pdf
 
-
-//static void _InitializeDevice(SPI_HandleTypeDef * SpiPtr, GPIO_TypeDef * GpioPtr, uint8_t CsPin, uint8_t CePin, NrfSpiDevice * Device)
-//{
-//	Device->spi_ptr = SpiPtr;
-//	Device->gpio_ptr = GpioPtr;
-//	Device->cs_pin = CsPin;
-//	Device->ce_pin = CePin;
-//}
 static void _ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = R_REGISTER | Register;
@@ -71,6 +61,8 @@ static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Regist
 	uint8_t width;
 	uint8_t bytes;
 	
+	*NrfStatus = (NrfReg_STATUS){ 0 };
+
 	_ReadSingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &width, NrfStatus);
 	
 	switch (width)
