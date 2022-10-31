@@ -16,10 +16,14 @@ void SysTick_Handler(void)
  
 #include <string.h>
 
-#include <NRF24L01_defs.h>
-#include <NRF24L01_types.h>
+#include <NRF24L01_macros.h>
+#include <NRF24L01_typedefs.h>
+#include <NRF24L01_structs.h>
+#include <NRF24L01_externs.h>
 #include <NRF24L01_calls.h>
  
+
+
 // This code works for the Nucleo F446RE board
 
 #define SPI_CS GPIO_PIN_4
@@ -169,10 +173,10 @@ void send_commands()
 	uint8_t BUFFER[5];
 	
 	uint8_t regval;
-	STATUS status;
-	CONFIG config;
-	EN_AA en_aa;
-	EN_RXADDR en_rxaddr;
+	NrfReg_STATUS status;
+	NrfReg_CONFIG config;
+	NrfReg_EN_AA en_aa;
+	NrfReg_EN_RXADDR en_rxaddr;
 	
 	uint8_t multisize;
 	
@@ -218,7 +222,7 @@ void trap()
 	;
 }
 void init_nrf_registers(NrfLibrary * lib, NrfSpiDevice * device)
-{	STATUS status;
+{	NrfReg_STATUS status;
 
 	uint8_t arg = 0;
 	

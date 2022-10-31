@@ -710,10 +710,19 @@
     <ClInclude Include="NRF24L01_calls.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_types.h">
+    <ClInclude Include="NRF24L01_structs.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_defs.h">
+    <ClInclude Include="NRF24L01_macros.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="NRF24L01_typedefs.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="NRF24L01_externs.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="NRF24L01_globals.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

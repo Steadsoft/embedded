@@ -158,8 +158,11 @@
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_usart.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_utils.c" />
     <ClInclude Include="NRF24L01_calls.h" />
-    <ClInclude Include="NRF24L01_defs.h" />
-    <ClInclude Include="NRF24L01_types.h" />
+    <ClInclude Include="NRF24L01_macros.h" />
+    <ClInclude Include="NRF24L01_externs.h" />
+    <ClInclude Include="NRF24L01_globals.h" />
+    <ClInclude Include="NRF24L01_structs.h" />
+    <ClInclude Include="NRF24L01_typedefs.h" />
     <ClInclude Include="stm32f4xx_hal_conf.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc.h" />
