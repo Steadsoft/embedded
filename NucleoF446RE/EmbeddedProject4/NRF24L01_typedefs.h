@@ -1,4 +1,5 @@
 typedef struct nrf_library_calls NrfLibraryCalls, * NrfLibraryCalls_ptr;
+typedef struct nrf_register_calls NrfRegisterCalls, * NrfRegisterCalls_ptr;
 typedef struct nrf_io_interface NrfIoInterface, * NrfIoInterface_ptr;
 typedef struct nrf_io_callbacks NrfIoCallbacks, * NrfIoCallbacks_ptr;
 typedef struct nrf_registers NrfRegisters, * NrfIoRegisters_ptr;

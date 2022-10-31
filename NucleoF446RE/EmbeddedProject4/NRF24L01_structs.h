@@ -94,14 +94,22 @@ struct nrf_reg_EN_RXADDR
 	unsigned int RESERVED : 2;
 
 };
+struct nrf_read_calls
+{
+	void(* SingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* MultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
+};
 
+struct nrf_write_calls
+{
+	void(* SingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* MultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
+};
 struct nrf_library_calls
 {
 	NrfIoCallbacks_ptr ptr;
-	void(* ReadSingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* WriteSingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* ReadMultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
-	void(* WriteMultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
+	struct nrf_read_calls Read;
+	struct nrf_write_calls Write;
 };
 
 struct nrf_io_callbacks

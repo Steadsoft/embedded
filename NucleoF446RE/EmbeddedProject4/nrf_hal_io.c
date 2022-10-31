@@ -10,6 +10,14 @@
 #include <nrf_hal_structs.h>
 #include <nrf_hal_functions.h>
 
+void spi_ce_lo(NrfIoDescriptor_ptr ptr)
+{
+	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->ce_pin, GPIO_PIN_RESET);
+}
+void spi_ce_hi(NrfIoDescriptor_ptr ptr)
+{
+	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->ce_pin, GPIO_PIN_SET);
+}
 void spi_cs_lo(NrfIoDescriptor_ptr ptr)
 {
 	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_RESET);

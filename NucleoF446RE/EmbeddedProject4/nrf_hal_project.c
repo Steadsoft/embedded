@@ -192,28 +192,42 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 	forever
 	{
 	
-		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P2, &regval, &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P2, &regval, &status);
 		if (regval != 0xC3) trap();
 		
-		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P3, &regval, &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P3, &regval, &status);
 		if (regval != 0xC4) trap();
 		
-		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P4, &regval, &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P4, &regval, &status);
 		if (regval != 0xC5) trap();
 		
-		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P5, &regval, &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P5, &regval, &status);
 		if (regval != 0xC6) trap();
 		
-		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.CONFIG, &config, &status);
-		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.EN_AA, &en_aa, &status);
-		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
-		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &regval, &status);
-		NrfLibrary.ReadMultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		NrfLibrary.WriteMultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
-		NrfLibrary.ReadMultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		NrfLibrary.WriteMultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
-		NrfLibrary.ReadMultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P5, &regval, &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.RF_CH, &regval, &status);
+		if (regval != 0x00) trap();
+
+		regval = 8;
+		
+		NrfLibrary.Write.SingleByteRegister(device_ptr, NrfRegister.RF_CH, regval, &status);
+
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.RF_CH, &regval, &status);
+		if (regval != 0x08) trap();
+
+		regval = 0;
+		
+		NrfLibrary.Write.SingleByteRegister(device_ptr, NrfRegister.RF_CH, regval, &status);
+
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.CONFIG, &config, &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.EN_AA, &en_aa, &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &regval, &status);
+		NrfLibrary.Read.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.Write.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
+		NrfLibrary.Read.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.Write.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
+		NrfLibrary.Read.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P5, &regval, &status);
 		
 		if (regval != 0xC6)
 			break;
@@ -233,16 +247,16 @@ void init_nrf_registers(NrfSpiDevice * device)
 
 	uint8_t arg = 0;
 	
-	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.CONFIG, &arg, &status);
-	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.EN_AA, &arg, &status);
-	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.EN_RXADDR, &arg, &status);
-	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.SETUP_RETR, &arg, &status);
-	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.RF_CH, &arg, &status);
-	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.RF_SETUP, &arg, &status);
+	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.CONFIG, arg, &status);
+	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.EN_AA, arg, &status);
+	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.EN_RXADDR, arg, &status);
+	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.SETUP_RETR, arg, &status);
+	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.RF_CH, arg, &status);
+	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.RF_SETUP, arg, &status);
 	
 	arg = 3;
 	
-	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.SETUP_AW, &arg, &status);
+	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.SETUP_AW, &arg, &status);
 
 }
 

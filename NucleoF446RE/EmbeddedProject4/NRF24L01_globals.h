@@ -33,8 +33,14 @@ NrfRegisters NrfRegister =
 
 NrfLibraryCalls NrfLibrary =
 { 
-    .ReadSingleByteRegister = _ReadSingleByteRegister,
-	.WriteSingleByteRegister = _WriteSingleByteRegister,
-	.ReadMultiBytesRegister = _ReadMultiBytesRegister,
-	.WriteMultiBytesRegister = _WriteMultiBytesRegister
+	.Read =
+	{     
+		.SingleByteRegister = _ReadSingleByteRegister,
+		.MultiBytesRegister = _ReadMultiBytesRegister,
+	},
+	.Write = 
+	{ 
+		.SingleByteRegister = _WriteSingleByteRegister,
+		.MultiBytesRegister = _WriteMultiBytesRegister
+	}
 };
