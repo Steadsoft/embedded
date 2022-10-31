@@ -35,7 +35,7 @@ struct nrf_registers
 
 struct nrf_spi_device
 {
-	NrfIOCallBacks_ptr callbacks_ptr;
+	NrfIoCallbacks_ptr callbacks_ptr;
 	SPI_HandleTypeDef * spi_ptr;
 	GPIO_TypeDef * gpio_ptr;
 	HAL_StatusTypeDef status;
@@ -96,18 +96,18 @@ struct nrf_reg_EN_RXADDR
 
 };
 
-typedef struct
+struct nrf_library
 {
-	NrfIOCallBacks_ptr ptr;
+	NrfIoCallbacks_ptr ptr;
 	void(* InitDevice)(SPI_HandleTypeDef * SpiPtr, GPIO_TypeDef * GpioPtr, uint8_t CsPin, uint8_t CePin, NrfSpiDevice * Device);
 	void(* ReadSingleByteRegister)(NrfSpiDevice * SPI, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* WriteSingleByteRegister)(NrfSpiDevice * SPI, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* ReadMultiBytesRegister)(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
 	void(* WriteMultiBytesRegister)(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
-} NrfLibrary;
+};
 
-struct NrfIOCallBacks
+struct nrf_io_callbacks
 {
-	void(* SendRecvSingle)(NrfSpiDevice_ptr device_ptr, uint8_t ByteOut, uint8_t * ByteIn, STATUS * status);
-	void(* SendRecvMultiple)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, STATUS * NrfStatus);
+	void(* SendRecvSingle)(NrfSpiDevice_ptr device_ptr, uint8_t ByteOut, uint8_t * ByteIn, NrfReg_STATUS_ptr status);
+	void(* SendRecvMultiple)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
 };

@@ -22,8 +22,6 @@ void SysTick_Handler(void)
 #include <NRF24L01_externs.h>
 #include <NRF24L01_calls.h>
  
-
-
 // This code works for the Nucleo F446RE board
 
 #define SPI_CS GPIO_PIN_4

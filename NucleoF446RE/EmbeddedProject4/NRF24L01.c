@@ -56,7 +56,7 @@ static void _ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_
 	uint8_t bytes;
 	
 	*BytesRead = 0;
-	*NrfStatus = (STATUS){ 0 };
+	*NrfStatus = (NrfReg_STATUS){ 0 };
 	
 	SPI->callbacks_ptr->SendRecvSingle(SPI, Register, (uint8_t*)(Value), NrfStatus);
 
