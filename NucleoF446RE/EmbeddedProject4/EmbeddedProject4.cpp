@@ -1,4 +1,11 @@
 #include <stm32f4xx_hal.h>
+#include <string.h>
+
+#include <NRF24L01_macros.h>
+#include <NRF24L01_typedefs.h>
+#include <NRF24L01_structs.h>
+#include <NRF24L01_externs.h>
+#include <NRF24L01_calls.h>
 
 #define forever for(;;)
 
@@ -14,20 +21,12 @@ void SysTick_Handler(void)
 	HAL_SYSTICK_IRQHandler();
 }
  
-#include <string.h>
-
-#include <NRF24L01_macros.h>
-#include <NRF24L01_typedefs.h>
-#include <NRF24L01_structs.h>
-#include <NRF24L01_externs.h>
-#include <NRF24L01_calls.h>
  
 // This code works for the Nucleo F446RE board
 
 #define SPI_CS GPIO_PIN_4
 #define NRF_CE GPIO_PIN_1
 
-NrfLibrary library;
 NrfSpiDevice device; 
 
 typedef struct
@@ -40,7 +39,7 @@ void init_peripherals()
 {
 	
 }
-void init_nrf_registers(NrfLibrary * lib, NrfSpiDevice * device);
+void init_nrf_registers(NrfSpiDevice * device);
 void init_spi(SPI_HandleTypeDef *);
 void init_control_pins();
 
@@ -152,11 +151,9 @@ int main(void)
 
 	init_control_pins();
 
-	InitializeLibrary(&library);
+	NrfLibrary.InitDevice(&spi, GPIOA, SPI_CS, NRF_CE, &device);
 
-	library.InitDevice(&spi, GPIOA, SPI_CS, NRF_CE, &device);
-
-	init_nrf_registers(&library, &device);
+	init_nrf_registers(&device);
 	
 	send_commands();
 }
@@ -183,16 +180,16 @@ void send_commands()
 	forever
 	{
 	
-		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P2, &regval, &status);
+		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P2, &regval, &status);
 		if (regval != 0xC3) trap();
 		
-		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
+		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
 		if (regval != 0xC4) trap();
 		
-		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
+		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
 		if (regval != 0xC5) trap();
 		
-		library.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P5, &regval, &status);
+		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P5, &regval, &status);
 		if (regval != 0xC6) trap();
 		
 //		library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
@@ -219,20 +216,20 @@ void trap()
 {
 	;
 }
-void init_nrf_registers(NrfLibrary * lib, NrfSpiDevice * device)
+void init_nrf_registers(NrfSpiDevice * device)
 {	NrfReg_STATUS status;
 
 	uint8_t arg = 0;
 	
-	lib->WriteSingleByteRegister(device, NrfRegister.CONFIG, &arg, &status);
-	lib->WriteSingleByteRegister(device, NrfRegister.EN_AA, &arg, &status);
-	lib->WriteSingleByteRegister(device, NrfRegister.EN_RXADDR, &arg, &status);
-	lib->WriteSingleByteRegister(device, NrfRegister.SETUP_RETR, &arg, &status);
-	lib->WriteSingleByteRegister(device, NrfRegister.RF_CH, &arg, &status);
-	lib->WriteSingleByteRegister(device, NrfRegister.RF_SETUP, &arg, &status);
+	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.CONFIG, &arg, &status);
+	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.EN_AA, &arg, &status);
+	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.EN_RXADDR, &arg, &status);
+	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.SETUP_RETR, &arg, &status);
+	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.RF_CH, &arg, &status);
+	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.RF_SETUP, &arg, &status);
 	
 	arg = 3;
 	
-	lib->WriteSingleByteRegister(device, NrfRegister.SETUP_AW, &arg, &status);
+	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.SETUP_AW, &arg, &status);
 
 }

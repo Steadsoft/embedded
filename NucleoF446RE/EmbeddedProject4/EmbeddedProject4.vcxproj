@@ -161,6 +161,7 @@
     <ClInclude Include="NRF24L01_macros.h" />
     <ClInclude Include="NRF24L01_externs.h" />
     <ClInclude Include="NRF24L01_globals.h" />
+    <ClInclude Include="NRF24L01_statics.h" />
     <ClInclude Include="NRF24L01_structs.h" />
     <ClInclude Include="NRF24L01_typedefs.h" />
     <ClInclude Include="stm32f4xx_hal_conf.h" />

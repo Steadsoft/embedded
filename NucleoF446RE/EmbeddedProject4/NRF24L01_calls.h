@@ -1,1 +1,1 @@
-void InitializeLibrary(NrfLibrary * lib);
+void InitializeLibrary(NrfLibraryCalls * lib);

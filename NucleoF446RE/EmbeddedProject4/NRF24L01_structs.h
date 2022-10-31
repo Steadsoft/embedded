@@ -96,7 +96,7 @@ struct nrf_reg_EN_RXADDR
 
 };
 
-struct nrf_library
+struct nrf_library_calls
 {
 	NrfIoCallbacks_ptr ptr;
 	void(* InitDevice)(SPI_HandleTypeDef * SpiPtr, GPIO_TypeDef * GpioPtr, uint8_t CsPin, uint8_t CePin, NrfSpiDevice * Device);

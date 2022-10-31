@@ -1,3 +1,6 @@
+/* This file is for consumption only by library code. */
+/* Global items exposed by the NRF library.           */
+
 NrfRegisters NrfRegister =
 { 
 	.CONFIG = 0x00,
@@ -25,5 +28,14 @@ NrfRegisters NrfRegister =
 	.RX_PW_P5 = 0x16,
 	.FIFO_STATUS = 0x17,
 	.DYNPD = 0x1C,
-	.FEATURE = 0x1D,
+	.FEATURE = 0x1D
+};
+
+NrfLibraryCalls NrfLibrary =
+{ 
+	.InitDevice = _InitializeDevice,
+    .ReadSingleByteRegister = _ReadSingleByteRegister,
+	.WriteSingleByteRegister = _WriteSingleByteRegister,
+	.ReadMultiBytesRegister = _ReadMultiBytesRegister,
+	.WriteMultiBytesRegister = _WriteMultiBytesRegister
 };

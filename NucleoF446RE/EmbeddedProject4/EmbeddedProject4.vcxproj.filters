@@ -725,5 +725,8 @@
     <ClInclude Include="NRF24L01_globals.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="NRF24L01_statics.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
