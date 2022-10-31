@@ -11,30 +11,30 @@
 // SEE: https://www.mouser.com/datasheet/2/297/nRF24L01_Product_Specification_v2_0-9199.pdf
 
 
-static void _InitializeDevice(SPI_HandleTypeDef * SpiPtr, GPIO_TypeDef * GpioPtr, uint8_t CsPin, uint8_t CePin, NrfSpiDevice * Device)
-{
-	Device->spi_ptr = SpiPtr;
-	Device->gpio_ptr = GpioPtr;
-	Device->cs_pin = CsPin;
-	Device->ce_pin = CePin;
-}
-static void _ReadSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus)
+//static void _InitializeDevice(SPI_HandleTypeDef * SpiPtr, GPIO_TypeDef * GpioPtr, uint8_t CsPin, uint8_t CePin, NrfSpiDevice * Device)
+//{
+//	Device->spi_ptr = SpiPtr;
+//	Device->gpio_ptr = GpioPtr;
+//	Device->cs_pin = CsPin;
+//	Device->ce_pin = CePin;
+//}
+static void _ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = R_REGISTER | Register;
-	spi_cs_lo(SPI);
-	SPI->status = HAL_SPI_TransmitReceive(SPI->spi_ptr, &command, (uint8_t*)NrfStatus, 1, HAL_MAX_DELAY);
-	SPI->status = HAL_SPI_Receive(SPI->spi_ptr, Value, 1, HAL_MAX_DELAY);
-	spi_cs_hi(SPI);
+	
+	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
+	device_ptr->ReadBytes(device_ptr->io_ptr, Value, 1);
+	device_ptr->DeselectDevice(device_ptr->io_ptr);
 }
-static void _WriteSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus)
+static void _WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = W_REGISTER | Register;
-	spi_cs_lo(SPI);
-	SPI->status = HAL_SPI_TransmitReceive(SPI->spi_ptr, &command, (uint8_t*)NrfStatus, 1, HAL_MAX_DELAY);
-	SPI->status = HAL_SPI_Transmit(SPI->spi_ptr, Value, 1, HAL_MAX_DELAY);
-	spi_cs_hi(SPI);
+	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
+	device_ptr->DeselectDevice(device_ptr->io_ptr);
 }
-static void _ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus)
+static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = R_REGISTER | Register;
 	uint8_t width;
@@ -42,10 +42,8 @@ static void _ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_
 	
 	*BytesRead = 0;
 	*NrfStatus = (NrfReg_STATUS){ 0 };
-	
-	SPI->callbacks_ptr->SendRecvSingle(SPI, Register, (uint8_t*)(Value), NrfStatus);
 
-	//_ReadSingleByteRegister(SPI, NrfRegister.SETUP_AW, &width, NrfStatus);
+	_ReadSingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &width, NrfStatus);
 	
 	switch (width)
 	{
@@ -62,18 +60,18 @@ static void _ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_
 	
 	*BytesRead = bytes;
 	
-	spi_cs_lo(SPI);
-	SPI->status = HAL_SPI_TransmitReceive(SPI->spi_ptr, &command, (uint8_t*)NrfStatus, 1, HAL_MAX_DELAY);
-	SPI->status = HAL_SPI_Receive(SPI->spi_ptr, Value, bytes, HAL_MAX_DELAY);
-	spi_cs_hi(SPI);
+	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus,1);
+	device_ptr->ReadBytes(device_ptr->io_ptr, Value, bytes);
+	device_ptr->DeselectDevice(device_ptr->io_ptr);
 }
-static void _WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus)
+static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = W_REGISTER | Register;
 	uint8_t width;
 	uint8_t bytes;
 	
-	_ReadSingleByteRegister(SPI, NrfRegister.SETUP_AW, &width, NrfStatus);
+	_ReadSingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &width, NrfStatus);
 	
 	switch (width)
 	{
@@ -90,16 +88,8 @@ static void _WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8
 	
 	*BytesWritten = bytes;
 	
-	spi_cs_lo(SPI);
-	SPI->status = HAL_SPI_TransmitReceive(SPI->spi_ptr, &command, (uint8_t*)NrfStatus, 1, HAL_MAX_DELAY);
-	SPI->status = HAL_SPI_Transmit(SPI->spi_ptr, Value, bytes, HAL_MAX_DELAY);
-	spi_cs_hi(SPI);
-}
-static void spi_cs_lo(NrfSpiDevice * SPI)
-{
-	HAL_GPIO_WritePin(SPI->gpio_ptr, SPI->cs_pin, GPIO_PIN_RESET);
-}
-static void spi_cs_hi(NrfSpiDevice * SPI)
-{
-	HAL_GPIO_WritePin(SPI->gpio_ptr, SPI->cs_pin, GPIO_PIN_SET);
+	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
+	device_ptr->WriteBytes(device_ptr->io_ptr, Value, bytes);
+	device_ptr->DeselectDevice(device_ptr->io_ptr);
 }

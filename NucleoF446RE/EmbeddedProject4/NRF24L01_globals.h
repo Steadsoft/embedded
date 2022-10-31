@@ -33,7 +33,6 @@ NrfRegisters NrfRegister =
 
 NrfLibraryCalls NrfLibrary =
 { 
-	.InitDevice = _InitializeDevice,
     .ReadSingleByteRegister = _ReadSingleByteRegister,
 	.WriteSingleByteRegister = _WriteSingleByteRegister,
 	.ReadMultiBytesRegister = _ReadMultiBytesRegister,

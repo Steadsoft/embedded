@@ -21,13 +21,21 @@ void SysTick_Handler(void)
 	HAL_SYSTICK_IRQHandler();
 }
  
- 
 // This code works for the Nucleo F446RE board
 
 #define SPI_CS GPIO_PIN_4
 #define NRF_CE GPIO_PIN_1
 
-NrfSpiDevice device; 
+typedef struct nrf_io_descriptor NrfIoDescriptor, * NrfIoDescriptor_ptr;
+
+struct nrf_io_descriptor
+{
+	SPI_HandleTypeDef * spi_ptr;
+	GPIO_TypeDef * gpio_ptr;
+	HAL_StatusTypeDef status;
+	uint8_t cs_pin;
+	uint8_t ce_pin;
+};
 
 typedef struct
 {
@@ -47,6 +55,12 @@ int get_board_id();
 void sleep_100_uS();
 void send_commands();
 void trap();
+
+static void spi_cs_lo(NrfIoDescriptor_ptr);
+static void spi_cs_hi(NrfIoDescriptor_ptr);
+static void exchange_bytes(NrfIoDescriptor_ptr, uint8_t[], uint8_t[], uint8_t);
+static void read_bytes(NrfIoDescriptor_ptr, uint8_t bytes_in_ptr[], uint8_t count);
+static void write_bytes(NrfIoDescriptor_ptr, uint8_t bytes_out_ptr[], uint8_t count);
 
 // SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
 
@@ -143,6 +157,9 @@ int main(void)
 	
 	SPI_HandleTypeDef spi; 
 	
+	NrfSpiDevice device; 
+	NrfIoDescriptor descriptor;
+	
 	int board = get_board_id();
 	
 	HAL_Init();
@@ -150,15 +167,25 @@ int main(void)
 	init_spi(&spi);
 
 	init_control_pins();
-
-	NrfLibrary.InitDevice(&spi, GPIOA, SPI_CS, NRF_CE, &device);
-
+	
+	descriptor.spi_ptr = &spi;
+	descriptor.gpio_ptr = GPIOA;
+	descriptor.ce_pin = NRF_CE;
+	descriptor.cs_pin = SPI_CS;
+	
+	device.io_ptr = &descriptor;
+	device.SelectDevice = spi_cs_lo;
+	device.DeselectDevice = spi_cs_hi;
+	device.ExchangeBytes = exchange_bytes;
+	device.ReadBytes = read_bytes;
+	device.WriteBytes = write_bytes;
+	
 	init_nrf_registers(&device);
 	
-	send_commands();
+	send_commands(&device);
 }
 
-void send_commands()
+void send_commands(NrfSpiDevice_ptr device_ptr)
 {
 	
 	
@@ -180,16 +207,16 @@ void send_commands()
 	forever
 	{
 	
-		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P2, &regval, &status);
+		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P2, &regval, &status);
 		if (regval != 0xC3) trap();
 		
-		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P3, &regval, &status);
+		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P3, &regval, &status);
 		if (regval != 0xC4) trap();
 		
-		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P4, &regval, &status);
+		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P4, &regval, &status);
 		if (regval != 0xC5) trap();
 		
-		NrfLibrary.ReadSingleByteRegister(&device, NrfRegister.RX_ADDR_P5, &regval, &status);
+		NrfLibrary.ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P5, &regval, &status);
 		if (regval != 0xC6) trap();
 		
 //		library.ReadSingleByteRegister(&device, NrfRegister.CONFIG, &config, &status);
@@ -232,4 +259,27 @@ void init_nrf_registers(NrfSpiDevice * device)
 	
 	NrfLibrary.WriteSingleByteRegister(device, NrfRegister.SETUP_AW, &arg, &status);
 
+}
+
+static void spi_cs_lo(NrfIoDescriptor_ptr ptr)
+{
+	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_RESET);
+}
+static void spi_cs_hi(NrfIoDescriptor_ptr ptr)
+{
+	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_SET);
+}
+static void exchange_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
+{
+	ptr->status = HAL_SPI_TransmitReceive(ptr->spi_ptr, bytes_out_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
+}
+
+static void read_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count)
+{
+	ptr->status = HAL_SPI_Receive(ptr->spi_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
+}
+
+static void write_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count)
+{
+	ptr->status = HAL_SPI_Receive(ptr->spi_ptr, bytes_out_ptr, count, HAL_MAX_DELAY);
 }

@@ -35,13 +35,12 @@ struct nrf_registers
 
 struct nrf_spi_device
 {
-	NrfIoCallbacks_ptr callbacks_ptr;
-	SPI_HandleTypeDef * spi_ptr;
-	GPIO_TypeDef * gpio_ptr;
-	HAL_StatusTypeDef status;
-	uint8_t cs_pin;
-	uint8_t ce_pin;
-	
+	void(* ReadBytes)(void * io_ptr, uint8_t BytesIn[], uint8_t BytesToRead);
+	void(* WriteBytes)(void * io_ptr, uint8_t BytesOut[], uint8_t BytesToWrite);
+	void(* ExchangeBytes)(void * io_ptr, uint8_t BytesOut[], uint8_t BytesIn[], uint8_t Count);
+	void(* SelectDevice)(void * io_ptr);
+	void(* DeselectDevice)(void * io_ptr);
+	void * io_ptr;
 };
 
 // This is the structure of the nRF24L01's STATUS register.
@@ -99,15 +98,13 @@ struct nrf_reg_EN_RXADDR
 struct nrf_library_calls
 {
 	NrfIoCallbacks_ptr ptr;
-	void(* InitDevice)(SPI_HandleTypeDef * SpiPtr, GPIO_TypeDef * GpioPtr, uint8_t CsPin, uint8_t CePin, NrfSpiDevice * Device);
-	void(* ReadSingleByteRegister)(NrfSpiDevice * SPI, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* WriteSingleByteRegister)(NrfSpiDevice * SPI, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* ReadMultiBytesRegister)(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
-	void(* WriteMultiBytesRegister)(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
+	void(* ReadSingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* WriteSingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, void * Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* ReadMultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
+	void(* WriteMultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
 };
 
 struct nrf_io_callbacks
 {
-	void(* SendRecvSingle)(NrfSpiDevice_ptr device_ptr, uint8_t ByteOut, uint8_t * ByteIn, NrfReg_STATUS_ptr status);
-	void(* SendRecvMultiple)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
+
 };
