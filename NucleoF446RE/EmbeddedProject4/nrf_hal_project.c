@@ -140,6 +140,8 @@ void sleep_100_uS()
 int main(void)
 {
 	
+	NrfReg_EN_RXADDR reg = { 0 };
+	
 	SPI_HandleTypeDef spi; 
 	
 	NrfSpiDevice device; 
@@ -208,12 +210,14 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.RF_CH, &regval, &status);
 		if (regval != 0x00) trap();
 
-		regval = 8;
+		regval = 23;
 		
 		NrfLibrary.Write.SingleByteRegister(device_ptr, NrfRegister.RF_CH, regval, &status);
 
 		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.RF_CH, &regval, &status);
-		if (regval != 0x08) trap();
+//		if (regval != 0x08) trap();
+		
+		rfchan.fields.RF_CH = 12;
 		
 		NrfLibrary.Read.RFChannelRegister(device_ptr, &rfchan, &status);
 
@@ -221,9 +225,9 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 		
 		NrfLibrary.Write.SingleByteRegister(device_ptr, NrfRegister.RF_CH, regval, &status);
 
-		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.CONFIG, &config, &status);
-		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.EN_AA, &en_aa, &status);
-		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.EN_RXADDR, &en_rxaddr, &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.CONFIG, &(config.value), &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.EN_AA, &(en_aa.value), &status);
+		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.EN_RXADDR, &(en_rxaddr.value), &status);
 		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &regval, &status);
 		NrfLibrary.Read.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
 		NrfLibrary.Write.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);

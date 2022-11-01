@@ -7,7 +7,12 @@
 
 static void _ReadRFChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.RF_CH, (uint8_t*)(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, NrfRegister.RF_CH, &(Value->value), NrfStatus);
+}
+
+static void _WriteRFChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	_WriteSingleByteRegister(device_ptr, NrfRegister.RF_CH, Value.value, NrfStatus);
 }
 
 static void _ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus)

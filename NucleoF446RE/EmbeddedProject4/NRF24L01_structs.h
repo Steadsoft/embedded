@@ -45,61 +45,85 @@ struct nrf_spi_device
 };
 
 // This is the structure of the nRF24L01's STATUS register.
-struct nrf_reg_status
-{
-	unsigned int TX_FULL : 1;
-	unsigned int RX_P_NO : 3;
-	unsigned int MAX_RT : 1;
-	unsigned int TX_DS : 1;
-	unsigned int RX_DR : 1;
-	unsigned int RESERVED : 1;
 
-} ;
+union nrf_reg_STATUS_union
+{
+	uint8_t value;
+	struct 
+	{
+		unsigned int TX_FULL : 1;
+		unsigned int RX_P_NO : 3;
+		unsigned int MAX_RT : 1;
+		unsigned int TX_DS : 1;
+		unsigned int RX_DR : 1;
+		unsigned int RESERVED : 1;
+
+	} fields;
+};
 
 // This is the structure of the nRF24L01's CONFIG register.
-struct nrf_reg_config
-{
-	unsigned int PRIM_RX : 1;
-	unsigned int PWR_UP : 1;
-	unsigned int CRCO : 1;
-	unsigned int EN_CRC : 1;
-	unsigned int MASK_MAX_RT : 1;
-	unsigned int MASK_TX_DS : 1;
-	unsigned int MASK_RX_DR : 1;
-	unsigned int RESERVED : 1;
 
+union nrf_reg_CONFIG_union
+{
+	uint8_t value;
+	struct 
+	{
+		unsigned int PRIM_RX : 1;
+		unsigned int PWR_UP : 1;
+		unsigned int CRCO : 1;
+		unsigned int EN_CRC : 1;
+		unsigned int MASK_MAX_RT : 1;
+		unsigned int MASK_TX_DS : 1;
+		unsigned int MASK_RX_DR : 1;
+		unsigned int RESERVED : 1;
+
+	} fields;
 };
 
 // This is the structure of the nRF24L01's EN_AA register.
-struct nrf_reg_EN_AA
+union nrf_reg_EN_AA_union
 {
-	unsigned int ENAA_P0 : 1;
-	unsigned int ENAA_P1 : 1;
-	unsigned int ENAA_P2 : 1;
-	unsigned int ENAA_P3 : 1;
-	unsigned int ENAA_P4 : 1;
-	unsigned int ENAA_P5 : 1;
-	unsigned int RESERVED : 2;
+	uint8_t value;
 
+	struct 
+	{
+		unsigned int ENAA_P0 : 1;
+		unsigned int ENAA_P1 : 1;
+		unsigned int ENAA_P2 : 1;
+		unsigned int ENAA_P3 : 1;
+		unsigned int ENAA_P4 : 1;
+		unsigned int ENAA_P5 : 1;
+		unsigned int RESERVED : 2;
+
+	} fields;
 };
 
 // This is the structure of the nRF24L01's EN_RXADDR register.
-struct nrf_reg_EN_RXADDR
-{
-	unsigned int ERX_P0 : 1;
-	unsigned int ERX_P1 : 1;
-	unsigned int ERX_P2 : 1;
-	unsigned int ERX_P3 : 1;
-	unsigned int ERX_P4 : 1;
-	unsigned int ERX_P5 : 1;
-	unsigned int RESERVED : 2;
 
+union nrf_reg_EN_RXADDR_union
+{
+	uint8_t value;
+	struct 
+	{
+		unsigned int ERX_P0 : 1;
+		unsigned int ERX_P1 : 1;
+		unsigned int ERX_P2 : 1;
+		unsigned int ERX_P3 : 1;
+		unsigned int ERX_P4 : 1;
+		unsigned int ERX_P5 : 1;
+		unsigned int RESERVED : 2;
+
+	} fields;
 };
 
-struct nrf_reg_RF_CH
+union nrf_reg_RF_CH_union
 {
-	unsigned int RF_CH : 7;
-	unsigned int RESERVED : 1;
+	uint8_t value;
+	struct 
+	{
+		unsigned int RF_CH : 7;
+		unsigned int RESERVED : 1;
+	} fields;
 };
 struct nrf_read_calls
 {
@@ -113,6 +137,7 @@ struct nrf_write_calls
 {
 	void(* SingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* MultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
+	void(* RFChannelRegister)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_STATUS_ptr NrfStatus);
 };
 struct nrf_library_calls
 {
