@@ -38,10 +38,18 @@ NrfLibraryCalls NrfLibrary =
 		.SingleByteRegister = _ReadSingleByteRegister,
 		.MultiBytesRegister = _ReadMultiBytesRegister,
 		.RFChannelRegister = _ReadRFChannelRegister,
+		.RfSetupRegister = _ReadRfSetupRegister,
+		.ConfigRegister = _ReadConfigRegister,
+		.EnRxAddrRegister = _ReadEnRxAddrRegister,
+		
 	},
 	.Write = 
 	{ 
 		.SingleByteRegister = _WriteSingleByteRegister,
-		.MultiBytesRegister = _WriteMultiBytesRegister
+		.MultiBytesRegister = _WriteMultiBytesRegister,
+		.RFChannelRegister = _WriteRFChannelRegister,
+		.RfSetupRegister = _WriteRfSetupRegister,
+		.ConfigRegister = _WriteConfigRegister,
+		.EnRxAddrRegister = _WriteEnRxAddrRegister,
 	}
 };

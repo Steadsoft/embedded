@@ -68,14 +68,14 @@ union nrf_reg_CONFIG_union
 	uint8_t value;
 	struct 
 	{
-		unsigned int PRIM_RX : 1;
-		unsigned int PWR_UP : 1;
-		unsigned int CRCO : 1;
-		unsigned int EN_CRC : 1;
-		unsigned int MASK_MAX_RT : 1;
-		unsigned int MASK_TX_DS : 1;
-		unsigned int MASK_RX_DR : 1;
-		unsigned int RESERVED : 1;
+		uint8_t PRIM_RX : 1;
+		uint8_t PWR_UP : 1;
+		uint8_t CRCO : 1;
+		uint8_t EN_CRC : 1;
+		uint8_t MASK_MAX_RT : 1;
+		uint8_t MASK_TX_DS : 1;
+		uint8_t MASK_RX_DR : 1;
+		uint8_t RESERVED : 1;
 
 	} fields;
 };
@@ -87,13 +87,13 @@ union nrf_reg_EN_AA_union
 
 	struct 
 	{
-		unsigned int ENAA_P0 : 1;
-		unsigned int ENAA_P1 : 1;
-		unsigned int ENAA_P2 : 1;
-		unsigned int ENAA_P3 : 1;
-		unsigned int ENAA_P4 : 1;
-		unsigned int ENAA_P5 : 1;
-		unsigned int RESERVED : 2;
+		uint8_t ENAA_P0 : 1;
+		uint8_t ENAA_P1 : 1;
+		uint8_t ENAA_P2 : 1;
+		uint8_t ENAA_P3 : 1;
+		uint8_t ENAA_P4 : 1;
+		uint8_t ENAA_P5 : 1;
+		uint8_t RESERVED : 2;
 
 	} fields;
 };
@@ -105,13 +105,13 @@ union nrf_reg_EN_RXADDR_union
 	uint8_t value;
 	struct 
 	{
-		unsigned int ERX_P0 : 1;
-		unsigned int ERX_P1 : 1;
-		unsigned int ERX_P2 : 1;
-		unsigned int ERX_P3 : 1;
-		unsigned int ERX_P4 : 1;
-		unsigned int ERX_P5 : 1;
-		unsigned int RESERVED : 2;
+		uint8_t ERX_P0 : 1;
+		uint8_t ERX_P1 : 1;
+		uint8_t ERX_P2 : 1;
+		uint8_t ERX_P3 : 1;
+		uint8_t ERX_P4 : 1;
+		uint8_t ERX_P5 : 1;
+		uint8_t RESERVED : 2;
 
 	} fields;
 };
@@ -121,8 +121,32 @@ union nrf_reg_RF_CH_union
 	uint8_t value;
 	struct 
 	{
-		unsigned int RF_CH : 7;
-		unsigned int RESERVED : 1;
+		uint8_t RF_CH : 7;
+		uint8_t RESERVED : 1;
+	} fields;
+};
+
+union nrf_reg_SETUP_RETR_union
+{
+	uint8_t value;
+	struct 
+	{
+		uint8_t ARC : 4;
+		uint8_t ARD : 4;
+	} fields;
+
+};
+
+union nrf_reg_RF_SETUP_union
+{
+	uint8_t value;
+	struct
+	{
+		unsigned long LNA_HCURR : 1;
+		unsigned long RF_PWR : 2;
+		unsigned long RF_DR : 1;
+		unsigned long PLL_LOCK : 1;
+		unsigned long RESERVED : 3;
 	} fields;
 };
 struct nrf_read_calls
@@ -130,7 +154,9 @@ struct nrf_read_calls
 	void(* SingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* MultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
 	void(* RFChannelRegister)(NrfSpiDevice_ptr device_ptr,  NrfReg_RF_CH_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-
+	void(* RfSetupRegister)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* EnRxAddrRegister)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* ConfigRegister)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 };
 
 struct nrf_write_calls
@@ -138,6 +164,9 @@ struct nrf_write_calls
 	void(* SingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* MultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
 	void(* RFChannelRegister)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RfSetupRegister)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* EnRxAddrRegister)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* ConfigRegister)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
 };
 struct nrf_library_calls
 {

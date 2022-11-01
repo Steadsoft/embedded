@@ -16,3 +16,5 @@ typedef union nrf_reg_CONFIG_union NrfReg_CONFIG, * NrfReg_CONFIG_ptr;
 typedef union nrf_reg_RF_CH_union NrfReg_RF_CH, * NrfReg_RF_CH_ptr;
 typedef union nrf_reg_EN_AA_union NrfReg_EN_AA, * NrfReg_EN_AA_ptr;
 typedef union nrf_reg_EN_RXADDR_union NrfReg_EN_RXADDR, * NrfReg_EN_RXADDR_ptr;
+typedef union nrf_reg_SETUP_RETR_union NrfReg_SETUP_RETR, * NrfReg_SETUP_RETR_ptr;
+typedef union nrf_reg_RF_SETUP_union NrfReg_RF_SETUP, * NrfReg_RF_SETUP_ptr;

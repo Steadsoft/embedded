@@ -26,6 +26,18 @@ void SysTick_Handler(void)
 #define SPI_CS GPIO_PIN_4
 #define NRF_CE GPIO_PIN_1
 
+struct bits
+{
+	unsigned int B0 : 1;
+	unsigned int B1 : 1;
+	unsigned int B2 : 1;
+	unsigned int B3 : 1;
+	unsigned int B4 : 1;
+	unsigned int B5 : 1;
+	unsigned int B6 : 2;
+
+};
+
 
 typedef struct
 {
@@ -140,6 +152,8 @@ void sleep_100_uS()
 int main(void)
 {
 	
+	struct bits data = { 0 };
+	
 	NrfReg_EN_RXADDR reg = { 0 };
 	
 	SPI_HandleTypeDef spi; 
@@ -187,6 +201,7 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 	NrfReg_EN_AA en_aa;
 	NrfReg_EN_RXADDR en_rxaddr;
 	NrfReg_RF_CH rfchan;
+	NrfReg_RF_SETUP rf = { 0 };
 	
 	uint8_t multisize;
 	
@@ -194,7 +209,15 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 	
 	forever
 	{
+		rf.fields.PLL_LOCK = 1;
+		rf.fields.RF_PWR = 2;
 	
+		//NrfLibrary.Write.RfSetupRegister(device_ptr, rf, &status);
+
+		rf.value = 0;
+		
+		NrfLibrary.Read.RfSetupRegister(device_ptr, &rf, &status);
+		
 		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P2, &regval, &status);
 		if (regval != 0xC3) trap();
 		
@@ -220,7 +243,7 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 		rfchan.fields.RF_CH = 12;
 		
 		NrfLibrary.Read.RFChannelRegister(device_ptr, &rfchan, &status);
-
+		
 		regval = 0;
 		
 		NrfLibrary.Write.SingleByteRegister(device_ptr, NrfRegister.RF_CH, regval, &status);
@@ -259,7 +282,7 @@ void init_nrf_registers(NrfSpiDevice * device)
 	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.EN_RXADDR, arg, &status);
 	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.SETUP_RETR, arg, &status);
 	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.RF_CH, arg, &status);
-	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.RF_SETUP, arg, &status);
+	//NrfLibrary.Write.SingleByteRegister(device, NrfRegister.RF_SETUP, arg, &status);
 	
 	arg = 3;
 	
