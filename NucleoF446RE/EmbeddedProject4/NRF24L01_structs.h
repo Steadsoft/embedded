@@ -1,4 +1,5 @@
-
+/* Note, all bitfield structs are lexically ordered with */
+/* the MSB at the bottom and the LSB at the top.         */
 struct nrf_registers
 {
 	uint8_t CONFIG;
@@ -94,10 +95,18 @@ struct nrf_reg_EN_RXADDR
 	unsigned int RESERVED : 2;
 
 };
+
+struct nrf_reg_RF_CH
+{
+	unsigned int RF_CH : 7;
+	unsigned int RESERVED : 1;
+};
 struct nrf_read_calls
 {
 	void(* SingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* MultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
+	void(* RFChannelRegister)(NrfSpiDevice_ptr device_ptr,  NrfReg_RF_CH_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+
 };
 
 struct nrf_write_calls

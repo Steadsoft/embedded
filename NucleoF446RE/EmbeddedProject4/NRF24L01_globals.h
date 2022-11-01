@@ -37,6 +37,7 @@ NrfLibraryCalls NrfLibrary =
 	{     
 		.SingleByteRegister = _ReadSingleByteRegister,
 		.MultiBytesRegister = _ReadMultiBytesRegister,
+		.RFChannelRegister = _ReadRFChannelRegister,
 	},
 	.Write = 
 	{ 

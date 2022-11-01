@@ -1,6 +1,6 @@
 /*------------------------------------------------------------*/
 /* This header file is not for consumers of the NRF library   */
-/* It is intended for consumption by the impmenentation only. */
+/* It is intended for inclusion by the impmenentation only.   */
 /*------------------------------------------------------------*/
 
 #include <NRF24L01_macros.h>

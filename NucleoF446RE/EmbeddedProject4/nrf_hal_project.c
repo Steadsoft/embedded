@@ -184,6 +184,7 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 	NrfReg_CONFIG config;
 	NrfReg_EN_AA en_aa;
 	NrfReg_EN_RXADDR en_rxaddr;
+	NrfReg_RF_CH rfchan;
 	
 	uint8_t multisize;
 	
@@ -213,6 +214,8 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 
 		NrfLibrary.Read.SingleByteRegister(device_ptr, NrfRegister.RF_CH, &regval, &status);
 		if (regval != 0x08) trap();
+		
+		NrfLibrary.Read.RFChannelRegister(device_ptr, &rfchan, &status);
 
 		regval = 0;
 		
