@@ -256,7 +256,7 @@ void init_nrf_registers(NrfSpiDevice * device)
 	
 	arg = 3;
 	
-	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.SETUP_AW, &arg, &status);
+	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.SETUP_AW, arg, &status);
 
 }
 

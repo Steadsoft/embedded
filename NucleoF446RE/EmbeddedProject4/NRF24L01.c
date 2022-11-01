@@ -1,10 +1,6 @@
 #include <stdint.h>
-#include <NRF24L01_macros.h>
-#include <NRF24L01_typedefs.h>
-#include <NRF24L01_structs.h>
-#include <NRF24L01_statics.h>
-#include <NRF24L01_globals.h>
-#include <NRF24L01_functions.h>
+
+#include <NRF24L01_headers.h>
 
 // SEE: https://www.mouser.com/datasheet/2/297/nRF24L01_Product_Specification_v2_0-9199.pdf
 
