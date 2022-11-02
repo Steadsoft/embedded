@@ -257,8 +257,8 @@ struct nrf_write_calls
 struct nrf_library_calls
 {
 	NrfIoCallbacks_ptr ptr;
-	struct nrf_read_calls Read;
-	struct nrf_write_calls Write;
+	struct nrf_read_calls Get;
+	struct nrf_write_calls Set;
 };
 
 struct nrf_io_callbacks

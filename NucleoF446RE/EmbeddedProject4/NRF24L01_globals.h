@@ -33,7 +33,7 @@ NrfRegisters NrfRegister =
 
 NrfLibraryCalls NrfLibrary =
 { 
-	.Read =
+	.Get =
 	{     
 		.ConfigRegister = _ReadConfigRegister,
 		.EnAaRegister = _ReadEnAaRegister,
@@ -53,7 +53,7 @@ NrfLibraryCalls NrfLibrary =
 		.MultiBytesRegister = _ReadMultiBytesRegister,
 
 	},
-	.Write = 
+	.Set = 
 	{ 
 		.ConfigRegister = _WriteConfigRegister,
 		.EnAaRegister = _WriteEnAaRegister,
