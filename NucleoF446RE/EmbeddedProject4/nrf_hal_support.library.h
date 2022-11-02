@@ -1,0 +1,5 @@
+#include "nrf_hal_support.macros.h"
+#include "nrf_hal_support.typedefs.h"
+#include "nrf_hal_support.structs.h"
+#include "nrf_hal_support.externs.h"
+#include "nrf_hal_support.functions.h"

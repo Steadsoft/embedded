@@ -1,5 +1,6 @@
 #include <stdint.h>
 
+#define NRF24L01
 #include <NRF24L01_headers.h>
 
 

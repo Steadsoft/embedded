@@ -63,8 +63,8 @@
   </ImportGroup>
   <ItemGroup>
     <ClCompile Include="nrf_hal_project.c" />
-    <ClCompile Include="nrf_hal_io.c" />
     <ClCompile Include="NRF24L01.c" />
+    <ClCompile Include="nrf_hal_support.c" />
     <ClCompile Include="system_stm32f4xx.c" />
     <None Include="stm32.props" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\StartupFiles\startup_stm32f446xx.c" />
@@ -160,16 +160,20 @@
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_utils.c" />
     <ClInclude Include="NRF24L01_functions.h" />
     <ClInclude Include="NRF24L01_headers.h" />
-    <ClInclude Include="NRF24L01_library.h" />
     <ClInclude Include="NRF24L01_macros.h" />
     <ClInclude Include="NRF24L01_externs.h" />
     <ClInclude Include="NRF24L01_globals.h" />
     <ClInclude Include="NRF24L01_statics.h" />
     <ClInclude Include="NRF24L01_structs.h" />
     <ClInclude Include="NRF24L01_typedefs.h" />
-    <ClInclude Include="nrf_hal_structs.h" />
-    <ClInclude Include="nrf_hal_typedefs.h" />
-    <ClInclude Include="nrf_hal_functions.h" />
+    <ClInclude Include="nrf_hal_support.externs.h" />
+    <ClInclude Include="nrf_hal_support.globals.h" />
+    <ClInclude Include="nrf_hal_support.headers.h" />
+    <ClInclude Include="nrf_hal_support.macros.h" />
+    <ClInclude Include="nrf_hal_support.statics.h" />
+    <ClInclude Include="nrf_hal_support.structs.h" />
+    <ClInclude Include="nrf_hal_support.typedefs.h" />
+    <ClInclude Include="nrf_hal_support.functions.h" />
     <ClInclude Include="stm32f4xx_hal_conf.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc.h" />

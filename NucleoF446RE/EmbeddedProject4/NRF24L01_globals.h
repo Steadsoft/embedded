@@ -49,8 +49,8 @@ NrfLibraryCalls NrfLibrary =
 		.RX_PW = _ReadRxPwRegister,
 		.DYNPD = _ReadDynpdRegister,
 		.FEATURE = _ReadFeatureRegister,
-		.SingleByteRegister = _ReadSingleByteRegister,
-		.MultiBytesRegister = _ReadMultiBytesRegister,
+//		.SingleByteRegister = _ReadSingleByteRegister,
+//		.MultiBytesRegister = _ReadMultiBytesRegister,
 
 	},
 	.SetRegister = 
@@ -69,7 +69,7 @@ NrfLibraryCalls NrfLibrary =
 		.RX_PW = _WriteRxPwRegister,
 		.DYNPD = _WriteDynpdRegister,
 		.FEATURE = _WriteFeatureRegister,
-		.SingleByteRegister = _WriteSingleByteRegister,
-		.MultiBytesRegister = _WriteMultiBytesRegister,
+//		.SingleByteRegister = _WriteSingleByteRegister,
+//		.MultiBytesRegister = _WriteMultiBytesRegister,
 	}
 };
