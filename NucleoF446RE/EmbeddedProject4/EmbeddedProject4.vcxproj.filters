@@ -702,7 +702,7 @@
     <None Include="stm32.xml">
       <Filter>VisualGDB settings</Filter>
     </None>
-    <ClCompile Include="NRF24L01.c">
+    <ClCompile Include="nrf24_package.c">
       <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="nrf_hal_support.c">
@@ -710,25 +710,25 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="NRF24L01_package.functions.h">
+    <ClInclude Include="nrf24_package.functions.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_package.structs.h">
+    <ClInclude Include="nrf24_package.structs.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_package.macros.h">
+    <ClInclude Include="nrf24_package.macros.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_package.typedefs.h">
+    <ClInclude Include="nrf24_package.typedefs.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_package.externs.h">
+    <ClInclude Include="nrf24_package.externs.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_package.globals.h">
+    <ClInclude Include="nrf24_package.globals.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_package.statics.h">
+    <ClInclude Include="nrf24_package.statics.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="nrf_hal_support.typedefs.h">
@@ -740,7 +740,7 @@
     <ClInclude Include="nrf_hal_support.functions.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_package.library.h">
+    <ClInclude Include="nrf24_package.library.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="nrf_hal_support.statics.h">

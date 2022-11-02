@@ -1,6 +1,6 @@
 
 #include <stm32f4xx_hal.h>
-#include <NRF24L01_package.library.h>
+#include <nrf24_package.library.h>
 
 #define nrf_hal_support
 #include <nrf_hal_support.library.h>
