@@ -7,6 +7,8 @@
 #include <nrf_hal_structs.h>
 #include <nrf_hal_functions.h>
 
+#include <stdio.h>
+
 #define forever for(;;)
 
 // SEE: http://blog.gorski.pm/stm32-unique-id
@@ -58,6 +60,7 @@ void sleep_100_uS();
 void send_commands();
 void trap();
 
+void print_register(uint8_t Register, uint8_t Value);
 
 // SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
 
@@ -122,7 +125,6 @@ void init_spi(SPI_HandleTypeDef * spi_ptr)
 	GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
  
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_spi);
-
 }
 
 void init_control_pins()
@@ -151,7 +153,8 @@ void sleep_100_uS()
 
 int main(void)
 {
-	
+	printf("Application Started\n");
+
 	struct bits data = { 0 };
 	
 	NrfReg_EN_RXADDR reg = { 0 };
@@ -181,7 +184,7 @@ int main(void)
 	device.ReadBytes = read_bytes;
 	device.WriteBytes = write_bytes;
 	
-	init_nrf_registers(&device);
+	//init_nrf_registers(&device);
 	
 	send_commands(&device);
 }
@@ -202,10 +205,21 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 	NrfReg_EN_RXADDR en_rxaddr;
 	NrfReg_RF_CH rfchan;
 	NrfReg_RF_SETUP rf = { 0 };
-	
+	NrfReg_FEATURE ftr;
 	uint8_t multisize;
 	
+	NrfLibrary.Read.FeatureRegister(device_ptr, &ftr, &status);
+
+	NrfLibrary.Read.RfSetupRegister(device_ptr, &rf, &status);
+	
+	print_register(NrfRegister.RF_SETUP, rf.value);
+	
+	NrfLibrary.Read.RfChannelRegister(device_ptr, &rfchan, &status);
+
+	print_register(NrfRegister.RF_CH, rfchan.value);
+
 	// Just a bunch of test calls into the various register read/write functions.
+	
 	
 	forever
 	{
@@ -242,7 +256,7 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 		
 		rfchan.fields.RF_CH = 12;
 		
-		NrfLibrary.Read.RFChannelRegister(device_ptr, &rfchan, &status);
+		NrfLibrary.Read.RfChannelRegister(device_ptr, &rfchan, &status);
 		
 		regval = 0;
 		
@@ -282,7 +296,7 @@ void init_nrf_registers(NrfSpiDevice * device)
 	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.EN_RXADDR, arg, &status);
 	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.SETUP_RETR, arg, &status);
 	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.RF_CH, arg, &status);
-	//NrfLibrary.Write.SingleByteRegister(device, NrfRegister.RF_SETUP, arg, &status);
+	NrfLibrary.Write.SingleByteRegister(device, NrfRegister.RF_SETUP, arg, &status);
 	
 	arg = 3;
 	
@@ -290,3 +304,28 @@ void init_nrf_registers(NrfSpiDevice * device)
 
 }
 
+void print_register(uint8_t Register, uint8_t Value)
+{
+	switch (Register)
+	{
+	case 0x05:
+		{
+			NrfReg_RF_CH reg;
+			reg.value = Value;
+			printf("RF_CH: RF_CH %d, ", reg.fields.RF_CH);
+			printf("RF.RESERVED %d\n", reg.fields.RESERVED);
+			return;
+		}
+	case 0x06:
+		{
+			NrfReg_RF_SETUP reg;
+			reg.value = Value;
+			printf("RF_SETUP: LNA_HCURR %d, ", reg.fields.LNA_HCURR);
+			printf("RF_PWR %d, ", reg.fields.RF_PWR);
+			printf("RF_DR %d, ", reg.fields.RF_DR);
+			printf("PLL_LOCK %d, ", reg.fields.PLL_LOCK);
+			printf("RF.RESERVED %d\n", reg.fields.RESERVED);
+			return;
+		}
+	}
+}

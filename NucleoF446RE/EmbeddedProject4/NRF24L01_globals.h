@@ -35,21 +35,41 @@ NrfLibraryCalls NrfLibrary =
 { 
 	.Read =
 	{     
+		.ConfigRegister = _ReadConfigRegister,
+		.EnAaRegister = _ReadEnAaRegister,
+		.EnRxAddrRegister = _ReadEnRxAddrRegister,
+		.SetupAwRegister = _ReadSetupAwRegister,
+		.SetupRetrRegister = _ReadSetupRetrRegister,
+		.RfChannelRegister = _ReadRfChannelRegister,
+		.RfSetupRegister = _ReadRfSetupRegister,
+		.StatusRegister = _ReadStatusRegister,
+		.ObserveTxRegister = _ReadObserveTxRegister,
+		.CdRegister = _ReadCdRegister,
+		.RxAddrRegister = _ReadRxAddrRegister,
+		.RxPwRegister = _ReadRxPwRegister,
+		.DynpdRegister = _ReadDynpdRegister,
+		.FeatureRegister = _ReadFeatureRegister,
 		.SingleByteRegister = _ReadSingleByteRegister,
 		.MultiBytesRegister = _ReadMultiBytesRegister,
-		.RFChannelRegister = _ReadRFChannelRegister,
-		.RfSetupRegister = _ReadRfSetupRegister,
-		.ConfigRegister = _ReadConfigRegister,
-		.EnRxAddrRegister = _ReadEnRxAddrRegister,
-		
+
 	},
 	.Write = 
 	{ 
+		.ConfigRegister = _WriteConfigRegister,
+		.EnAaRegister = _WriteEnAaRegister,
+		.EnRxAddrRegister = _WriteEnRxAddrRegister,
+		.SetupAwRegister = _WriteSetupAwRegister,
+		.SetupRetrRegister = _WriteSetupRetrRegister,
+		.RfChannelRegister = _WriteRfChannelRegister,
+		.RfSetupRegister = _WriteRfSetupRegister,
+		.StatusRegister = _WriteStatusRegister,
+		.ObserveTxRegister = _WriteObserveTxRegister,
+		.CdRegister = _WriteCdRegister,
+		.RxAddrRegister = _WriteRxAddrRegister,
+		.RxPwRegister = _WriteRxPwRegister,
+		.DynpdRegister = _WriteDynpdRegister,
+		.FeatureRegister = _WriteFeatureRegister,
 		.SingleByteRegister = _WriteSingleByteRegister,
 		.MultiBytesRegister = _WriteMultiBytesRegister,
-		.RFChannelRegister = _WriteRFChannelRegister,
-		.RfSetupRegister = _WriteRfSetupRegister,
-		.ConfigRegister = _WriteConfigRegister,
-		.EnRxAddrRegister = _WriteEnRxAddrRegister,
 	}
 };
