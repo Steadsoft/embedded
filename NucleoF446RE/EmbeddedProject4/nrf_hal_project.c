@@ -208,13 +208,13 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 	NrfReg_FEATURE ftr;
 	uint8_t multisize;
 	
-	NrfLibrary.Get.FeatureRegister(device_ptr, &ftr, &status);
+	NrfLibrary.GetRegister.Feature(device_ptr, &ftr, &status);
 
-	NrfLibrary.Get.RfSetupRegister(device_ptr, &rf, &status);
+	NrfLibrary.GetRegister.RfSetup(device_ptr, &rf, &status);
 	
 	print_register(NrfRegister.RF_SETUP, rf.value);
 	
-	NrfLibrary.Get.RfChannelRegister(device_ptr, &rfchan, &status);
+	NrfLibrary.GetRegister.RfChannel(device_ptr, &rfchan, &status);
 
 	print_register(NrfRegister.RF_CH, rfchan.value);
 
@@ -230,48 +230,48 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 
 		rf.value = 0;
 		
-		NrfLibrary.Get.RfSetupRegister(device_ptr, &rf, &status);
+		NrfLibrary.GetRegister.RfSetup(device_ptr, &rf, &status);
 		
-		NrfLibrary.Get.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P2, &regval, &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P2, &regval, &status);
 		if (regval != 0xC3) trap();
 		
-		NrfLibrary.Get.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P3, &regval, &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P3, &regval, &status);
 		if (regval != 0xC4) trap();
 		
-		NrfLibrary.Get.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P4, &regval, &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P4, &regval, &status);
 		if (regval != 0xC5) trap();
 		
-		NrfLibrary.Get.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P5, &regval, &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P5, &regval, &status);
 		if (regval != 0xC6) trap();
 		
-		NrfLibrary.Get.SingleByteRegister(device_ptr, NrfRegister.RF_CH, &regval, &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.RF_CH, &regval, &status);
 		if (regval != 0x00) trap();
 
 		regval = 23;
 		
-		NrfLibrary.Set.SingleByteRegister(device_ptr, NrfRegister.RF_CH, regval, &status);
+		NrfLibrary.SetRegister.SingleByteRegister(device_ptr, NrfRegister.RF_CH, regval, &status);
 
-		NrfLibrary.Get.SingleByteRegister(device_ptr, NrfRegister.RF_CH, &regval, &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.RF_CH, &regval, &status);
 //		if (regval != 0x08) trap();
 		
 		rfchan.fields.RF_CH = 12;
 		
-		NrfLibrary.Get.RfChannelRegister(device_ptr, &rfchan, &status);
+		NrfLibrary.GetRegister.RfChannel(device_ptr, &rfchan, &status);
 		
 		regval = 0;
 		
-		NrfLibrary.Set.SingleByteRegister(device_ptr, NrfRegister.RF_CH, regval, &status);
+		NrfLibrary.SetRegister.SingleByteRegister(device_ptr, NrfRegister.RF_CH, regval, &status);
 
-		NrfLibrary.Get.SingleByteRegister(device_ptr, NrfRegister.CONFIG, &(config.value), &status);
-		NrfLibrary.Get.SingleByteRegister(device_ptr, NrfRegister.EN_AA, &(en_aa.value), &status);
-		NrfLibrary.Get.SingleByteRegister(device_ptr, NrfRegister.EN_RXADDR, &(en_rxaddr.value), &status);
-		NrfLibrary.Get.SingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &regval, &status);
-		NrfLibrary.Get.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		NrfLibrary.Set.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
-		NrfLibrary.Get.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		NrfLibrary.Set.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
-		NrfLibrary.Get.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
-		NrfLibrary.Get.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P5, &regval, &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.CONFIG, &(config.value), &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.EN_AA, &(en_aa.value), &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.EN_RXADDR, &(en_rxaddr.value), &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &regval, &status);
+		NrfLibrary.GetRegister.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.SetRegister.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
+		NrfLibrary.GetRegister.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.SetRegister.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR2, &multisize, &status);
+		NrfLibrary.GetRegister.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P5, &regval, &status);
 		
 		if (regval != 0xC6)
 			break;
@@ -291,16 +291,16 @@ void init_nrf_registers(NrfSpiDevice * device)
 
 	uint8_t arg = 0;
 	
-	NrfLibrary.Set.SingleByteRegister(device, NrfRegister.CONFIG, arg, &status);
-	NrfLibrary.Set.SingleByteRegister(device, NrfRegister.EN_AA, arg, &status);
-	NrfLibrary.Set.SingleByteRegister(device, NrfRegister.EN_RXADDR, arg, &status);
-	NrfLibrary.Set.SingleByteRegister(device, NrfRegister.SETUP_RETR, arg, &status);
-	NrfLibrary.Set.SingleByteRegister(device, NrfRegister.RF_CH, arg, &status);
-	NrfLibrary.Set.SingleByteRegister(device, NrfRegister.RF_SETUP, arg, &status);
+	NrfLibrary.SetRegister.SingleByteRegister(device, NrfRegister.CONFIG, arg, &status);
+	NrfLibrary.SetRegister.SingleByteRegister(device, NrfRegister.EN_AA, arg, &status);
+	NrfLibrary.SetRegister.SingleByteRegister(device, NrfRegister.EN_RXADDR, arg, &status);
+	NrfLibrary.SetRegister.SingleByteRegister(device, NrfRegister.SETUP_RETR, arg, &status);
+	NrfLibrary.SetRegister.SingleByteRegister(device, NrfRegister.RF_CH, arg, &status);
+	NrfLibrary.SetRegister.SingleByteRegister(device, NrfRegister.RF_SETUP, arg, &status);
 	
 	arg = 3;
 	
-	NrfLibrary.Set.SingleByteRegister(device, NrfRegister.SETUP_AW, arg, &status);
+	NrfLibrary.SetRegister.SingleByteRegister(device, NrfRegister.SETUP_AW, arg, &status);
 
 }
 
