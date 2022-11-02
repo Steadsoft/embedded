@@ -1,3 +1,4 @@
+
 #include <stm32f4xx_hal.h>
 #include <string.h>
 
@@ -200,7 +201,7 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 	
 	uint8_t regval;
 	NrfReg_STATUS status;
-	NrfReg_CONFIG config;
+	NrfReg_CONFIG configuration;
 	NrfReg_EN_AA en_aa;
 	NrfReg_EN_RXADDR en_rxaddr;
 	NrfReg_RF_CH rfchan;
@@ -208,29 +209,30 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 	NrfReg_FEATURE ftr;
 	uint8_t multisize;
 	
-	NrfLibrary.GetRegister.Feature(device_ptr, &ftr, &status);
+	NrfLibrary.GetRegister.FEATURE(device_ptr, &ftr, &status);
 
-	NrfLibrary.GetRegister.RfSetup(device_ptr, &rf, &status);
+	NrfLibrary.GetRegister.RF_SETUP(device_ptr, &rf, &status);
 	
-	print_register(NrfRegister.RF_SETUP, rf.value);
+	print_register(NrfRegister.RF_SETUP, BYTE_VALUE(rf));
 	
-	NrfLibrary.GetRegister.RfChannel(device_ptr, &rfchan, &status);
+	NrfLibrary.GetRegister.RF_CH(device_ptr, &rfchan, &status);
 
-	print_register(NrfRegister.RF_CH, rfchan.value);
+	print_register(NrfRegister.RF_CH, BYTE_VALUE(rfchan));
 
 	// Just a bunch of test calls into the various register read/write functions.
 	
+	NrfLibrary.GetRegister.CONFIG(device_ptr, &configuration, &status);
 	
 	forever
 	{
-		rf.fields.PLL_LOCK = 1;
-		rf.fields.RF_PWR = 2;
+		rf.PLL_LOCK = 1;
+		rf.RF_PWR = 2;
 	
 		//NrfLibrary.Write.RfSetupRegister(device_ptr, rf, &status);
 
-		rf.value = 0;
+		BYTE_VALUE(rf) = 0;
 		
-		NrfLibrary.GetRegister.RfSetup(device_ptr, &rf, &status);
+		NrfLibrary.GetRegister.RF_SETUP(device_ptr, &rf, &status);
 		
 		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P2, &regval, &status);
 		if (regval != 0xC3) trap();
@@ -254,17 +256,17 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.RF_CH, &regval, &status);
 //		if (regval != 0x08) trap();
 		
-		rfchan.fields.RF_CH = 12;
+		rfchan.RF_CH = 12;
 		
-		NrfLibrary.GetRegister.RfChannel(device_ptr, &rfchan, &status);
+		NrfLibrary.GetRegister.RF_CH(device_ptr, &rfchan, &status);
 		
 		regval = 0;
 		
 		NrfLibrary.SetRegister.SingleByteRegister(device_ptr, NrfRegister.RF_CH, regval, &status);
 
-		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.CONFIG, &(config.value), &status);
-		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.EN_AA, &(en_aa.value), &status);
-		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.EN_RXADDR, &(en_rxaddr.value), &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.CONFIG, BYTE_ADDRESS(&(configuration)), &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.EN_AA, BYTE_ADDRESS(&(en_aa)), &status);
+		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.EN_RXADDR, BYTE_ADDRESS(&(en_rxaddr)), &status);
 		NrfLibrary.GetRegister.SingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &regval, &status);
 		NrfLibrary.GetRegister.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, BUFFER, &multisize, &status);
 		NrfLibrary.SetRegister.MultiBytesRegister(device_ptr, NrfRegister.RX_ADDR_P0, RX_ADDR1, &multisize, &status);
@@ -311,20 +313,20 @@ void print_register(uint8_t Register, uint8_t Value)
 	case 0x05:
 		{
 			NrfReg_RF_CH reg;
-			reg.value = Value;
-			printf("RF_CH: RF_CH %d, ", reg.fields.RF_CH);
-			printf("RF.RESERVED %d\n", reg.fields.RESERVED);
+			BYTE_VALUE(reg) = Value;
+			printf("RF_CH: RF_CH %d, ", reg.RF_CH);
+			printf("RF.RESERVED %d\n", reg.RESERVED);
 			return;
 		}
 	case 0x06:
 		{
 			NrfReg_RF_SETUP reg;
-			reg.value = Value;
-			printf("RF_SETUP: LNA_HCURR %d, ", reg.fields.LNA_HCURR);
-			printf("RF_PWR %d, ", reg.fields.RF_PWR);
-			printf("RF_DR %d, ", reg.fields.RF_DR);
-			printf("PLL_LOCK %d, ", reg.fields.PLL_LOCK);
-			printf("RF.RESERVED %d\n", reg.fields.RESERVED);
+			BYTE_VALUE(reg) = Value;
+			printf("RF_SETUP: LNA_HCURR %d, ", reg.LNA_HCURR);
+			printf("RF_PWR %d, ", reg.RF_PWR);
+			printf("RF_DR %d, ", reg.RF_DR);
+			printf("PLL_LOCK %d, ", reg.PLL_LOCK);
+			printf("RF.RESERVED %d\n", reg.RESERVED);
 			return;
 		}
 	}
