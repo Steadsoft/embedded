@@ -1,7 +1,7 @@
 #include <stdint.h>
 
 #define NRF24L01
-#include <NRF24L01_headers.h>
+#include <NRF24L01_package.library.h>
 
 
 // SEE: https://www.mouser.com/datasheet/2/297/nRF24L01_Product_Specification_v2_0-9199.pdf

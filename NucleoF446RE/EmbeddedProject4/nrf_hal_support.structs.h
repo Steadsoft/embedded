@@ -18,5 +18,7 @@ struct nrf_hal_functions
 	void (*exchange_bytes)(void *, uint8_t[], uint8_t[], uint8_t);
 	void (*read_bytes)(void *, uint8_t bytes_in_ptr[], uint8_t count);
 	void (*write_bytes)(void *, uint8_t bytes_out_ptr[], uint8_t count);
+	void(*init_device)(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr);
+	void(*flash_led_forever)();
 
 };

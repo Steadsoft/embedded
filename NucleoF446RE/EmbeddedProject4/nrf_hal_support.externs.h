@@ -1,1 +1,1 @@
-extern NrfHalFunctions AppFunctions;
+extern NrfHalFunctions NrfHalSupport;

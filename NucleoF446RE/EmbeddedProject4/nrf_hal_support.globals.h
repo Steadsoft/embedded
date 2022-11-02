@@ -1,4 +1,4 @@
-NrfHalFunctions AppFunctions =
+NrfHalFunctions NrfHalSupport =
 {
 	.init_spi = init_spi,
 	.init_control_pins = init_control_pins,
@@ -8,5 +8,8 @@ NrfHalFunctions AppFunctions =
 	.spi_cs_hi = spi_cs_hi,
 	.exchange_bytes = exchange_bytes,
 	.read_bytes = read_bytes,
-	.write_bytes = write_bytes
+	.write_bytes = write_bytes,
+	.init_device = init_device,
+	.flash_led_forever = flash_led_forever
+		
 };

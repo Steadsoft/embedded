@@ -710,25 +710,25 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="NRF24L01_functions.h">
+    <ClInclude Include="NRF24L01_package.functions.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_structs.h">
+    <ClInclude Include="NRF24L01_package.structs.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_macros.h">
+    <ClInclude Include="NRF24L01_package.macros.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_typedefs.h">
+    <ClInclude Include="NRF24L01_package.typedefs.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_externs.h">
+    <ClInclude Include="NRF24L01_package.externs.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_globals.h">
+    <ClInclude Include="NRF24L01_package.globals.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_statics.h">
+    <ClInclude Include="NRF24L01_package.statics.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="nrf_hal_support.typedefs.h">
@@ -740,7 +740,7 @@
     <ClInclude Include="nrf_hal_support.functions.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NRF24L01_headers.h">
+    <ClInclude Include="NRF24L01_package.library.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="nrf_hal_support.statics.h">
@@ -755,7 +755,7 @@
     <ClInclude Include="nrf_hal_support.externs.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="nrf_hal_support.headers.h">
+    <ClInclude Include="nrf_hal_support.library.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

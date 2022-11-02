@@ -1,8 +1,8 @@
 #include <stm32f4xx_hal.h>
 #include <stdio.h>
 
-#include <NRF24L01_headers.h>
-#include <nrf_hal_support.headers.h>
+#include <NRF24L01_package.library.h>
+#include <nrf_hal_support.library.h>
 
 
 // SEE: http://blog.gorski.pm/stm32-unique-id
@@ -42,7 +42,7 @@ typedef struct
 void init_nrf_registers(NrfSpiDevice * device);
 int get_board_id();
 void sleep_100_uS();
-void send_commands();
+void send_commands(NrfSpiDevice_ptr device_ptr, int count);
 void trap();
 
 void print_register(uint8_t Register, uint8_t Value);
@@ -93,67 +93,32 @@ int main(void)
 {
 	HAL_Init();
 	
-	//printf("Application Started\n");
+	int board = get_board_id();
 
-	struct bits data = { 0 };
-	
-	NrfReg_EN_RXADDR reg = { 0 };
+	// Allocate these data structures on the stack.
 	
 	SPI_HandleTypeDef spi; 
-	
 	NrfSpiDevice device; 
 	NrfIoDescriptor descriptor;
 	
-	int board = get_board_id();
+	// Perform all IO related initialization
 	
+	NrfHalSupport.init_spi(&spi);
+	NrfHalSupport.init_control_pins();
+	NrfHalSupport.init_device(&spi, &device, &descriptor);
 	
-	AppFunctions.init_spi(&spi);
-
-	AppFunctions.init_control_pins();
+	// Send a bunch of NRF commands to the device.
 	
-	descriptor.spi_ptr = &spi;
-	descriptor.gpio_ptr = GPIOA;
-	descriptor.ce_pin = NRF_CE;
-	descriptor.cs_pin = SPI_CS;
+	send_commands(&device, 2000);
 	
-	device.io_ptr = &descriptor;
-	device.SelectDevice = AppFunctions.spi_cs_lo;
-	device.DeselectDevice = AppFunctions.spi_cs_hi;
-	device.ExchangeBytes = AppFunctions.exchange_bytes;
-	device.ReadBytes = AppFunctions.read_bytes;
-	device.WriteBytes = AppFunctions.write_bytes;
+	// Flash the Nucleo's LED to indicate that command sending is over.
 	
-	//init_nrf_registers(&device);
-	
-	send_commands(&device);
-	
-	HAL_DeInit();
-	HAL_Init();
-	
-	__GPIOA_CLK_ENABLE();
-
-	GPIO_InitTypeDef  GPIO_InitStruct = { 0 };
-	
-	GPIO_InitStruct.Pin       = GPIO_PIN_5;
-	GPIO_InitStruct.Mode      = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull      = GPIO_NOPULL;
-	GPIO_InitStruct.Speed     = GPIO_SPEED_MEDIUM;
-	
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
-	while (1)
-	{
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-		HAL_Delay(100);	
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-		HAL_Delay(100);	
-	}
-	
+	NrfHalSupport.flash_led_forever();
 	
 	return(0);
 }
 
-void send_commands(NrfSpiDevice_ptr device_ptr)
+void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 {
 	
 	
@@ -188,7 +153,7 @@ void send_commands(NrfSpiDevice_ptr device_ptr)
 	
 	NrfLibrary.GetRegister.CONFIG(device_ptr, &configuration, &status);
 	
-	for (int X=0; X < 1000; X++)
+	for (int X=0; X < count; X++)
 	{
 		rf.PLL_LOCK = 1;
 		rf.RF_PWR = 2;

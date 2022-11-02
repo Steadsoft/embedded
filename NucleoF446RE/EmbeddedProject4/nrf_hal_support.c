@@ -1,9 +1,51 @@
 
 #include <stm32f4xx_hal.h>
+#include <NRF24L01_package.library.h>
 
 #define nrf_hal_support
-#include <nrf_hal_support.headers.h>
+#include <nrf_hal_support.library.h>
 
+static void flash_led_forever()
+{
+	HAL_DeInit();
+	HAL_Init();
+	
+	__GPIOA_CLK_ENABLE();
+
+	GPIO_InitTypeDef  GPIO_InitStruct = { 0 };
+	
+	GPIO_InitStruct.Pin       = GPIO_PIN_5;
+	GPIO_InitStruct.Mode      = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull      = GPIO_NOPULL;
+	GPIO_InitStruct.Speed     = GPIO_SPEED_MEDIUM;
+	
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	
+	while (1)
+	{
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+		HAL_Delay(100);	
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+		HAL_Delay(100);	
+	}
+	
+
+}
+static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr)
+{
+	descriptor_ptr->spi_ptr = spi_ptr;
+	descriptor_ptr->gpio_ptr = GPIOA;
+	descriptor_ptr->ce_pin = NRF_CE;
+	descriptor_ptr->cs_pin = SPI_CS;
+	
+	device_ptr->io_ptr = descriptor_ptr;
+	device_ptr->SelectDevice = NrfHalSupport.spi_cs_lo;
+	device_ptr->DeselectDevice = NrfHalSupport.spi_cs_hi;
+	device_ptr->ExchangeBytes = NrfHalSupport.exchange_bytes;
+	device_ptr->ReadBytes = NrfHalSupport.read_bytes;
+	device_ptr->WriteBytes = NrfHalSupport.write_bytes;
+
+}
 static void init_spi(SPI_HandleTypeDef * spi_ptr)
 {
 	GPIO_InitTypeDef  GPIO_InitStruct_spi = { 0 };
