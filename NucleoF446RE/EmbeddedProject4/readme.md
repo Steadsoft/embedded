@@ -87,6 +87,24 @@ The library consumer can now regard the library as being a namespace, and refer 
 ```c
 	NrfHalSupport.init_spi(&spi);
 ```
+The `.library.` header file consolidates the inlcuding of all the other needed files. This same file is included in the implementation source file and the consumer's source file, here it is:
+
+```c
+#include "nrf_hal_support.macros.h"
+#include "nrf_hal_support.typedefs.h"
+#include "nrf_hal_support.types.h"
+
+// The library implementation source file defines this because it also declares globals.
+// Library consumers, refer to these globals using 'extern' and so include that header.
+
+#if !defined(nrf_hal_support_implementer)
+#include "nrf_hal_support.externs.h"
+#endif
+```
+
+The macro `nrf_hal_support_implementer` name is a private defintion, only defined within the implementation source file, this is how consumers define the externs exposed by the library.
+
+
 
 
 
