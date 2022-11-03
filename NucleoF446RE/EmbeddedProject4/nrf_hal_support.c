@@ -2,7 +2,7 @@
 #include <stm32f4xx_hal.h>
 #include <nrf24_package.library.h>
 
-#define nrf_hal_support
+#define nrf_hal_support_implementer
 #include <nrf_hal_support.library.h>
 
 // Declare all static functions
@@ -19,7 +19,7 @@ static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr
 static void flash_led_forever(uint32_t interval);
 
 // Declare the global library interface
-NrfHalFunctions NrfHalSupport =
+nrf_hal_support NrfHalSupport =
 {
 	.init_spi = init_spi,
 	.init_control_pins = init_control_pins,

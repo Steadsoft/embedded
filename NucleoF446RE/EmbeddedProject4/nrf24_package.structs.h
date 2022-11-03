@@ -192,7 +192,7 @@ struct nrf_write_calls
 //	void(* SingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus);
 //	void(* MultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
 };
-struct nrf_library_calls
+struct nrf24_package_interface
 {
 	NrfIoCallbacks_ptr ptr;
 	struct nrf_read_calls GetRegister;

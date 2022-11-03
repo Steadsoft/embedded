@@ -1,7 +1,12 @@
+// SEE: https://www.mouser.com/datasheet/2/297/nRF24L01_Product_Specification_v2_0-9199.pdf
+// SEE: https://infocenter.nordicsemi.com/pdf/nan_24-08.pdf?cp=13_10
+
 #include <stdint.h>
 
-#define nrf24_package
+#define nrf24_package_implementer
 #include <nrf24_package.library.h>
+
+// Declare all static functions
 
 static void _ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 static void _WriteConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
@@ -36,6 +41,7 @@ static void _WriteSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, uint8
 static void _ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
 static void _WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
 
+// Declare the global library interface
 
 NrfRegisters NrfRegister =
 { 
@@ -67,51 +73,51 @@ NrfRegisters NrfRegister =
 	.FEATURE = 0x1D
 };
 
-NrfLibraryCalls NrfLibrary =
+nrf24_package Nrf24Package =
 { 
-	.GetRegister = {     
-	.CONFIG = _ReadConfigRegister,
-	.EN_AA = _ReadEnAaRegister,
-	.EN_RX_ADDR = _ReadEnRxAddrRegister,
-	.SETUP_AW = _ReadSetupAwRegister,
-	.SETUP_RETR = _ReadSetupRetrRegister,
-	.RF_CH = _ReadRfChannelRegister,
-	.RF_SETUP = _ReadRfSetupRegister,
-	.STATUS = _ReadStatusRegister,
-	.OBSERVE_TX = _ReadObserveTxRegister,
-	.CD = _ReadCdRegister,
-	.RX_ADDR = _ReadRxAddrRegister,
-	.RX_PW = _ReadRxPwRegister,
-	.DYNPD = _ReadDynpdRegister,
-	.FEATURE = _ReadFeatureRegister,
-	//		.SingleByteRegister = _ReadSingleByteRegister,
-	//		.MultiBytesRegister = _ReadMultiBytesRegister,
-
-},
-	.SetRegister = { 
-	.CONFIG = _WriteConfigRegister,
-	.EN_AA = _WriteEnAaRegister,
-	.EN_RX_ADDR = _WriteEnRxAddrRegister,
-	.SETUP_AW = _WriteSetupAwRegister,
-	.SETUP_RETR = _WriteSetupRetrRegister,
-	.RF_CH = _WriteRfChannelRegister,
-	.RF_SETUP = _WriteRfSetupRegister,
-	.STATUS = _WriteStatusRegister,
-	.OBSERVE_TX = _WriteObserveTxRegister,
-	.CD = _WriteCdRegister,
-	.RX_ADDR = _WriteRxAddrRegister,
-	.RX_PW = _WriteRxPwRegister,
-	.DYNPD = _WriteDynpdRegister,
-	.FEATURE = _WriteFeatureRegister,
-	//		.SingleByteRegister = _WriteSingleByteRegister,
-	//		.MultiBytesRegister = _WriteMultiBytesRegister,
-}
+	.GetRegister = 
+	{     
+		.CONFIG = _ReadConfigRegister,
+		.EN_AA = _ReadEnAaRegister,
+		.EN_RX_ADDR = _ReadEnRxAddrRegister,
+		.SETUP_AW = _ReadSetupAwRegister,
+		.SETUP_RETR = _ReadSetupRetrRegister,
+		.RF_CH = _ReadRfChannelRegister,
+		.RF_SETUP = _ReadRfSetupRegister,
+		.STATUS = _ReadStatusRegister,
+		.OBSERVE_TX = _ReadObserveTxRegister,
+		.CD = _ReadCdRegister,
+		.RX_ADDR = _ReadRxAddrRegister,
+		.RX_PW = _ReadRxPwRegister,
+		.DYNPD = _ReadDynpdRegister,
+		.FEATURE = _ReadFeatureRegister,
+		//		.SingleByteRegister = _ReadSingleByteRegister,
+		//		.MultiBytesRegister = _ReadMultiBytesRegister,
+	},
+	.SetRegister = 
+	{ 
+		.CONFIG = _WriteConfigRegister,
+		.EN_AA = _WriteEnAaRegister,
+		.EN_RX_ADDR = _WriteEnRxAddrRegister,
+		.SETUP_AW = _WriteSetupAwRegister,
+		.SETUP_RETR = _WriteSetupRetrRegister,
+		.RF_CH = _WriteRfChannelRegister,
+		.RF_SETUP = _WriteRfSetupRegister,
+		.STATUS = _WriteStatusRegister,
+		.OBSERVE_TX = _WriteObserveTxRegister,
+		.CD = _WriteCdRegister,
+		.RX_ADDR = _WriteRxAddrRegister,
+		.RX_PW = _WriteRxPwRegister,
+		.DYNPD = _WriteDynpdRegister,
+		.FEATURE = _WriteFeatureRegister,
+		//		.SingleByteRegister = _WriteSingleByteRegister,
+		//		.MultiBytesRegister = _WriteMultiBytesRegister,
+	}
 };
 
 
+// Implementation 
 
-// SEE: https://www.mouser.com/datasheet/2/297/nRF24L01_Product_Specification_v2_0-9199.pdf
-// SEE: https://infocenter.nordicsemi.com/pdf/nan_24-08.pdf?cp=13_10
 
 static void _ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {

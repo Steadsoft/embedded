@@ -1,1 +1,1 @@
-extern NrfHalFunctions NrfHalSupport;
+extern nrf_hal_support NrfHalSupport;

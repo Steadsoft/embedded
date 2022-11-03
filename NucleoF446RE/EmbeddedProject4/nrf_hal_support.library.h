@@ -5,8 +5,6 @@
 // The library implementation source file defines this because it also declares globals.
 // Library using, consumers, refer to these globals using 'extern' and so use that header.
 
-#if !defined(nrf_hal_support)
+#if !defined(nrf_hal_support_implementer)
 #include "nrf_hal_support.externs.h"
 #endif
-
-#include "nrf_hal_support.functions.h"
