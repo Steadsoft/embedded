@@ -1,9 +1,9 @@
+#define nrf24_package_implementer
+
 // SEE: https://www.mouser.com/datasheet/2/297/nRF24L01_Product_Specification_v2_0-9199.pdf
 // SEE: https://infocenter.nordicsemi.com/pdf/nan_24-08.pdf?cp=13_10
 
 #include <stdint.h>
-
-#define nrf24_package_implementer
 #include <nrf24_package.library.h>
 
 // Declare all static functions
