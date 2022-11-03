@@ -19,7 +19,7 @@ static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr
 static void flash_led_forever(uint32_t interval);
 
 // Declare the global library interface
-nrf_hal_support NrfHalSupport =
+nrf_hal_support_struct nrf_hal_support =
 {
 	.init_spi = init_spi,
 	.init_control_pins = init_control_pins,
@@ -69,11 +69,11 @@ static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr
 	descriptor_ptr->cs_pin = SPI_CS;
 	
 	device_ptr->io_ptr = descriptor_ptr;
-	device_ptr->SelectDevice = NrfHalSupport.spi_cs_lo;
-	device_ptr->DeselectDevice = NrfHalSupport.spi_cs_hi;
-	device_ptr->ExchangeBytes = NrfHalSupport.exchange_bytes;
-	device_ptr->ReadBytes = NrfHalSupport.read_bytes;
-	device_ptr->WriteBytes = NrfHalSupport.write_bytes;
+	device_ptr->SelectDevice = nrf_hal_support.spi_cs_lo;
+	device_ptr->DeselectDevice = nrf_hal_support.spi_cs_hi;
+	device_ptr->ExchangeBytes = nrf_hal_support.exchange_bytes;
+	device_ptr->ReadBytes = nrf_hal_support.read_bytes;
+	device_ptr->WriteBytes = nrf_hal_support.write_bytes;
 
 }
 static void init_spi(SPI_HandleTypeDef * spi_ptr)

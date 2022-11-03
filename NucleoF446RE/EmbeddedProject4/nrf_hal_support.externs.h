@@ -1,1 +1,1 @@
-extern nrf_hal_support NrfHalSupport;
+extern nrf_hal_support_struct nrf_hal_support;

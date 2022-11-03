@@ -85,9 +85,9 @@ int main(void)
 	
 	// Perform all IO related initialization
 	
-	NrfHalSupport.init_spi(&spi);
-	NrfHalSupport.init_control_pins();
-	NrfHalSupport.init_device(&spi, &device, &descriptor);
+	nrf_hal_support.init_spi(&spi);
+	nrf_hal_support.init_control_pins();
+	nrf_hal_support.init_device(&spi, &device, &descriptor);
 	
 	// Send a bunch of NRF commands to the device.
 	
@@ -95,7 +95,7 @@ int main(void)
 	
 	// Flash the Nucleo's LED to indicate that command sending is over.
 	
-	NrfHalSupport.flash_led_forever(1000);
+	nrf_hal_support.flash_led_forever(1000);
 	
 	return(0);
 }
@@ -120,15 +120,15 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 	NrfReg_FEATURE device_features;
 	NrfReg_SETUP_AW saw;
 	
-	Nrf24Package.GetRegister.FEATURE(device_ptr, &device_features, &status);
+	nrf24_package.GetRegister.FEATURE(device_ptr, &device_features, &status);
 
-	Nrf24Package.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
+	nrf24_package.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
 	
-	Nrf24Package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
+	nrf24_package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
 
 	// Just a bunch of test calls into the various register read/write functions.
 	
-	Nrf24Package.GetRegister.CONFIG(device_ptr, &configuration, &status);
+	nrf24_package.GetRegister.CONFIG(device_ptr, &configuration, &status);
 	
 	for (int X=0; X < count; X++)
 	{
@@ -137,46 +137,46 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 	
 		BYTE_VALUE(rf_setup) = 0;
 		
-		Nrf24Package.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
+		nrf24_package.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
 		
 		trapif(rf_setup.LNA_HCURR != 1 || rf_setup.RF_PWR != 3 || rf_setup.RF_DR != 1);
 		
-		Nrf24Package.GetRegister.RX_ADDR(device_ptr, &rx_address, 2, &status);
+		nrf24_package.GetRegister.RX_ADDR(device_ptr, &rx_address, 2, &status);
 	
 		trapif(rx_address.value != 0xC3);
 		
-		Nrf24Package.GetRegister.RX_ADDR(device_ptr, &rx_address, 3, &status);
+		nrf24_package.GetRegister.RX_ADDR(device_ptr, &rx_address, 3, &status);
 		
 		trapif(rx_address.value != 0xC4);
 		
-		Nrf24Package.GetRegister.RX_ADDR(device_ptr, &rx_address, 4, &status);
+		nrf24_package.GetRegister.RX_ADDR(device_ptr, &rx_address, 4, &status);
 		
 		trapif(rx_address.value != 0xC5);
 		
-		Nrf24Package.GetRegister.RX_ADDR(device_ptr, &rx_address, 5, &status);
+		nrf24_package.GetRegister.RX_ADDR(device_ptr, &rx_address, 5, &status);
 		
 		trapif(rx_address.value != 0xC6);
 		
-		Nrf24Package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
+		nrf24_package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
 		
 		trapif(rf_channel.RF_CH != 0x02);
 
 		rf_channel.RF_CH = 23;
 		
-		Nrf24Package.SetRegister.RF_CH(device_ptr, rf_channel, &status);
+		nrf24_package.SetRegister.RF_CH(device_ptr, rf_channel, &status);
 
-		Nrf24Package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
+		nrf24_package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
 		
 		trapif(rf_channel.RF_CH != 23);
 		
 		rf_channel.RF_CH = 2;
 
-		Nrf24Package.SetRegister.RF_CH(device_ptr, rf_channel, &status);
+		nrf24_package.SetRegister.RF_CH(device_ptr, rf_channel, &status);
 
-		Nrf24Package.GetRegister.CONFIG(device_ptr, &(configuration), &status);
-		Nrf24Package.GetRegister.EN_AA(device_ptr, &(auto_acknowledge_flags), &status);
-		Nrf24Package.GetRegister.RX_ADDR(device_ptr, &(rx_address),3, &status);
-		Nrf24Package.GetRegister.SETUP_AW(device_ptr, &saw, &status);
+		nrf24_package.GetRegister.CONFIG(device_ptr, &(configuration), &status);
+		nrf24_package.GetRegister.EN_AA(device_ptr, &(auto_acknowledge_flags), &status);
+		nrf24_package.GetRegister.RX_ADDR(device_ptr, &(rx_address), 3, &status);
+		nrf24_package.GetRegister.SETUP_AW(device_ptr, &saw, &status);
 		
 		trapif(saw.AW != 0x03);
 
@@ -189,7 +189,7 @@ void trapif(int value)
 	if (!value)
 		return;
 	
-	NrfHalSupport.flash_led_forever(20);
+	nrf_hal_support.flash_led_forever(20);
 }
 void init_nrf_registers(NrfSpiDevice * device)
 {	NrfReg_STATUS status;
@@ -202,16 +202,16 @@ void init_nrf_registers(NrfSpiDevice * device)
 	NrfReg_RF_SETUP rf_setup = { 0 };
 	NrfReg_SETUP_AW setup_aw = { 0 };
 	
-	Nrf24Package.SetRegister.CONFIG(device, config, &status);
-	Nrf24Package.SetRegister.EN_AA(device, en_aa, &status);
-	Nrf24Package.SetRegister.EN_RX_ADDR(device, en_rxaddr, &status);
-	Nrf24Package.SetRegister.SETUP_RETR(device, setup_retr, &status);
-	Nrf24Package.SetRegister.RF_CH(device, rf_ch, &status);
-	Nrf24Package.SetRegister.RF_SETUP(device, rf_setup, &status);
+	nrf24_package.SetRegister.CONFIG(device, config, &status);
+	nrf24_package.SetRegister.EN_AA(device, en_aa, &status);
+	nrf24_package.SetRegister.EN_RX_ADDR(device, en_rxaddr, &status);
+	nrf24_package.SetRegister.SETUP_RETR(device, setup_retr, &status);
+	nrf24_package.SetRegister.RF_CH(device, rf_ch, &status);
+	nrf24_package.SetRegister.RF_SETUP(device, rf_setup, &status);
 	
 	setup_aw.AW = 3;
 	
-	Nrf24Package.SetRegister.SETUP_AW(device, setup_aw, &status);
+	nrf24_package.SetRegister.SETUP_AW(device, setup_aw, &status);
 
 }
 void print_register(uint8_t Register, uint8_t Value)

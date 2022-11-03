@@ -73,7 +73,7 @@ nrf24_register_names Nrf24Register =
 	.FEATURE = 0x1D
 };
 
-nrf24_package Nrf24Package =
+nrf24_package_struct nrf24_package =
 { 
 	.GetRegister = 
 	{     
