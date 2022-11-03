@@ -43,7 +43,7 @@ static void _WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8
 
 // Declare the global library interface
 
-const nrf24_register_names Nrf24Register =
+nrf24_register_names Nrf24Register =
 { 
 	.CONFIG = 0x00,
 	.EN_AA = 0x01,
@@ -73,7 +73,7 @@ const nrf24_register_names Nrf24Register =
 	.FEATURE = 0x1D
 };
 
-const nrf24_package Nrf24Package =
+nrf24_package Nrf24Package =
 { 
 	.GetRegister = 
 	{     
