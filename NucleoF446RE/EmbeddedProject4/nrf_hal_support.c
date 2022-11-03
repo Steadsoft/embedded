@@ -5,7 +5,7 @@
 #define nrf_hal_support
 #include <nrf_hal_support.library.h>
 
-static void flash_led_forever()
+static void flash_led_forever(uint32_t interval)
 {
 	HAL_DeInit();
 	HAL_Init();
@@ -24,9 +24,9 @@ static void flash_led_forever()
 	while (1)
 	{
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-		HAL_Delay(100);	
+		HAL_Delay(interval);	
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-		HAL_Delay(100);	
+		HAL_Delay(interval);	
 	}
 	
 

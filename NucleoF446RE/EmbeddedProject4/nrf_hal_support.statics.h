@@ -9,4 +9,4 @@ static void init_spi(SPI_HandleTypeDef * spi_ptr);
 static void init_control_pins();
 static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr);
 
-static void flash_led_forever();
+static void flash_led_forever(uint32_t interval);

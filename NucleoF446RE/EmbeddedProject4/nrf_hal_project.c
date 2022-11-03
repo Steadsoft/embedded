@@ -17,22 +17,6 @@ void SysTick_Handler(void)
 	HAL_SYSTICK_IRQHandler();
 }
  
-// This code works for the Nucleo F446RE board
-
-
-struct bits
-{
-	unsigned int B0 : 1;
-	unsigned int B1 : 1;
-	unsigned int B2 : 1;
-	unsigned int B3 : 1;
-	unsigned int B4 : 1;
-	unsigned int B5 : 1;
-	unsigned int B6 : 2;
-
-};
-
-
 typedef struct
 {
 	unsigned long fields[3];
@@ -43,7 +27,7 @@ void init_nrf_registers(NrfSpiDevice * device);
 int get_board_id();
 void sleep_100_uS();
 void send_commands(NrfSpiDevice_ptr device_ptr, int count);
-void trap();
+void trapif(int);
 
 void print_register(uint8_t Register, uint8_t Value);
 
@@ -79,8 +63,6 @@ int get_board_id()
 	known = 0;
 	return known;
 }
-
-
 void sleep_100_uS()
 {
 	for (int X = 0; X < 122; X++)
@@ -109,45 +91,40 @@ int main(void)
 	
 	// Send a bunch of NRF commands to the device.
 	
-	send_commands(&device, 2000);
+	send_commands(&device, 20000);
 	
 	// Flash the Nucleo's LED to indicate that command sending is over.
 	
-	NrfHalSupport.flash_led_forever();
+	NrfHalSupport.flash_led_forever(1000);
 	
 	return(0);
 }
 
 void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 {
-	
-	
 	uint8_t RX_ADDR1[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
 	uint8_t RX_ADDR2[5] = { 0x04, 0x03, 0x02, 0x01, 0x00 };
-
 	uint8_t BUFFER[5];
-	
 	uint8_t regval;
-	NrfReg_STATUS status;
-	NrfReg_CONFIG configuration;
-	NrfReg_EN_AA en_aa;
-	NrfReg_EN_RXADDR en_rxaddr;
-	NrfReg_RX_ADDR rxaddr;
-	NrfReg_RF_CH rfchan;
-	NrfReg_RF_SETUP rf = { 0 };
-	NrfReg_FEATURE ftr;
-	NrfReg_SETUP_AW saw;
 	uint8_t multisize;
 	
-	NrfLibrary.GetRegister.FEATURE(device_ptr, &ftr, &status);
-
-	NrfLibrary.GetRegister.RF_SETUP(device_ptr, &rf, &status);
+	// Declare some NRF register variables.
 	
-	//print_register(NrfRegister.RF_SETUP, BYTE_VALUE(rf));
+	NrfReg_STATUS status;
+	NrfReg_CONFIG configuration;
+	NrfReg_EN_AA auto_acknowledge_flags;
+	NrfReg_EN_RXADDR rx_addresses_flags;
+	NrfReg_RX_ADDR rx_address;
+	NrfReg_RF_CH rf_channel;
+	NrfReg_RF_SETUP rf_setup = { 0 };
+	NrfReg_FEATURE device_features;
+	NrfReg_SETUP_AW saw;
 	
-	NrfLibrary.GetRegister.RF_CH(device_ptr, &rfchan, &status);
+	NrfLibrary.GetRegister.FEATURE(device_ptr, &device_features, &status);
 
-	//print_register(NrfRegister.RF_CH, BYTE_VALUE(rfchan));
+	NrfLibrary.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
+	
+	NrfLibrary.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
 
 	// Just a bunch of test calls into the various register read/write functions.
 	
@@ -155,58 +132,64 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 	
 	for (int X=0; X < count; X++)
 	{
-		rf.PLL_LOCK = 1;
-		rf.RF_PWR = 2;
+		rf_setup.PLL_LOCK = 1;
+		rf_setup.RF_PWR = 2;
 	
-		BYTE_VALUE(rf) = 0;
+		BYTE_VALUE(rf_setup) = 0;
 		
-		NrfLibrary.GetRegister.RF_SETUP(device_ptr, &rf, &status);
+		NrfLibrary.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
 		
+		trapif(rf_setup.LNA_HCURR != 1 || rf_setup.RF_PWR != 3 || rf_setup.RF_DR != 1);
 		
-		NrfLibrary.GetRegister.RX_ADDR(device_ptr, &rxaddr, 2, &status);
-		if (rxaddr.value != 0xC3) trap();
+		NrfLibrary.GetRegister.RX_ADDR(device_ptr, &rx_address, 2, &status);
+	
+		trapif(rx_address.value != 0xC3);
 		
-		NrfLibrary.GetRegister.RX_ADDR(device_ptr, &rxaddr, 3, &status);
-		if (rxaddr.value != 0xC4) trap();
+		NrfLibrary.GetRegister.RX_ADDR(device_ptr, &rx_address, 3, &status);
 		
-		NrfLibrary.GetRegister.RX_ADDR(device_ptr, &rxaddr, 4, &status);
-		if (rxaddr.value != 0xC5) trap();
+		trapif(rx_address.value != 0xC4);
 		
-		NrfLibrary.GetRegister.RX_ADDR(device_ptr, &rxaddr, 5, &status);
-		if (rxaddr.value != 0xC6) trap();
+		NrfLibrary.GetRegister.RX_ADDR(device_ptr, &rx_address, 4, &status);
 		
-		NrfLibrary.GetRegister.RF_CH(device_ptr, &rfchan, &status);
-		if (rfchan.RF_CH != 0x02) trap();
+		trapif(rx_address.value != 0xC5);
+		
+		NrfLibrary.GetRegister.RX_ADDR(device_ptr, &rx_address, 5, &status);
+		
+		trapif(rx_address.value != 0xC6);
+		
+		NrfLibrary.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
+		
+		trapif(rf_channel.RF_CH != 0x02);
 
-		rfchan.RF_CH = 23;
+		rf_channel.RF_CH = 23;
 		
-		NrfLibrary.SetRegister.RF_CH(device_ptr, rfchan, &status);
+		NrfLibrary.SetRegister.RF_CH(device_ptr, rf_channel, &status);
 
-		NrfLibrary.GetRegister.RF_CH(device_ptr, &rfchan, &status);
+		NrfLibrary.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
 		
-		if (rfchan.RF_CH != 23) trap();
+		trapif(rf_channel.RF_CH != 23);
 		
-		rfchan.RF_CH = 2;
+		rf_channel.RF_CH = 2;
 
-		NrfLibrary.SetRegister.RF_CH(device_ptr, rfchan, &status);
+		NrfLibrary.SetRegister.RF_CH(device_ptr, rf_channel, &status);
 
 		NrfLibrary.GetRegister.CONFIG(device_ptr, &(configuration), &status);
-		NrfLibrary.GetRegister.EN_AA(device_ptr, &(en_aa), &status);
-		NrfLibrary.GetRegister.RX_ADDR(device_ptr, &(rxaddr),3, &status);
+		NrfLibrary.GetRegister.EN_AA(device_ptr, &(auto_acknowledge_flags), &status);
+		NrfLibrary.GetRegister.RX_ADDR(device_ptr, &(rx_address),3, &status);
 		NrfLibrary.GetRegister.SETUP_AW(device_ptr, &saw, &status);
 		
-		if (saw.AW != 0x03)
-			break;
+		trapif(saw.AW != 0x03);
 
 		sleep_100_uS();
-		
-//		HAL_Delay(1);
 	}
 }
 
-void trap()
+void trapif(int value)
 {
-	;
+	if (!value)
+		return;
+	
+	NrfHalSupport.flash_led_forever(20);
 }
 void init_nrf_registers(NrfSpiDevice * device)
 {	NrfReg_STATUS status;
@@ -231,7 +214,6 @@ void init_nrf_registers(NrfSpiDevice * device)
 	NrfLibrary.SetRegister.SETUP_AW(device, setup_aw, &status);
 
 }
-
 void print_register(uint8_t Register, uint8_t Value)
 {
 	switch (Register)
