@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include <nrf24_package.library.h>
-#include <nrf_hal_support.library.h>
+#include <nrf24_hal_support.library.h>
 
 
 // SEE: http://blog.gorski.pm/stm32-unique-id
@@ -85,9 +85,9 @@ int main(void)
 	
 	// Perform all IO related initialization
 	
-	nrf_hal_support.init_spi(&spi);
-	nrf_hal_support.init_control_pins();
-	nrf_hal_support.init_device(&spi, &device, &descriptor);
+	nrf24_hal_support.init_spi(&spi);
+	nrf24_hal_support.init_control_pins();
+	nrf24_hal_support.init_device(&spi, &device, &descriptor);
 	
 	// Send a bunch of NRF commands to the device.
 	
@@ -95,7 +95,7 @@ int main(void)
 	
 	// Slowly flash the Nucleo's LED to indicate that command sending is over.
 	
-	nrf_hal_support.flash_led_forever(1000);
+	nrf24_hal_support.flash_led_forever(1000);
 	
 	return(0);
 }
@@ -191,7 +191,7 @@ void trapif(int value)
 	
 	// Rapidly flash the Nucleo's LED to indicate an unexpected register read.
 	
-	nrf_hal_support.flash_led_forever(20);
+	nrf24_hal_support.flash_led_forever(20);
 }
 void init_nrf_registers(NrfSpiDevice * device)
 {	NrfReg_STATUS status;

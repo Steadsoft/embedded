@@ -2,8 +2,8 @@
 #include <stm32f4xx_hal.h>
 #include <nrf24_package.library.h>
 
-#define nrf_hal_support_implementer
-#include <nrf_hal_support.library.h>
+#define nrf24_hal_support_implementer
+#include <nrf24_hal_support.library.h>
 
 // Declare all static functions
 static void spi_ce_lo(void *);
@@ -19,7 +19,7 @@ static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr
 static void flash_led_forever(uint32_t interval);
 
 // Declare the global library interface with same name as library
-nrf_hal_support_struct nrf_hal_support =
+nrf24_hal_support_struct nrf24_hal_support =
 {
 	.init_spi = init_spi,
 	.init_control_pins = init_control_pins,
@@ -69,11 +69,11 @@ static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr
 	descriptor_ptr->cs_pin = SPI_CS;
 	
 	device_ptr->io_ptr = descriptor_ptr;
-	device_ptr->SelectDevice = nrf_hal_support.spi_cs_lo;
-	device_ptr->DeselectDevice = nrf_hal_support.spi_cs_hi;
-	device_ptr->ExchangeBytes = nrf_hal_support.exchange_bytes;
-	device_ptr->ReadBytes = nrf_hal_support.read_bytes;
-	device_ptr->WriteBytes = nrf_hal_support.write_bytes;
+	device_ptr->SelectDevice = nrf24_hal_support.spi_cs_lo;
+	device_ptr->DeselectDevice = nrf24_hal_support.spi_cs_hi;
+	device_ptr->ExchangeBytes = nrf24_hal_support.exchange_bytes;
+	device_ptr->ReadBytes = nrf24_hal_support.read_bytes;
+	device_ptr->WriteBytes = nrf24_hal_support.write_bytes;
 
 }
 static void init_spi(SPI_HandleTypeDef * spi_ptr)

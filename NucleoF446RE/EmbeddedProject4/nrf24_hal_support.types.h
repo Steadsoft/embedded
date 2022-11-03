@@ -7,7 +7,7 @@ struct nrf_io_descriptor
 	uint8_t ce_pin;
 };
 
-struct nrf_hal_support_interface
+struct nrf24_hal_support_interface
 {
 	void (*init_spi)(SPI_HandleTypeDef * spi_ptr);
 	void (*init_control_pins)();

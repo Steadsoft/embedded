@@ -29,13 +29,13 @@
 /* the various files.                                                                    */
 /*---------------------------------------------------------------------------------------*/
 
-#include "nrf_hal_support.macros.h"
-#include "nrf_hal_support.typedefs.h"
-#include "nrf_hal_support.types.h"
+#include "nrf24_hal_support.macros.h"
+#include "nrf24_hal_support.typedefs.h"
+#include "nrf24_hal_support.types.h"
 
 // The library implementation source file defines this because it also declares globals.
 // Library consumers, refer to these globals using 'extern' and so include that header.
 
-#if !defined(nrf_hal_support_implementer)
-#include "nrf_hal_support.externs.h"
+#if !defined(nrf24_hal_support_implementer)
+#include "nrf24_hal_support.externs.h"
 #endif

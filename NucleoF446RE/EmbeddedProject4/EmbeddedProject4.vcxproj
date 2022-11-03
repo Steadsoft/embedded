@@ -64,7 +64,7 @@
   <ItemGroup>
     <ClCompile Include="nrf_hal_project.c" />
     <ClCompile Include="nrf24_package.c" />
-    <ClCompile Include="nrf_hal_support.c" />
+    <ClCompile Include="nrf24_hal_support.c" />
     <ClCompile Include="system_stm32f4xx.c" />
     <None Include="stm32.props" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\StartupFiles\startup_stm32f446xx.c" />
@@ -163,11 +163,11 @@
     <ClInclude Include="nrf24_package.externs.h" />
     <ClInclude Include="nrf24_package.types.h" />
     <ClInclude Include="nrf24_package.typedefs.h" />
-    <ClInclude Include="nrf_hal_support.externs.h" />
-    <ClInclude Include="nrf_hal_support.library.h" />
-    <ClInclude Include="nrf_hal_support.macros.h" />
-    <ClInclude Include="nrf_hal_support.types.h" />
-    <ClInclude Include="nrf_hal_support.typedefs.h" />
+    <ClInclude Include="nrf24_hal_support.externs.h" />
+    <ClInclude Include="nrf24_hal_support.library.h" />
+    <ClInclude Include="nrf24_hal_support.macros.h" />
+    <ClInclude Include="nrf24_hal_support.types.h" />
+    <ClInclude Include="nrf24_hal_support.typedefs.h" />
     <ClInclude Include="stm32f4xx_hal_conf.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc.h" />
