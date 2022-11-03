@@ -710,7 +710,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="nrf24_package.structs.h">
+    <ClInclude Include="nrf24_package.types.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="nrf24_package.macros.h">
@@ -725,7 +725,7 @@
     <ClInclude Include="nrf_hal_support.typedefs.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="nrf_hal_support.structs.h">
+    <ClInclude Include="nrf_hal_support.types.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="nrf24_package.library.h">

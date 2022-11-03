@@ -161,12 +161,12 @@
     <ClInclude Include="nrf24_package.library.h" />
     <ClInclude Include="nrf24_package.macros.h" />
     <ClInclude Include="nrf24_package.externs.h" />
-    <ClInclude Include="nrf24_package.structs.h" />
+    <ClInclude Include="nrf24_package.types.h" />
     <ClInclude Include="nrf24_package.typedefs.h" />
     <ClInclude Include="nrf_hal_support.externs.h" />
     <ClInclude Include="nrf_hal_support.library.h" />
     <ClInclude Include="nrf_hal_support.macros.h" />
-    <ClInclude Include="nrf_hal_support.structs.h" />
+    <ClInclude Include="nrf_hal_support.types.h" />
     <ClInclude Include="nrf_hal_support.typedefs.h" />
     <ClInclude Include="stm32f4xx_hal_conf.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h" />
