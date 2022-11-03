@@ -725,12 +725,6 @@
     <ClInclude Include="nrf24_package.externs.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="nrf24_package.globals.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="nrf24_package.statics.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
     <ClInclude Include="nrf_hal_support.typedefs.h">
       <Filter>Header files</Filter>
     </ClInclude>
@@ -743,13 +737,7 @@
     <ClInclude Include="nrf24_package.library.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="nrf_hal_support.statics.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
     <ClInclude Include="nrf_hal_support.macros.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="nrf_hal_support.globals.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="nrf_hal_support.externs.h">

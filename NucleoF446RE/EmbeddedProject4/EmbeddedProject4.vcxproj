@@ -162,15 +162,11 @@
     <ClInclude Include="nrf24_package.library.h" />
     <ClInclude Include="nrf24_package.macros.h" />
     <ClInclude Include="nrf24_package.externs.h" />
-    <ClInclude Include="nrf24_package.globals.h" />
-    <ClInclude Include="nrf24_package.statics.h" />
     <ClInclude Include="nrf24_package.structs.h" />
     <ClInclude Include="nrf24_package.typedefs.h" />
     <ClInclude Include="nrf_hal_support.externs.h" />
-    <ClInclude Include="nrf_hal_support.globals.h" />
     <ClInclude Include="nrf_hal_support.library.h" />
     <ClInclude Include="nrf_hal_support.macros.h" />
-    <ClInclude Include="nrf_hal_support.statics.h" />
     <ClInclude Include="nrf_hal_support.structs.h" />
     <ClInclude Include="nrf_hal_support.typedefs.h" />
     <ClInclude Include="nrf_hal_support.functions.h" />

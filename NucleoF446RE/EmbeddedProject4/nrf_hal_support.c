@@ -5,6 +5,36 @@
 #define nrf_hal_support
 #include <nrf_hal_support.library.h>
 
+// Declare all static functions
+static void spi_ce_lo(void *);
+static void spi_ce_hi(void *);
+static void spi_cs_lo(void *);
+static void spi_cs_hi(void *);
+static void exchange_bytes(void *, uint8_t[], uint8_t[], uint8_t);
+static void read_bytes(void *, uint8_t bytes_in_ptr[], uint8_t count);
+static void write_bytes(void *, uint8_t bytes_out_ptr[], uint8_t count);
+static void init_spi(SPI_HandleTypeDef * spi_ptr);
+static void init_control_pins();
+static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr);
+static void flash_led_forever(uint32_t interval);
+
+// Declare the global library interface
+NrfHalFunctions NrfHalSupport =
+{
+	.init_spi = init_spi,
+	.init_control_pins = init_control_pins,
+	.spi_ce_lo = spi_ce_lo,
+	.spi_ce_hi = spi_ce_hi,
+	.spi_cs_lo = spi_cs_lo,
+	.spi_cs_hi = spi_cs_hi,
+	.exchange_bytes = exchange_bytes,
+	.read_bytes = read_bytes,
+	.write_bytes = write_bytes,
+	.init_device = init_device,
+	.flash_led_forever = flash_led_forever
+};
+
+// Implementation 
 static void flash_led_forever(uint32_t interval)
 {
 	HAL_DeInit();
