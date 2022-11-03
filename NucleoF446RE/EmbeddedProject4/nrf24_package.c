@@ -43,7 +43,7 @@ static void _WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8
 
 // Declare the global library interface
 
-NrfRegisters NrfRegister =
+const nrf24_register_names Nrf24Register =
 { 
 	.CONFIG = 0x00,
 	.EN_AA = 0x01,
@@ -73,7 +73,7 @@ NrfRegisters NrfRegister =
 	.FEATURE = 0x1D
 };
 
-nrf24_package Nrf24Package =
+const nrf24_package Nrf24Package =
 { 
 	.GetRegister = 
 	{     
@@ -121,123 +121,123 @@ nrf24_package Nrf24Package =
 
 static void _ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.CONFIG, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.CONFIG, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.CONFIG, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.CONFIG, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.EN_AA, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.EN_AA, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.EN_AA, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.EN_AA, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.EN_RXADDR, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.EN_RXADDR, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.EN_RXADDR, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.EN_RXADDR, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.SETUP_AW, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.SETUP_AW, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.SETUP_RETR, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_RETR, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.SETUP_RETR, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.SETUP_RETR, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.RF_CH, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.RF_CH, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.RF_CH, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.RF_CH, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.RF_SETUP, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.RF_SETUP, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.RF_SETUP, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.RF_SETUP, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.STATUS, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.STATUS, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.STATUS, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.STATUS, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.OBSERVE_TX, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.OBSERVE_TX, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.OBSERVE_TX, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.OBSERVE_TX, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadCdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CD_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.CD, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.CD, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteCdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CD Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.CD, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.CD, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P0 + Pipe, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadRxAddrP0Register(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P0, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteRxAddrP0Register(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.RX_ADDR_P0, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.RX_PW_P0 + Pipe, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.RX_PW_P0 + Pipe, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW Value, uint8_t Pipe,NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.RX_PW_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.RX_PW_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.FEATURE, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.FEATURE, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.FEATURE, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.FEATURE, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, NrfRegister.FEATURE, BYTE_ADDRESS(Value), NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.FEATURE, BYTE_ADDRESS(Value), NrfStatus);
 }
 static void _WriteFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, NrfRegister.FEATURE, BYTE_VALUE(Value), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.FEATURE, BYTE_VALUE(Value), NrfStatus);
 }
 static void _ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus)
 {
@@ -265,7 +265,7 @@ static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 	*BytesRead = 0;
 	*NrfStatus = (NrfReg_STATUS){ 0 };
 
-	_ReadSingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &width, NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, &width, NrfStatus);
 	
 	switch (width)
 	{
@@ -295,7 +295,7 @@ static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Regist
 	
 	*NrfStatus = (NrfReg_STATUS){ 0 };
 
-	_ReadSingleByteRegister(device_ptr, NrfRegister.SETUP_AW, &width, NrfStatus);
+	_ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, &width, NrfStatus);
 	
 	switch (width)
 	{

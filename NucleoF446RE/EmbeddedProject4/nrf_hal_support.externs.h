@@ -1,1 +1,1 @@
-extern nrf_hal_support NrfHalSupport;
+extern const nrf_hal_support NrfHalSupport;

@@ -19,7 +19,7 @@ static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr
 static void flash_led_forever(uint32_t interval);
 
 // Declare the global library interface
-nrf_hal_support NrfHalSupport =
+const nrf_hal_support NrfHalSupport =
 {
 	.init_spi = init_spi,
 	.init_control_pins = init_control_pins,
