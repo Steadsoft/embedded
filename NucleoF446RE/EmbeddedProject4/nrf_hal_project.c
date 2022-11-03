@@ -91,9 +91,9 @@ int main(void)
 	
 	// Send a bunch of NRF commands to the device.
 	
-	send_commands(&device, 20000);
+	send_commands(&device, 10000);
 	
-	// Flash the Nucleo's LED to indicate that command sending is over.
+	// Slowly flash the Nucleo's LED to indicate that command sending is over.
 	
 	nrf_hal_support.flash_led_forever(1000);
 	
@@ -188,6 +188,8 @@ void trapif(int value)
 {
 	if (!value)
 		return;
+	
+	// Rapidly flash the Nucleo's LED to indicate an unexpected register read.
 	
 	nrf_hal_support.flash_led_forever(20);
 }
