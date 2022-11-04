@@ -106,6 +106,16 @@ The macro `nrf_hal_support_implementer` name is a private defintion, only define
 
 The global name that represents the interface is named with the library name, this makes it easy to infer the name of the global interface simply by knowing the name of a library. These are conventions and must be maintained by developers but the benefits are significant in terms of uniformity, consisteny and readability.
 
+Consumer code thus looks like these exampples:
+
+```c
+	nrf24_package.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
+```
+
+```c
+	nrf24_hal_support.init_spi(&spi);
+```
+
 
 
 
