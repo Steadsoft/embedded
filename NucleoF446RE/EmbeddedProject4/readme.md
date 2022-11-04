@@ -148,16 +148,6 @@ The application project source file contains only these headers:
 
 The application code interacts with the code in the libraries strictly through the interfaces defined by the library `.types.` headers:
 
-```c
-struct nrf24_package_interface
-{
-	NrfIoCallbacks_ptr ptr;
-	struct nrf_set_register_interface GetRegister;
-	struct nrf_get_register_interface SetRegister;
-};
-```
-
-and
 
 ```c
 struct nrf24_hal_support_interface
@@ -175,6 +165,49 @@ struct nrf24_hal_support_interface
 	void(*flash_led_forever)(uint32_t interval);
 };
 ```
+and
+```c
+struct nrf24_package_interface
+{
+	NrfIoCallbacks_ptr ptr;
+	struct nrf_set_register_interface GetRegister;
+	struct nrf_get_register_interface SetRegister;
+};
+```
+The last interface is an example of a hieracrchical interface, `GetRegister` is itself an interface exposing a set of functions:
+
+```c
+struct nrf_get_register_interface
+{
+	void(* CONFIG)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* EN_AA)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* EN_RX_ADDR)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* SETUP_AW)(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* SETUP_RETR)(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* STATUS)(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* OBSERVE_TX)(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* CD)(NrfSpiDevice_ptr device_ptr, NrfReg_CD Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RX_ADDR)(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+	void(* RX_PW)(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+	void(* DYNPD)(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RF_CH)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RF_SETUP)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* FEATURE)(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_STATUS_ptr NrfStatus);
+};
+```
+
+This means we can use the same name for two functions:
+
+```c
+	nrf24_package.GetRegister.RX_ADDR(device_ptr, &rx_address, 3, &status);
+	nrf24_package.SeRegister.RX_ADDR(device_ptr, rx_address, 3, &status);
+```
+
+There are in fact two methods named `RX_ADDR` but there's no conflict because they are in different namespaces.
+
+
+
+
 
 
 
