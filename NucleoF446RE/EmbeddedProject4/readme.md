@@ -132,10 +132,9 @@ A library strives to be a pattern that can serve any need. All code could be str
 
 ## Example
 
-The following is helpful as a summary of the library concept, this is a typical small project:
+The following is helpful as a summary of the library concept, this is a typical small project created in Microsoft's Visual Studio using the 3rd part tool Visual GDB:
 
-
-![image](https://user-images.githubusercontent.com/12262952/200020950-81383cd7-74e4-4437-a878-dbbf290590ba.png)
+![image](https://user-images.githubusercontent.com/12262952/200022652-3bdd8073-c3d7-4c7e-a03f-9556f69ac779.png)
 
 There are two libraries here `nrf24_hal_support` and `nrf24_package` as well as a small application that uses them `nrf_hal_project`. You can see the various header files and their names as well as the code implementation files. 
 
