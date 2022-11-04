@@ -132,7 +132,7 @@ A library strives to be a pattern that can serve any need. All code could be str
 
 ## Example
 
-The following is helpful as a summary of the library concept, this is a typical small project created in Microsoft's Visual Studio using the 3rd part tool Visual GDB:
+The following is helpful as a summary of the library concept, this is a typical small project created in Microsoft's Visual Studio using the 3rd party tool Visual GDB:
 
 ![image](https://user-images.githubusercontent.com/12262952/200022652-3bdd8073-c3d7-4c7e-a03f-9556f69ac779.png)
 
