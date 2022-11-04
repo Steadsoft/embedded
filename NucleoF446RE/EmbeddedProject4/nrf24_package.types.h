@@ -153,7 +153,7 @@ struct NrfReg_FEATURE_struct
 	uint8_t  EN_DPL : 1;
 	uint8_t  RESERVED : 5;
 };
-struct nrf_read_calls
+struct nrf_set_register_interface
 {
 	void(* CONFIG)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* EN_AA)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA_ptr Value, NrfReg_STATUS_ptr NrfStatus);
@@ -173,7 +173,7 @@ struct nrf_read_calls
 //	void(* MultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
 
 };
-struct nrf_write_calls
+struct nrf_get_register_interface
 {
 	void(* CONFIG)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* EN_AA)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_STATUS_ptr NrfStatus);
@@ -195,8 +195,8 @@ struct nrf_write_calls
 struct nrf24_package_interface
 {
 	NrfIoCallbacks_ptr ptr;
-	struct nrf_read_calls GetRegister;
-	struct nrf_write_calls SetRegister;
+	struct nrf_set_register_interface GetRegister;
+	struct nrf_get_register_interface SetRegister;
 };
 struct nrf_io_callbacks
 {

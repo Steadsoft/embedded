@@ -1,4 +1,4 @@
-struct nrf_io_descriptor
+struct nrf24_io_descriptor
 {
 	SPI_HandleTypeDef * spi_ptr;
 	GPIO_TypeDef * gpio_ptr;
@@ -20,5 +20,4 @@ struct nrf24_hal_support_interface
 	void (*write_bytes)(void *, uint8_t bytes_out_ptr[], uint8_t count);
 	void(*init_device)(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr);
 	void(*flash_led_forever)(uint32_t interval);
-
 };

@@ -740,5 +740,8 @@
     <ClInclude Include="nrf24_hal_support.library.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="nrf24_package.docs.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

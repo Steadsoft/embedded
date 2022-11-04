@@ -8,6 +8,7 @@
 // SEE: http://blog.gorski.pm/stm32-unique-id
 
 
+
 #ifdef __cplusplus
 extern "C"
 #endif
@@ -31,7 +32,6 @@ void trapif(int);
 
 void print_register(uint8_t Register, uint8_t Value);
 
-// SEE: https://github.com/mokhwasomssi/stm32_hal_nrf24l01p
 
 int get_board_id()
 {

@@ -29,6 +29,7 @@
 /* the various files.                                                                    */
 /*---------------------------------------------------------------------------------------*/
 
+#include <nrf24_package.docs.h>
 #include <nrf24_package.macros.h>
 #include <nrf24_package.typedefs.h>
 #include <nrf24_package.types.h>
