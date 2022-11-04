@@ -7,8 +7,7 @@ I had no idea how to structure my own projects but as an experienced software en
 
 ## Libraries
 A library is something intended for *easy reuse* at the source level. The structure of a library insofar as files are concerned is as follows, let the library be named `stm32_utilities` for example:
-
-- 
+ 
 - A single implemenetation file, the source `stm32_utilities.c` file.
 - A single macro header file `stm32_utilities.macros.h`
 - A single typedefs header file `stm32_utilities.typedefs.h`
