@@ -116,14 +116,19 @@ Consumer code thus looks like these exampples:
 	nrf24_hal_support.init_spi(&spi);
 ```
 
+## Benefits of the Library pattern
 
+The library pattern is nothing more than a disciplined organizational practice, by enabling functional blocks to be represented as distinct libraries, it aids in the decomposition of the larger problem that one's application must implement.
 
+Because every library follows the same regular structure, there's no uncertainty about where to find a type or a function defintion.
 
+Libraries are not solely intended for exporting code for reuse across applications, it serves well for that need but is just as helpful as a way of breaking up a problem into smaller pieces, you might create libraries that are only ever used by one application.
 
+Libraries provide a well defined way for library code to define and use "private" types, typedefs and macros; these are totally unseen by consuming code and so name collisions are far less likely than in a less undisciplined code structure.
 
+A library is not an attempt at providing OO features, the concepts used are standard C concepts using stanadard C scoping and header file policies, yes the "interface" seems to sound OO but is not really, it is just a way to provide a namespace for functions and aids in code readability as well as exoploiting an IDEs itellisense features.
 
-
-
+A library strives to be a pattern that can serve any need. All code could be structured this way in principle and so gives the C developer a helpful abstraction for code decomposition and reuse than the language alone provides.
 
 
 
