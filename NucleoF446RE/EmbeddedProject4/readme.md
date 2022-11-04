@@ -15,14 +15,15 @@ A library is something intended for *easy reuse* at the source level. The struct
 - A single types header file `stm32_utilities.types.h`
 - A single externs header file `stm32_utilities.externs.h`
 - A single library heade file `stm32_utilities.library.h`
+- A single doc header files `stm32_utilities.docs.h`
 
 This structure can support any desired implementation or functionality. By adopting the same pattern for all libraries we can build a complete system from simply libraries, that is, all the code will follow the same structural pattern in terms of files. The system imposes no constraints on *how* one writes the code, what techniques are used etc, it is only imposed on the way we *represent the library* in terms of source files.
 
 ## Library Features
-A library implemenetd with this pattern is easy to reuse. The consumer simply include a single *library* header file like `stm32_utilities.library.h`. So long as all the files are present in the project and can be built, this is all a consumer needs to include.
+A library implemenetd with this pattern is easy to reuse. The consumer simply include a single *library* header file like `stm32_utilities.library.h`. So long as all the files are present in the project and can be built, this is *all a consumer needs to include*.
 
 ## Library Name
-This is whatever you want it to, it us repeated in the names of the header files and also appears as a prefix in several important place. In the `types` header we always have a type `<library_name>_interface` a struct. This struct defines a set of function pointers that represent every function we want to expose to the library consumer. 
+This is whatever you want it to be, it is repeated in the names of the header files and also appears as a prefix in several important place. In the `types` header we always have a type `<library_name>_interface` a struct. This struct defines a set of function pointers that represent every function we want to expose to the library consumer. 
 
 e.g.
 
@@ -47,12 +48,10 @@ struct nrf_hal_support_interface
 In the typedefs header we define a typename for this struct type, e.g.
 
 ```c
-typedef struct nrf_hal_support_interface const nrf_hal_support;
+typedef const struct nrf24_hal_support_interface nrf24_hal_support_struct, * nrf_hal_support_ptr;
 ```
 
-That defined type name - a const - is the library name, the library name is therefore a C type.
-
-In the implemengation source file all functions are static, there are no exported functions. We have three distinct things in this file:
+In the implementation source file all functions are static, there are no exported functions. We have three distinct things in this file:
 
 1. Forward prototype declarations for all implemented functions.
 2. A global declaration of a single initialized instance of the interface type.
@@ -61,7 +60,7 @@ In the implemengation source file all functions are static, there are no exporte
 Here's an example of how the global interface is defined in the source file:
 
 ```c
-nrf_hal_support NrfHalSupport =
+nrf24_hal_support_struct nrf24_hal_support =
 {
 	.init_spi = init_spi,
 	.init_control_pins = init_control_pins,
@@ -77,15 +76,16 @@ nrf_hal_support NrfHalSupport =
 };
 ```
 
-This global name is also define in the `externs` file:
+This global name is also define in the `externs` file, this file's content is only seen by consumers of the library.
 
 ```c
-extern nrf_hal_support NrfHalSupport;
+extern nrf24_hal_support_struct nrf24_hal_support;
 ```
+
 The library consumer can now regard the library as being a namespace, and refer to function by a qualified a name,a great help in C:
 
 ```c
-	NrfHalSupport.init_spi(&spi);
+	nrf24_hal_support.init_spi(&spi);
 ```
 The `.library.` header file consolidates the inlcuding of all the other needed files. This same file is included in the implementation source file and the consumer's source file, here it is:
 
@@ -102,7 +102,9 @@ The `.library.` header file consolidates the inlcuding of all the other needed f
 #endif
 ```
 
-The macro `nrf_hal_support_implementer` name is a private defintion, only defined within the implementation source file, this is how consumers define the externs exposed by the library.
+The macro `nrf_hal_support_implementer` name is a private defintion, only defined within the implementation source file, this is how consuming code is able to define the externs exposed by the library.
+
+The global name that represents the interface is named with the library name, this makes it easy to infer the name of the global interface simply by knowing the name of a library. These are conventions and must be maintained by developers but the benefits are significant in terms of uniformity, consisteny and readability.
 
 
 
