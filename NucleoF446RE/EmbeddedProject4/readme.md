@@ -130,5 +130,55 @@ A library is not an attempt at providing OO features, the concepts used are stan
 
 A library strives to be a pattern that can serve any need. All code could be structured this way in principle and so gives the C developer a helpful abstraction for code decomposition and reuse than the language alone provides.
 
+## Example
+
+The following is helpful as a summary of the library concept, this is a typical small project:
+
+
+![image](https://user-images.githubusercontent.com/12262952/200020950-81383cd7-74e4-4437-a878-dbbf290590ba.png)
+
+There are two libraries here `nrf24_hal_support` and `nrf24_package` as well as a small application that uses them `nrf_hal_project`. You can see the various header files and their names as well as the code implementation files. 
+
+The application project source file contains only these headers:
+
+```c
+#include <stm32f4xx_hal.h>
+#include <nrf24_package.library.h>
+#include <nrf24_hal_support.library.h>
+```
+
+The application code interacts with the code in the libraries strictly through the interfaces defined by the library `.types.` headers:
+
+```c
+struct nrf24_package_interface
+{
+	NrfIoCallbacks_ptr ptr;
+	struct nrf_set_register_interface GetRegister;
+	struct nrf_get_register_interface SetRegister;
+};
+```
+
+and
+
+```c
+struct nrf24_hal_support_interface
+{
+	void (*init_spi)(SPI_HandleTypeDef * spi_ptr);
+	void (*init_control_pins)();
+	void (*spi_ce_lo)(void *);
+	void (*spi_ce_hi)(void *);
+	void (*spi_cs_lo)(void *);
+	void (*spi_cs_hi)(void *);
+	void (*exchange_bytes)(void *, uint8_t[], uint8_t[], uint8_t);
+	void (*read_bytes)(void *, uint8_t bytes_in_ptr[], uint8_t count);
+	void (*write_bytes)(void *, uint8_t bytes_out_ptr[], uint8_t count);
+	void(*init_device)(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr);
+	void(*flash_led_forever)(uint32_t interval);
+};
+```
+
+
+
+
 
 
