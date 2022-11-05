@@ -177,6 +177,8 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 		nrf24_package.GetRegister.SETUP_AW(device_ptr, &saw, &status);
 		
 		trapif(saw.AW != 0x03);
+		
+		nrf24_package.GetRegister.STATUS(device_ptr, &status);
 
 		sleep_100_uS();
 	}
