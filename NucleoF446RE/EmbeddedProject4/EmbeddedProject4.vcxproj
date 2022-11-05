@@ -158,6 +158,7 @@
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_tim.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_usart.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_utils.c" />
+    <ClInclude Include="nrf24_hal_support.docs.h" />
     <ClInclude Include="nrf24_package.docs.h" />
     <ClInclude Include="nrf24_package.library.h" />
     <ClInclude Include="nrf24_package.macros.h" />

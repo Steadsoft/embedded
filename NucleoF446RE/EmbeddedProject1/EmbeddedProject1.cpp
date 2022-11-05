@@ -27,7 +27,6 @@ int main(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	GPIO_InitStructure.Pin = GPIO_PIN_5;
-
 	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStructure.Pull = GPIO_NOPULL;

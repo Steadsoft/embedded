@@ -1,6 +1,4 @@
 #include <stm32f4xx_hal.h>
-#include <stdio.h>
-
 #include <nrf24_package.library.h>
 #include <nrf24_hal_support.library.h>
 
@@ -224,19 +222,19 @@ void print_register(uint8_t Register, uint8_t Value)
 		{
 			NrfReg_RF_CH reg;
 			BYTE_VALUE(reg) = Value;
-			printf("RF_CH: RF_CH %d, ", reg.RF_CH);
-			printf("RF.RESERVED %d\n", reg.RESERVED);
+//			printf("RF_CH: RF_CH %d, ", reg.RF_CH);
+//			printf("RF.RESERVED %d\n", reg.RESERVED);
 			return;
 		}
 	case 0x06:
 		{
 			NrfReg_RF_SETUP reg;
 			BYTE_VALUE(reg) = Value;
-			printf("RF_SETUP: LNA_HCURR %d, ", reg.LNA_HCURR);
-			printf("RF_PWR %d, ", reg.RF_PWR);
-			printf("RF_DR %d, ", reg.RF_DR);
-			printf("PLL_LOCK %d, ", reg.PLL_LOCK);
-			printf("RF.RESERVED %d\n", reg.RESERVED);
+//			printf("RF_SETUP: LNA_HCURR %d, ", reg.LNA_HCURR);
+//			printf("RF_PWR %d, ", reg.RF_PWR);
+//			printf("RF_DR %d, ", reg.RF_DR);
+//			printf("PLL_LOCK %d, ", reg.PLL_LOCK);
+//			printf("RF.RESERVED %d\n", reg.RESERVED);
 			return;
 		}
 	}
