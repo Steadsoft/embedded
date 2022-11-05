@@ -1,5 +1,7 @@
 typedef const struct nrf24_package_interface nrf24_package_struct, * nrf24_package_ptr;
-typedef const struct nrf_registers nrf24_register_names, * NrfIoRegisters_ptr;
+typedef const struct nrf_registers nrf24_register_names;
+typedef const struct nrf_commands nrf24_command_names;
+
 
 typedef struct nrf_register_calls NrfRegisterCalls, * NrfRegisterCalls_ptr;
 typedef struct nrf_io_interface NrfIoInterface, * NrfIoInterface_ptr;

@@ -96,7 +96,7 @@ nrf24_package_struct nrf24_package =
 	}
 };
 
-nrf24_register_names Nrf24Register =
+const nrf24_register_names Nrf24Register =
 { 
 	.CONFIG = 0x00,
 	.EN_AA = 0x01,
@@ -124,6 +124,21 @@ nrf24_register_names Nrf24Register =
 	.FIFO_STATUS = 0x17,
 	.DYNPD = 0x1C,
 	.FEATURE = 0x1D
+};
+
+const nrf24_command_names NrfCommand =
+{ 
+	.R_REGISTER = 0x00,
+	.W_REGISTER = 0x20,
+	.R_RX_PAYLOAD = 0x61,
+	.W_TX_PAYLOAD = 0xA0,
+	.FLUSH_TX = 0xE1,
+	.FLUSH_RX = 0xE2,
+	.REUSE_TX_PL = 0xE3,
+	.R_RX_PL_WID = 0x60,
+	.W_ACK_PAYLOAD = 0xA8,
+	.W_TX_PAYLOAD_NOACK = 0xB0,
+	.NOP = 0xFF
 };
 
 // Implementation 
@@ -271,7 +286,7 @@ static void _WriteFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Va
 }
 static void _ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	uint8_t command = R_REGISTER | Register;
+	uint8_t command = NrfCommand.R_REGISTER | Register;
 	
 	device_ptr->SelectDevice(device_ptr->io_ptr);
 	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
@@ -280,7 +295,7 @@ static void _ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 }
 static void _WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	uint8_t command = W_REGISTER | Register;
+	uint8_t command = NrfCommand.W_REGISTER | Register;
 	device_ptr->SelectDevice(device_ptr->io_ptr);
 	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
 	device_ptr->WriteBytes(device_ptr->io_ptr, &Value, 1);
@@ -288,7 +303,7 @@ static void _WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Regist
 }
 static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus)
 {
-	uint8_t command = R_REGISTER | Register;
+	uint8_t command = NrfCommand.R_REGISTER | Register;
 	uint8_t width;
 	uint8_t bytes;
 	
@@ -319,7 +334,7 @@ static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 }
 static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus)
 {
-	uint8_t command = W_REGISTER | Register;
+	uint8_t command = NrfCommand.W_REGISTER | Register;
 	uint8_t width;
 	uint8_t bytes;
 	

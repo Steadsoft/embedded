@@ -29,6 +29,20 @@ struct nrf_registers
 	uint8_t DYNPD;
 	uint8_t FEATURE;
 };
+struct nrf_commands
+{
+	uint8_t R_REGISTER;
+	uint8_t W_REGISTER;
+	uint8_t R_RX_PAYLOAD;
+	uint8_t W_TX_PAYLOAD;
+	uint8_t FLUSH_TX;
+	uint8_t FLUSH_RX;
+	uint8_t REUSE_TX_PL;
+	uint8_t R_RX_PL_WID;
+	uint8_t W_ACK_PAYLOAD;
+	uint8_t W_TX_PAYLOAD_NOACK;
+	uint8_t NOP;
+};
 
 // Create (in effect) a "namespace" for containing all of the register names.
 
