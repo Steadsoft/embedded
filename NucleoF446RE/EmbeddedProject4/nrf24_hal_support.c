@@ -15,7 +15,7 @@ static void write_bytes(void *, uint8_t bytes_out_ptr[], uint8_t count);
 static void init_spi(SPI_HandleTypeDef * spi_ptr);
 static void init_control_pins();
 static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr);
-static void flash_led_forever(uint32_t interval);
+static void pulse_led_forever(uint32_t interval);
 
 // Declare the global library interface with same name as library
 nrf24_hal_support_struct nrf24_hal_support =
@@ -30,11 +30,11 @@ nrf24_hal_support_struct nrf24_hal_support =
 	.read_bytes = read_bytes,
 	.write_bytes = write_bytes,
 	.init_device = init_device,
-	.flash_led_forever = flash_led_forever
+	.flash_led_forever = pulse_led_forever
 };
 
 // Implementation 
-static void flash_led_forever(uint32_t interval)
+static void pulse_led_forever(uint32_t interval)
 {
 	HAL_DeInit();
 	HAL_Init();
