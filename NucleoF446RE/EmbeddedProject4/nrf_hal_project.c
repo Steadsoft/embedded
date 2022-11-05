@@ -112,7 +112,7 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 	NrfReg_CONFIG configuration;
 	NrfReg_EN_AA auto_acknowledge_flags;
 	NrfReg_EN_RXADDR rx_addresses_flags;
-	NrfReg_RX_ADDR rx_address;
+	NrfReg_RX_ADDR_SHORT rx_address;
 	NrfReg_RF_CH rf_channel;
 	NrfReg_RF_SETUP rf_setup = { 0 };
 	NrfReg_FEATURE device_features;
@@ -137,21 +137,21 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 		
 		nrf24_package.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
 		
-		trapif(rf_setup.LNA_HCURR != 1 || rf_setup.RF_PWR != 3 || rf_setup.RF_DR != 1);
+		//trapif(rf_setup.LNA_HCURR != 1 || rf_setup.RF_PWR != 3 || rf_setup.RF_DR != 1);
 		
-		nrf24_package.GetRegister.RX_ADDR(device_ptr, &rx_address, 2, &status);
+		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 2, &status);
 	
 		trapif(rx_address.value != 0xC3);
 		
-		nrf24_package.GetRegister.RX_ADDR(device_ptr, &rx_address, 3, &status);
+		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 3, &status);
 		
 		trapif(rx_address.value != 0xC4);
 		
-		nrf24_package.GetRegister.RX_ADDR(device_ptr, &rx_address, 4, &status);
+		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 4, &status);
 		
 		trapif(rx_address.value != 0xC5);
 		
-		nrf24_package.GetRegister.RX_ADDR(device_ptr, &rx_address, 5, &status);
+		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 5, &status);
 		
 		trapif(rx_address.value != 0xC6);
 		
@@ -173,7 +173,7 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 
 		nrf24_package.GetRegister.CONFIG(device_ptr, &(configuration), &status);
 		nrf24_package.GetRegister.EN_AA(device_ptr, &(auto_acknowledge_flags), &status);
-		nrf24_package.GetRegister.RX_ADDR(device_ptr, &(rx_address), 3, &status);
+		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &(rx_address), 3, &status);
 		nrf24_package.GetRegister.SETUP_AW(device_ptr, &saw, &status);
 		
 		trapif(saw.AW != 0x03);
