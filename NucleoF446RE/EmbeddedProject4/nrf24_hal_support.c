@@ -78,6 +78,7 @@ static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr
 static void init_spi(SPI_HandleTypeDef * spi_ptr)
 {
 	GPIO_InitTypeDef  GPIO_InitStruct_spi = { 0 };
+	GPIO_InitTypeDef  GPIO_InitStruct_irq = { 0 };
 
 	__SPI1_CLK_ENABLE();
 	
@@ -105,7 +106,20 @@ static void init_spi(SPI_HandleTypeDef * spi_ptr)
 	GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
  
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_spi);
+	
+	GPIO_InitStruct_irq.Pin = GPIO_PIN_0;
+	GPIO_InitStruct_irq.Mode = GPIO_MODE_IT_FALLING;
+	GPIO_InitStruct_irq.Pull = GPIO_NOPULL;
+	
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_irq);
+
+	/* EXTI interrupt init*/
+	HAL_NVIC_SetPriority(EXTI0_IRQn, 3, 0);
+	HAL_NVIC_EnableIRQ(EXTI0_IRQn); 
+
 }
+
+
 
 static void init_control_pins()
 {
