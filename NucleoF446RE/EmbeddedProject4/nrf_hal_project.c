@@ -2,6 +2,7 @@
 #include <nrf24_package.library.h>
 #include <nrf24_hal_support.library.h>
 
+//#include <cmsis_gcc.h>
 
 // SEE: http://blog.gorski.pm/stm32-unique-id
 
@@ -21,6 +22,7 @@ typedef struct
 	unsigned long fields[3];
 } BoardId;
 
+int interrupt_count = 0;
 
 void init_nrf_registers(NrfSpiDevice * device);
 int get_board_id();
@@ -30,6 +32,7 @@ void trapif(int);
 
 void print_register(uint8_t Register, uint8_t Value);
 
+volatile uint8_t lock = 0;
 
 int get_board_id()
 {
@@ -71,9 +74,13 @@ void sleep_100_uS()
 
 int main(void)
 {
+	uint32_t state;
+	
 	HAL_Init();
 	
 	int board = get_board_id();
+	
+	state = __STREXB(1, &lock); // does nothing, I don't yet underatand these kinds of ARM instructions.
 
 	// Allocate these data structures on the stack.
 	
@@ -244,5 +251,6 @@ void print_register(uint8_t Register, uint8_t Value)
 
 void EXTI0_IRQHandler(void)
 {
+	interrupt_count++;
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 } 

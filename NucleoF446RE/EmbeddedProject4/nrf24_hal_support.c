@@ -36,11 +36,7 @@ nrf24_hal_support_struct nrf24_hal_support =
 // Implementation 
 static void pulse_led_forever(uint32_t interval)
 {
-	HAL_DeInit();
-	HAL_Init();
 	
-	__GPIOA_CLK_ENABLE();
-
 	GPIO_InitTypeDef  GPIO_InitStruct = { 0 };
 	
 	GPIO_InitStruct.Pin       = GPIO_PIN_5;
@@ -57,8 +53,6 @@ static void pulse_led_forever(uint32_t interval)
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 		HAL_Delay(interval);	
 	}
-	
-
 }
 static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr)
 {
@@ -109,14 +103,14 @@ static void init_spi(SPI_HandleTypeDef * spi_ptr)
 	
 	GPIO_InitStruct_irq.Pin = GPIO_PIN_0;
 	GPIO_InitStruct_irq.Mode = GPIO_MODE_IT_FALLING;
-	GPIO_InitStruct_irq.Pull = GPIO_NOPULL;
-	
+	GPIO_InitStruct_irq.Pull = GPIO_PULLUP;
+	GPIO_InitStruct_spi.Speed = GPIO_SPEED_FAST;
+
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_irq);
-
+	
 	/* EXTI interrupt init*/
-	HAL_NVIC_SetPriority(EXTI0_IRQn, 3, 0);
+	HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(EXTI0_IRQn); 
-
 }
 
 
