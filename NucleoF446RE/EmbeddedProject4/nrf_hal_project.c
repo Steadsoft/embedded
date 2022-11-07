@@ -6,8 +6,6 @@
 
 // SEE: http://blog.gorski.pm/stm32-unique-id
 
-
-
 #ifdef __cplusplus
 extern "C"
 #endif
@@ -16,13 +14,13 @@ void SysTick_Handler(void)
 	HAL_IncTick();
 	HAL_SYSTICK_IRQHandler();
 }
- 
 typedef struct
 {
 	unsigned long fields[3];
 } BoardId;
 
 int interrupt_count = 0;
+void update(NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP_ptr);
 
 void init_nrf_registers(NrfSpiDevice * device);
 int get_board_id();
@@ -76,6 +74,8 @@ int main(void)
 {
 	uint32_t state;
 	
+	
+
 	HAL_Init();
 	
 	int board = get_board_id();
