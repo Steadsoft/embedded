@@ -40,8 +40,8 @@ static void _ReadLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_
 static void _WriteLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
 static void _ReadShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
 static void _WriteShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+static void _ReadTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+static void _WriteTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus);
 static void _ReadRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
 static void _WriteRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
 static void _ReadFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
@@ -68,7 +68,7 @@ nrf24_package_struct nrf24_package =
 	{     
 		.CONFIG = _ReadConfigRegister,
 		.EN_AA = _ReadEnAaRegister,
-		.EN_RX_ADDR = _ReadEnRxAddrRegister,
+		.EN_RXADDR = _ReadEnRxAddrRegister,
 		.SETUP_AW = _ReadSetupAwRegister,
 		.SETUP_RETR = _ReadSetupRetrRegister,
 		.RF_CH = _ReadRfChannelRegister,
@@ -78,7 +78,7 @@ nrf24_package_struct nrf24_package =
 		.RPD = _ReadRpdRegister,
 		.RX_ADDR_LONG = _ReadLongRxAddrRegister,
 		.RX_ADDR_SHORT = _ReadShortRxAddrRegister,
-		.TX_ADDR = _ReadTxAddrRegister,
+		.TX_ADDR_LONG = _ReadTxAddrRegister,
 		.RX_PW = _ReadRxPwRegister,
 		.FIFO_STATUS = _ReadFifoStatusRegister,
 		.DYNPD = _ReadDynpdRegister,
@@ -88,7 +88,7 @@ nrf24_package_struct nrf24_package =
 	{ 
 		.CONFIG = _WriteConfigRegister,
 		.EN_AA = _WriteEnAaRegister,
-		.EN_RX_ADDR = _WriteEnRxAddrRegister,
+		.EN_RXADDR = _WriteEnRxAddrRegister,
 		.SETUP_AW = _WriteSetupAwRegister,
 		.SETUP_RETR = _WriteSetupRetrRegister,
 		.RF_CH = _WriteRfChannelRegister,
@@ -98,7 +98,7 @@ nrf24_package_struct nrf24_package =
 		.RPD = _WriteRpdRegister,
 		.RX_ADDR_LONG = _WriteLongRxAddrRegister,
 		.RX_ADDR_SHORT = _WriteShortRxAddrRegister,
-		.TX_ADDR = _WriteTxAddrRegister,
+		.TX_ADDR_LONG = _WriteTxAddrRegister,
 		.RX_PW = _WriteRxPwRegister,
 		.FIFO_STATUS = _WriteFifoStatusRegister,
 		.DYNPD = _WriteDynpdRegister,
@@ -108,7 +108,7 @@ nrf24_package_struct nrf24_package =
 	{ 
 		.CONFIG = _UpdateConfigRegister,
 		.EN_AA = _UpdateEnAaRegister,
-		.EN_RX_ADDR = _UpdateEnRxAddrRegister,
+		.EN_RXADDR = _UpdateEnRxAddrRegister,
 		.SETUP_AW = _UpdateSetupAwRegister,
 		.SETUP_RETR = _UpdateSetupRetrRegister,
 		.RF_CH = _UpdateRfChannelRegister,
@@ -340,11 +340,11 @@ static void _WriteShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADD
 	_WriteSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
 }
 
-static void _ReadTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
+static void _ReadTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	_ReadSingleByteRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_ADDRESS(Value), NrfStatus);
 }
-static void _WriteTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
+static void _WriteTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	_WriteSingleByteRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_VALUE(Value), NrfStatus);
 }

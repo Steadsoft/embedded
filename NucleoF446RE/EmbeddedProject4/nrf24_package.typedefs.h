@@ -26,7 +26,7 @@ typedef struct NrfReg_OBSERVE_TX_struct NrfReg_OBSERVE_TX, * NrfReg_OBSERVE_TX_p
 typedef struct NrfReg_RPD_struct NrfReg_RPD, * NrfReg_RPD_ptr;
 typedef struct NrfReg_RX_ADDR_LONG_struct NrfReg_RX_ADDR_LONG, * NrfReg_RX_ADDR_LONG_ptr;
 typedef struct NrfReg_RX_ADDR_SHORT_struct NrfReg_RX_ADDR_SHORT, * NrfReg_RX_ADDR_SHORT_ptr;
-typedef struct NrfReg_TX_ADDR_struct NrfReg_TX_ADDR, * NrfReg_TX_ADDR_ptr;
+typedef struct NrfReg_TX_ADDR_LONG_struct NrfReg_TX_ADDR_LONG, * NrfReg_TX_ADDR_LONG_ptr;
 typedef struct NrfReg_RX_PW_struct NrfReg_RX_PW, * NrfReg_RX_PW_ptr;
 typedef struct NrfReg_FIFO_STATUS_struct NrfReg_FIFO_STATUS, * NrfReg_FIFO_STATUS_ptr;
 typedef struct NrfReg_DYNPD_struct NrfReg_DYNPD, * NrfReg_DYNPD_ptr;
