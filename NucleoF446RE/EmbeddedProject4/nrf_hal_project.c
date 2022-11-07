@@ -102,6 +102,25 @@ int main(void)
 	
 	nrf24_hal_support.flash_led_forever(1000);
 	
+	NrfReg_STATUS status;
+	NrfReg_RF_SETUP setup = { 0 };
+	NrfReg_RF_SETUP mask = { 0 };
+	
+	
+	nrf24_package.GetRegister.RF_SETUP(&device, &setup, &status);
+	
+	setup.PLL_LOCK = 0;
+	setup.RF_DR_LOW = 1;
+	setup.CONT_WAVE = 1;
+	
+	mask.PLL_LOCK = 1;
+	mask.RF_DR_LOW = 1;
+	mask.CONT_WAVE = 1;
+
+	nrf24_package.UpdateRegister.RF_SETUP(&device, setup, mask, &status);
+
+	nrf24_package.GetRegister.RF_SETUP(&device, &setup, &status);
+
 	return(0);
 }
 
