@@ -273,6 +273,29 @@ struct NrfReg_FEATURE_struct
 	uint8_t  EN_DPL : 1;
 	uint8_t  RESERVED : 5;
 };
+
+struct NrfReg_ALL_REGISTERS_struct
+{
+	NrfReg_CONFIG Config;
+	NrfReg_EN_AA  EnAa;
+	NrfReg_EN_RXADDR RxAddr;
+	NrfReg_SETUP_AW SetupAw;
+	NrfReg_SETUP_RETR SetupRetr;
+	NrfReg_RF_CH RfCh;
+	NrfReg_RF_SETUP RfSetup;
+	NrfReg_STATUS Status;
+	NrfReg_OBSERVE_TX ObserveTx;
+	NrfReg_RPD Rpd;
+	NrfReg_RX_ADDR_LONG RxAddrP0;
+	NrfReg_RX_ADDR_LONG RxAddrP1;
+	NrfReg_RX_ADDR_SHORT RxAddrP2;
+	NrfReg_RX_ADDR_SHORT RxAddrP3;
+	NrfReg_RX_ADDR_SHORT RxAddrP4;
+	NrfReg_RX_ADDR_SHORT RxAddrP5;
+
+
+	
+};
 struct nrf_set_register_interface
 {
 	void(* CONFIG)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
@@ -315,6 +338,7 @@ struct nrf_get_register_interface
 	void(* FIFO_STATUS)(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* DYNPD)(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* FEATURE)(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* ALL_REGISTERS)(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 };
 
 struct nrf_upd_register_interface

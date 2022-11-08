@@ -83,13 +83,20 @@ int main(void)
 	
 	HAL_Init();
 	
-	//HAL_Delay(60000);
+	NrfReg_ALL_REGISTERS everything = { 0 };
+	
+	
+	void * ps;
+	void * pe;
+	
+	ps = &(everything.RxAddrP0);
+	pe = &(everything.RxAddrP0.value);
+	
+	//HAL_Delay(30000);
 
 	
 	int board = get_board_id();
 	
-	state = __STREXB(1, &lock); // does nothing, I don't yet underatand these kinds of ARM instructions.
-
 	// Allocate these data structures on the stack.
 	
 	NrfReg_STATUS status;
@@ -97,6 +104,7 @@ int main(void)
 	NrfSpiDevice device; 
 	NrfIoDescriptor descriptor;
 	NrfReg_CONFIG cfg;
+	NrfReg_SETUP_AW aw = { 0 };
 	
 	// Perform all IO related initialization
 	
@@ -106,14 +114,21 @@ int main(void)
 	
 	nrf24_package.DeviceControl.PowerOnReset(&device);
 	
-	enter_rx_mode(&device);
+//	nrf24_package.GetRegister.SETUP_AW(&device, &(everything.SetupAw), &status);
+//	nrf24_package.GetRegister.SETUP_AW(&device, &(aw), &status);
+
+	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything, &status);
+
+	
+	
+	//enter_rx_mode(&device);
 	
 	nrf24_package.GetRegister.CONFIG(&device, &cfg, &status);
 	
 	
 	
 	
-	initialize_nrf(&device);
+	//initialize_nrf(&device);
 	
 	
 	// Send a bunch of NRF commands to the device.
@@ -138,7 +153,7 @@ int main(void)
 	mask.RF_DR_LOW = 1;
 	mask.CONT_WAVE = 1;
 
-	nrf24_package.UpdateRegister.RF_SETUP(&device, setup, mask, &status);
+	//nrf24_package.UpdateRegister.RF_SETUP(&device, setup, mask, &status);
 
 	nrf24_package.GetRegister.RF_SETUP(&device, &setup, &status);
 

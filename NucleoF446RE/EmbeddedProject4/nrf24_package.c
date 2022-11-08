@@ -59,6 +59,9 @@ static void _ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_
 static void _WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
 static void _SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr);
 
+static void _ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+
+
 // Declare the global library interface with same name as library
 
 nrf24_package_struct nrf24_package =
@@ -82,6 +85,7 @@ nrf24_package_struct nrf24_package =
 		.FIFO_STATUS = _ReadFifoStatusRegister,
 		.DYNPD = _ReadDynpdRegister,
 		.FEATURE = _ReadFeatureRegister,
+		.ALL_REGISTERS = _ReadAllRegisters,
 	},
 	.SetRegister = 
 	{ 
@@ -328,7 +332,8 @@ static void _UpdateRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, Nr
 }
 static void _ReadLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_ADDRESS(Value), NrfStatus);
+	uint8_t bytes_read;
+	_ReadMultiBytesRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, Value->value, &bytes_read, NrfStatus);
 }
 static void _WriteLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
@@ -429,9 +434,12 @@ static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 	uint8_t command = NrfCommand.R_REGISTER | Register;
 	uint8_t width;
 	uint8_t bytes;
+	NrfReg_SETUP_AW aw;
 	
 	*BytesRead = 0;
 	*NrfStatus = (NrfReg_STATUS){ 0 };
+	
+	_ReadSetupAwRegister(device_ptr, &aw, NrfStatus);
 
 	_ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, &width, NrfStatus);
 	
@@ -486,6 +494,9 @@ static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Regist
 	device_ptr->DeselectDevice(device_ptr->io_ptr);
 }
 
+// Set all regsiters to the same values they get set to, when the device is powered off/on
+// This function does not actually cycle the power, only simulate it in the sense that
+// the device registers are in the same state as if it had been power cycled.
 static void _SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr)
 {
 	NrfReg_STATUS status;
@@ -560,4 +571,23 @@ static void _SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr)
 	nrf24_package.SetRegister.FEATURE(device_ptr, feature, &status);
 }
 
+static void _ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	_ReadConfigRegister(device_ptr, &(Value->Config), NrfStatus);
+	_ReadEnAaRegister(device_ptr, &(Value->EnAa), NrfStatus);
+	_ReadEnRxAddrRegister(device_ptr, &(Value->RxAddr), NrfStatus);
+	_ReadSetupAwRegister(device_ptr, &(Value->SetupAw), NrfStatus);
+	_ReadSetupRetrRegister(device_ptr, &(Value->SetupRetr), NrfStatus);
+	_ReadRfChannelRegister(device_ptr, &(Value->RfCh), NrfStatus);
+	_ReadRfSetupRegister(device_ptr, &(Value->RfSetup), NrfStatus);
+	_ReadStatusRegister(device_ptr, &(Value->Status));
+	_ReadObserveTxRegister(device_ptr, &(Value->ObserveTx), NrfStatus);
+	_ReadRpdRegister(device_ptr, &(Value->Rpd), NrfStatus);
+	_ReadLongRxAddrRegister(device_ptr, &(Value->RxAddrP0), 0, NrfStatus);
+	_ReadLongRxAddrRegister(device_ptr, &(Value->RxAddrP1), 1, NrfStatus);
+	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP2), 2, NrfStatus);
+	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP3), 3, NrfStatus);
+	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP4), 4, NrfStatus);
+	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP5), 5, NrfStatus);
 
+}

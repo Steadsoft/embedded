@@ -31,3 +31,6 @@ typedef struct NrfReg_RX_PW_struct NrfReg_RX_PW, * NrfReg_RX_PW_ptr;
 typedef struct NrfReg_FIFO_STATUS_struct NrfReg_FIFO_STATUS, * NrfReg_FIFO_STATUS_ptr;
 typedef struct NrfReg_DYNPD_struct NrfReg_DYNPD, * NrfReg_DYNPD_ptr;
 typedef struct NrfReg_FEATURE_struct NrfReg_FEATURE, * NrfReg_FEATURE_ptr;
+
+typedef struct NrfReg_ALL_REGISTERS_struct NrfReg_ALL_REGISTERS, * NrfReg_ALL_REGISTERS_ptr;
+
