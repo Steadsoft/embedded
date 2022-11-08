@@ -333,12 +333,19 @@ struct nrf_upd_register_interface
 	void (* DYNPD)(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_DYNPD Mask, NrfReg_STATUS_ptr NrfStatus);
 	void (* FEATURE)(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_FEATURE Mask, NrfReg_STATUS_ptr NrfStatus);
 };
+
+struct nrf_device_interface
+{
+	
+	void(* PowerOnReset)(NrfSpiDevice_ptr); // Sets all device registers to the same values they have after powering off/on.
+};
 struct nrf24_package_interface
 {
 	NrfIoCallbacks_ptr ptr;
 	struct nrf_set_register_interface SetRegister;
 	struct nrf_get_register_interface GetRegister;
 	struct nrf_upd_register_interface UpdateRegister;
+	struct nrf_device_interface DeviceControl;
 };
 struct nrf_io_callbacks
 {

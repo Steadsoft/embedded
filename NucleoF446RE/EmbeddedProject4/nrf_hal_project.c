@@ -1,13 +1,7 @@
 #include <stm32f4xx_hal.h>
+#include <nrf24_package.macros.h>
 #include <nrf24_package.library.h>
 #include <nrf24_hal_support.library.h>
-
-#define E7 0xE7
-#define C2 0xC2
-#define C3 0xC3
-#define C4 0xC4
-#define C5 0xC5
-#define C6 0xC6
 
 
 //#include <cmsis_gcc.h>
@@ -33,6 +27,8 @@ int interrupt_count = 0;
 void update(NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP_ptr);
 
 void init_nrf_registers(NrfSpiDevice * device);
+void enter_rx_mode(NrfSpiDevice_ptr device_ptr);
+
 int get_board_id();
 void sleep_100_uS();
 void send_commands(NrfSpiDevice_ptr device_ptr, int count);
@@ -96,9 +92,11 @@ int main(void)
 
 	// Allocate these data structures on the stack.
 	
+	NrfReg_STATUS status;
 	SPI_HandleTypeDef spi; 
 	NrfSpiDevice device; 
 	NrfIoDescriptor descriptor;
+	NrfReg_CONFIG cfg;
 	
 	// Perform all IO related initialization
 	
@@ -106,11 +104,13 @@ int main(void)
 	nrf24_hal_support.init_control_pins();
 	nrf24_hal_support.init_device(&spi, &device, &descriptor);
 	
-	while (1)
-	{
-		set_to_reset_state(&device);
-		sleep_100_uS();
-	}
+	nrf24_package.DeviceControl.PowerOnReset(&device);
+	
+	enter_rx_mode(&device);
+	
+	nrf24_package.GetRegister.CONFIG(&device, &cfg, &status);
+	
+	
 	
 	
 	initialize_nrf(&device);
@@ -124,7 +124,6 @@ int main(void)
 	
 	nrf24_hal_support.flash_led_forever(1000);
 	
-	NrfReg_STATUS status;
 	NrfReg_RF_SETUP setup = { 0 };
 	NrfReg_RF_SETUP mask = { 0 };
 	
@@ -146,79 +145,17 @@ int main(void)
 	return(0);
 }
 
-void set_to_reset_state(NrfSpiDevice_ptr device_ptr)
+
+void enter_rx_mode(NrfSpiDevice_ptr device_ptr)
 {
 	NrfReg_STATUS status;
+
 	NrfReg_CONFIG configuration = { 0 };
-	NrfReg_EN_AA en_aa = { 0 };
-	NrfReg_EN_RXADDR en_rxaddr = { 0 };
-	NrfReg_SETUP_AW setup_aw = { 0 };
-	NrfReg_SETUP_RETR setup_retr = { 0 };
-	NrfReg_RF_CH rf_ch = { 0 };
-	NrfReg_RF_SETUP rf_setup = { 0 };
-	NrfReg_OBSERVE_TX observe_tx = { 0 };
-	NrfReg_RPD rpd = { 0 };
-	NrfReg_RX_ADDR_LONG rx_addr_long_p0 = { .value[0] = E7, .value[1] = E7, .value[2] = E7, .value[3] = E7, .value[4] = E7 };
-	NrfReg_RX_ADDR_LONG rx_addr_long_p1 = { .value[0] = C2, .value[1] = C2, .value[2] = C2, .value[3] = C2, .value[4] = C2 };
-	NrfReg_TX_ADDR_LONG tx_addr_long = { .value[0] = E7, .value[1] = E7, .value[2] = E7, .value[3] = E7, .value[4] = E7 };
-	NrfReg_RX_ADDR_SHORT rx_addr_short_p2 = { .value = C3 };
-	NrfReg_RX_ADDR_SHORT rx_addr_short_p3 = { .value = C4 };
-	NrfReg_RX_ADDR_SHORT rx_addr_short_p4 = { .value = C5 };
-	NrfReg_RX_ADDR_SHORT rx_addr_short_p5 = { .value = C6 };
-	NrfReg_RX_PW rx_pw = { 0 };
-	NrfReg_DYNPD dynpd = { 0 };
-	NrfReg_FEATURE feature = { 0 };
-	
-	configuration.EN_CRC = 1;
-	
-	en_aa.ENAA_P0 = 1;
-	en_aa.ENAA_P1 = 1;
-	en_aa.ENAA_P2 = 1;
-	en_aa.ENAA_P3 = 1;
-	en_aa.ENAA_P4 = 1;
-	en_aa.ENAA_P5 = 1;
 
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P1 = 1;
+	configuration.PWR_UP = 1;
+	configuration.PRIM_RX = 1;
 	
-	setup_aw.AW = 3;
-	
-	setup_retr.ARC = 3;
-	
-	rf_ch.RF_CH = 2;
-	
-	rf_setup.RF_DR_HIGH = 1;
-	rf_setup.RF_PWR = 3;
-	
-	rx_addr_short_p2.value = C3;
-	rx_addr_short_p3.value = C4;
-	rx_addr_short_p4.value = C5;
-	rx_addr_short_p5.value = C6;
-	
-	nrf24_package.SetRegister.CONFIG(device_ptr, configuration, &status);
-	nrf24_package.SetRegister.EN_AA(device_ptr, en_aa, &status);
-	nrf24_package.SetRegister.EN_RXADDR(device_ptr, en_rxaddr, &status);
-	nrf24_package.SetRegister.SETUP_AW(device_ptr, setup_aw, &status);
-	nrf24_package.SetRegister.SETUP_RETR(device_ptr, setup_retr, &status);
-	nrf24_package.SetRegister.RF_CH(device_ptr, rf_ch, &status);
-	nrf24_package.SetRegister.OBSERVE_TX(device_ptr, observe_tx, &status);
-	nrf24_package.SetRegister.RPD(device_ptr, rpd, &status);
-	nrf24_package.SetRegister.RX_ADDR_LONG(device_ptr, rx_addr_long_p0, 0, &status);
-	nrf24_package.SetRegister.RX_ADDR_LONG(device_ptr, rx_addr_long_p1, 1, &status);
-	nrf24_package.SetRegister.RX_ADDR_SHORT(device_ptr, rx_addr_short_p2, 2, &status);
-	nrf24_package.SetRegister.RX_ADDR_SHORT(device_ptr, rx_addr_short_p3, 3, &status);
-	nrf24_package.SetRegister.RX_ADDR_SHORT(device_ptr, rx_addr_short_p4, 4, &status);
-	nrf24_package.SetRegister.RX_ADDR_SHORT(device_ptr, rx_addr_short_p5, 5, &status);
-	nrf24_package.SetRegister.TX_ADDR_LONG(device_ptr, tx_addr_long, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 0, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 1, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 2, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 3, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 4, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 5, &status);
-	nrf24_package.SetRegister.DYNPD(device_ptr, dynpd, &status);
-	nrf24_package.SetRegister.FEATURE(device_ptr, feature, &status);
-
+	nrf24_package.UpdateRegister.CONFIG(device_ptr, configuration, configuration, &status);
 }
 void initialize_nrf(NrfSpiDevice_ptr device_ptr)
 {
@@ -270,8 +207,6 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 		rf_setup.PLL_LOCK = 1;
 		rf_setup.RF_PWR = 2;
 	
-		BYTE_VALUE(rf_setup) = 0;
-		
 		nrf24_package.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
 		
 		//trapif(rf_setup.LNA_HCURR != 1 || rf_setup.RF_PWR != 3 || rf_setup.RF_DR != 1);
@@ -360,7 +295,7 @@ void print_register(uint8_t Register, uint8_t Value)
 	case 0x05:
 		{
 			NrfReg_RF_CH reg;
-			BYTE_VALUE(reg) = Value;
+//			BYTE_VALUE(reg) = Value;
 //			printf("RF_CH: RF_CH %d, ", reg.RF_CH);
 //			printf("RF.RESERVED %d\n", reg.RESERVED);
 			return;
@@ -368,7 +303,7 @@ void print_register(uint8_t Register, uint8_t Value)
 	case 0x06:
 		{
 			NrfReg_RF_SETUP reg;
-			BYTE_VALUE(reg) = Value;
+//			BYTE_VALUE(reg) = Value;
 //			printf("RF_SETUP: LNA_HCURR %d, ", reg.LNA_HCURR);
 //			printf("RF_PWR %d, ", reg.RF_PWR);
 //			printf("RF_DR %d, ", reg.RF_DR);
