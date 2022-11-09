@@ -83,17 +83,10 @@ int main(void)
 	
 	HAL_Init();
 	
-	NrfReg_ALL_REGISTERS everything = { 0 };
+	NrfReg_ALL_REGISTERS everything_before = { 0 };
+	NrfReg_ALL_REGISTERS everything_after = { 0 };
 	
-	
-	void * ps;
-	void * pe;
-	
-	ps = &(everything.RxAddrP0);
-	pe = &(everything.RxAddrP0.value);
-	
-	//HAL_Delay(30000);
-
+	HAL_Delay(30000);
 	
 	int board = get_board_id();
 	
@@ -112,50 +105,27 @@ int main(void)
 	nrf24_hal_support.init_control_pins();
 	nrf24_hal_support.init_device(&spi, &device, &descriptor);
 	
+	// Force all register into their hardware reset state.
+	
 	nrf24_package.DeviceControl.PowerOnReset(&device);
 	
-//	nrf24_package.GetRegister.SETUP_AW(&device, &(everything.SetupAw), &status);
-//	nrf24_package.GetRegister.SETUP_AW(&device, &(aw), &status);
-
-	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything, &status);
-
+	// Snapshot all regsiters
 	
+	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_before, &status);
 	
-	//enter_rx_mode(&device);
-	
-	nrf24_package.GetRegister.CONFIG(&device, &cfg, &status);
-	
-	
-	
-	
-	//initialize_nrf(&device);
-	
-	
-	// Send a bunch of NRF commands to the device.
-	
-	send_commands(&device, 10000);
+	send_commands(&device, 100000);
 	
 	// Slowly flash the Nucleo's LED to indicate that command sending is over.
 	
+	initialize_nrf(&device);
+	
+	enter_rx_mode(&device);
+	
+	// Snapshot all regsiters
+	
+	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_after, &status);
+
 	nrf24_hal_support.flash_led_forever(1000);
-	
-	NrfReg_RF_SETUP setup = { 0 };
-	NrfReg_RF_SETUP mask = { 0 };
-	
-	
-	nrf24_package.GetRegister.RF_SETUP(&device, &setup, &status);
-	
-	setup.PLL_LOCK = 0;
-	setup.RF_DR_LOW = 1;
-	setup.CONT_WAVE = 1;
-	
-	mask.PLL_LOCK = 1;
-	mask.RF_DR_LOW = 1;
-	mask.CONT_WAVE = 1;
-
-	//nrf24_package.UpdateRegister.RF_SETUP(&device, setup, mask, &status);
-
-	nrf24_package.GetRegister.RF_SETUP(&device, &setup, &status);
 
 	return(0);
 }
@@ -279,29 +249,6 @@ void trapif(int value)
 	// Rapidly flash the Nucleo's LED to indicate an unexpected register read.
 	
 	nrf24_hal_support.flash_led_forever(20);
-}
-void init_nrf_registers(NrfSpiDevice * device)
-{	NrfReg_STATUS status;
-
-	NrfReg_CONFIG config = { 0 };
-	NrfReg_EN_AA en_aa = { 0 };
-	NrfReg_EN_RXADDR en_rxaddr = { 0 };
-	NrfReg_SETUP_RETR setup_retr = { 0 };
-	NrfReg_RF_CH rf_ch = { 0 };
-	NrfReg_RF_SETUP rf_setup = { 0 };
-	NrfReg_SETUP_AW setup_aw = { 0 };
-	
-	nrf24_package.SetRegister.CONFIG(device, config, &status);
-	nrf24_package.SetRegister.EN_AA(device, en_aa, &status);
-	nrf24_package.SetRegister.EN_RXADDR(device, en_rxaddr, &status);
-	nrf24_package.SetRegister.SETUP_RETR(device, setup_retr, &status);
-	nrf24_package.SetRegister.RF_CH(device, rf_ch, &status);
-	nrf24_package.SetRegister.RF_SETUP(device, rf_setup, &status);
-	
-	setup_aw.AW = 3;
-	
-	nrf24_package.SetRegister.SETUP_AW(device, setup_aw, &status);
-
 }
 void print_register(uint8_t Register, uint8_t Value)
 {

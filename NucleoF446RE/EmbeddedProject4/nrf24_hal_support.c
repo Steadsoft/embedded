@@ -36,6 +36,7 @@ nrf24_hal_support_struct nrf24_hal_support =
 // Implementation 
 static void pulse_led_forever(uint32_t interval)
 {
+	uint8_t cease = 0;
 	
 	GPIO_InitTypeDef  GPIO_InitStruct = { 0 };
 	
@@ -46,7 +47,7 @@ static void pulse_led_forever(uint32_t interval)
 	
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	
-	while (1)
+	while (cease == 0)
 	{
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 		HAL_Delay(interval);	
@@ -71,6 +72,8 @@ static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr
 }
 static void init_spi(SPI_HandleTypeDef * spi_ptr)
 {
+	HAL_StatusTypeDef status;
+	
 	GPIO_InitTypeDef  GPIO_InitStruct_spi = { 0 };
 	GPIO_InitTypeDef  GPIO_InitStruct_irq = { 0 };
 
@@ -83,13 +86,13 @@ static void init_spi(SPI_HandleTypeDef * spi_ptr)
 	spi_ptr->Init.CLKPolarity = SPI_POLARITY_LOW;
 	spi_ptr->Init.CLKPhase = SPI_PHASE_1EDGE;
 	spi_ptr->Init.NSS = SPI_NSS_SOFT; // SPI_NSS_HARD_OUTPUT
-	spi_ptr->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+	spi_ptr->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
 	spi_ptr->Init.FirstBit = SPI_FIRSTBIT_MSB;
 	spi_ptr->Init.TIMode = SPI_TIMODE_DISABLED;
 	spi_ptr->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
 	spi_ptr->Init.CRCPolynomial = 10;
 	
-	HAL_SPI_Init(spi_ptr);
+	status = HAL_SPI_Init(spi_ptr);
 	
 	__GPIOA_CLK_ENABLE();
 
@@ -150,14 +153,23 @@ static void spi_cs_hi(void * ptr)
 static void exchange_bytes(void * ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
 {
 	((NrfIoDescriptor_ptr)ptr)->status = HAL_SPI_TransmitReceive(((NrfIoDescriptor_ptr)ptr)->spi_ptr, bytes_out_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
+	
+	if (((NrfIoDescriptor_ptr)ptr)->status != HAL_OK)
+		pulse_led_forever(100);
 }
 
 static void read_bytes(void * ptr, uint8_t bytes_in_ptr[], uint8_t count)
 {
 	((NrfIoDescriptor_ptr)ptr)->status = HAL_SPI_Receive(((NrfIoDescriptor_ptr)ptr)->spi_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
+	
+	if (((NrfIoDescriptor_ptr)ptr)->status != HAL_OK)
+		pulse_led_forever(100);
 }
 
 static void write_bytes(void * ptr, uint8_t bytes_out_ptr[], uint8_t count)
 {
 	((NrfIoDescriptor_ptr)ptr)->status = HAL_SPI_Receive(((NrfIoDescriptor_ptr)ptr)->spi_ptr, bytes_out_ptr, count, HAL_MAX_DELAY);
+	
+	if (((NrfIoDescriptor_ptr)ptr)->status != HAL_OK)
+		pulse_led_forever(100);
 }
