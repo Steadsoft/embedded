@@ -86,7 +86,7 @@ int main(void)
 	NrfReg_ALL_REGISTERS everything_before = { 0 };
 	NrfReg_ALL_REGISTERS everything_after = { 0 };
 	
-	HAL_Delay(30000);
+	HAL_Delay(1000);
 	
 	int board = get_board_id();
 	
@@ -113,7 +113,7 @@ int main(void)
 	
 	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_before, &status);
 	
-	send_commands(&device, 100000);
+	send_commands(&device, 500000);
 	
 	// Slowly flash the Nucleo's LED to indicate that command sending is over.
 	

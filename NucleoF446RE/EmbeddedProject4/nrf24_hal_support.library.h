@@ -29,6 +29,7 @@
 /* the various files.                                                                    */
 /*---------------------------------------------------------------------------------------*/
 
+#include "nrf24_hal_support.docs.h"
 #include "nrf24_hal_support.macros.h"
 #include "nrf24_hal_support.typedefs.h"
 #include "nrf24_hal_support.types.h"

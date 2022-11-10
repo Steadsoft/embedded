@@ -36,7 +36,7 @@ nrf24_hal_support_struct nrf24_hal_support =
 // Implementation 
 static void pulse_led_forever(uint32_t interval)
 {
-	uint8_t cease = 0;
+	volatile uint8_t cease = 0;
 	
 	GPIO_InitTypeDef  GPIO_InitStruct = { 0 };
 	
