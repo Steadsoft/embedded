@@ -21,54 +21,19 @@ typedef struct
 	unsigned long fields[3];
 } BoardId;
 
-void set_to_reset_state(NrfSpiDevice_ptr device_ptr);
 
 int interrupt_count = 0;
-void update(NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP_ptr);
 
-void init_nrf_registers(NrfSpiDevice * device);
-void enter_rx_mode(NrfSpiDevice_ptr device_ptr);
-
+void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr);
+void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr);
 int get_board_id();
 void sleep_100_uS();
-void send_commands(NrfSpiDevice_ptr device_ptr, int count);
-void trapif(int);
-void initialize_nrf(NrfSpiDevice_ptr device_ptr);
 
-void print_register(uint8_t Register, uint8_t Value);
+void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr);
 
-volatile uint8_t lock = 0;
+void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len);
 
-int get_board_id()
-{
-	static int known = -1;
-	static BoardId board1 = { .fields[0] = 0x0039001E, .fields[1] = 0x31385119, .fields[2] = 0x36323738 };
-	static BoardId board2 = { .fields[0] = 0x0042002F, .fields[1] = 0x4633500F, .fields[2] = 0x20353836 };
 
-	if (known != -1)
-		return known;
-
-	// This is the MCU's unique ID, these addresses are specific to the F4 family.
-
-	unsigned long ID0 = (*(unsigned long *)0x1FFF7A10);
-	unsigned long ID1 = (*(unsigned long *)0x1FFF7A14);
-	unsigned long ID2 = (*(unsigned long *)0x1FFF7A18);
-	
-	if (ID0 == board1.fields[0] && ID1 == board1.fields[1] && ID2 == board1.fields[2])
-	{
-		known = 1;
-		return known;
-	}
-	
-	if (ID0 == board2.fields[0] && ID1 == board2.fields[1] && ID2 == board2.fields[2])
-	{
-		known = 2;
-		return known;
-	}
-
-	known = 0;
-	return known;
-}
 void sleep_100_uS()
 {
 	for (int X = 0; X < 122; X++)
@@ -80,8 +45,14 @@ void sleep_100_uS()
 int main(void)
 {
 	uint32_t state;
+	uint8_t buffer[32];
 	
 	HAL_Init();
+	
+	for (int X = 0; X < 32; X++)
+	{
+		buffer[X] = 0xAA;
+	}
 	
 	NrfReg_ALL_REGISTERS everything_before = { 0 };
 	NrfReg_ALL_REGISTERS everything_after = { 0 };
@@ -105,175 +76,200 @@ int main(void)
 	nrf24_hal_support.init_control_pins();
 	nrf24_hal_support.init_device(&spi, &device, &descriptor);
 	
+	// Snapshot all regsiters
+	
+	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_before, &status);
+	
 	// Force all register into their hardware reset state.
 	
 	nrf24_package.DeviceControl.PowerOnReset(&device);
 	
 	// Snapshot all regsiters
 	
-	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_before, &status);
+	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_after, &status);
+		
+	initialize_nrf24_device(&device);
 	
-	send_commands(&device, 500000);
+	while (1)
+	{
+		HAL_Delay(50);
+		
+		for (int X = 0; X < 32; X++)
+		{
+			buffer[X] = 0xAA;
+		}
+
+		
+		TM_NRF24L01_Transmit(&device, buffer, 32);
+		
+		sleep_100_uS();
+		
+		nrf24_package.GetRegister.STATUS(&device, &status);
+		
+		while (status.TX_DS == 0 || status.MAX_RT == 1)
+		{
+			nrf24_package.GetRegister.STATUS(&device, &status);
+		}
+		
+	}
 	
 	// Slowly flash the Nucleo's LED to indicate that command sending is over.
-	
-	initialize_nrf(&device);
-	
-	enter_rx_mode(&device);
-	
-	// Snapshot all regsiters
-	
-	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_after, &status);
 
 	nrf24_hal_support.flash_led_forever(1000);
 
 	return(0);
 }
 
-
-void enter_rx_mode(NrfSpiDevice_ptr device_ptr)
+void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len)
 {
 	NrfReg_STATUS status;
+	nrf24_hal_support.spi_ce_lo(device_ptr->io_ptr);
 
-	NrfReg_CONFIG configuration = { 0 };
-
-	configuration.PWR_UP = 1;
-	configuration.PRIM_RX = 1;
+	TM_NRF24L01_PowerUpTx(device_ptr);
 	
-	nrf24_package.UpdateRegister.CONFIG(device_ptr, configuration, configuration, &status);
-}
-void initialize_nrf(NrfSpiDevice_ptr device_ptr)
-{
-	NrfReg_STATUS status;
-
-	NrfReg_CONFIG configuration = { 0 };
-	NrfReg_CONFIG mask = { 0 };
+	nrf24_package.DeviceControl.FlushTxFifo(device_ptr, &status);
 	
-	mask.CRCO = 1;
-	configuration.CRCO = 1;
+	nrf24_package.DeviceControl.WriteTxPayload(device_ptr, data, len, &status);
 	
-	nrf24_package.GetRegister.CONFIG(device_ptr, &configuration, &status);
-	
-	nrf24_package.UpdateRegister.CONFIG(device_ptr, configuration, mask, &status);
+	nrf24_hal_support.spi_ce_hi(device_ptr->io_ptr);
 }
 
-void send_commands(NrfSpiDevice_ptr device_ptr, int count)
+void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
 {
-	uint8_t RX_ADDR1[5] = { 0x00, 0x01, 0x02, 0x03, 0x04 };
-	uint8_t RX_ADDR2[5] = { 0x04, 0x03, 0x02, 0x01, 0x00 };
-	uint8_t BUFFER[5];
-	uint8_t regval;
-	uint8_t multisize;
-	
-	// Declare some NRF register variables.
-	
 	NrfReg_STATUS status;
-	NrfReg_CONFIG configuration;
-	NrfReg_EN_AA auto_acknowledge_flags;
-	NrfReg_EN_RXADDR rx_addresses_flags;
-	NrfReg_RX_ADDR_SHORT rx_address;
-	NrfReg_RF_CH rf_channel;
+	NrfReg_RX_PW rx_pw = { 0 };
+	NrfReg_CONFIG configuration = { 0 };
 	NrfReg_RF_SETUP rf_setup = { 0 };
-	NrfReg_FEATURE device_features;
-	NrfReg_SETUP_AW saw;
+	NrfReg_EN_AA en_aa = { 0 };
+	NrfReg_EN_RXADDR en_rxaddr = { 0 };
+	NrfReg_SETUP_RETR setup_retr = { 0 };
+	NrfReg_DYNPD dynpd = { 0 };
 	
-	nrf24_package.GetRegister.FEATURE(device_ptr, &device_features, &status);
-
-	nrf24_package.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
+	// Set channel
 	
-	nrf24_package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
-
-	// Just a bunch of test calls into the various register read/write functions.
+	/* Set pipeline to max possible 32 bytes */
 	
-	nrf24_package.GetRegister.CONFIG(device_ptr, &configuration, &status);
+	rx_pw.RX_PW_LEN = 32;
 	
-	for (int X=0; X < count; X++)
-	{
-		rf_setup.PLL_LOCK = 1;
-		rf_setup.RF_PWR = 2;
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 0, &status);
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 1, &status);
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 2, &status);
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 3, &status);
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 4, &status);
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 5, &status);
+
+	/* Set RF settings (2mbps, output power) */
 	
-		nrf24_package.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
-		
-		//trapif(rf_setup.LNA_HCURR != 1 || rf_setup.RF_PWR != 3 || rf_setup.RF_DR != 1);
-		
-		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 2, &status);
+	rf_setup.RF_DR_HIGH = 1; // 2 Mbps
+	rf_setup.RF_PWR = 3; // 0 dBm
 	
-		trapif(rx_address.value != 0xC3);
-		
-		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 3, &status);
-		
-		trapif(rx_address.value != 0xC4);
-		
-		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 4, &status);
-		
-		trapif(rx_address.value != 0xC5);
-		
-		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 5, &status);
-		
-		trapif(rx_address.value != 0xC6);
-		
-		nrf24_package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
-		
-		trapif(rf_channel.RF_CH != 0x02);
+	nrf24_package.SetRegister.RF_SETUP(device_ptr, rf_setup, &status);
+	
+	/* Enable auto-acknowledgment for all pipes */
+	
+//	en_aa.ENAA_P0 = 1;
+//	en_aa.ENAA_P1 = 1;
+//	en_aa.ENAA_P2 = 1;
+//	en_aa.ENAA_P3 = 1;
+//	en_aa.ENAA_P4 = 1;
+//	en_aa.ENAA_P5 = 1;
+	
+	nrf24_package.SetRegister.EN_AA(device_ptr, en_aa, &status);
+	
+	/* Enable RX addresses */
+	
+	en_rxaddr.ERX_P0 = 1;
+	en_rxaddr.ERX_P0 = 1;
+	en_rxaddr.ERX_P0 = 1;
+	en_rxaddr.ERX_P0 = 1;
+	en_rxaddr.ERX_P0 = 1;
+	en_rxaddr.ERX_P0 = 1;
 
-		rf_channel.RF_CH = 23;
-		
-		nrf24_package.SetRegister.RF_CH(device_ptr, rf_channel, &status);
+	nrf24_package.SetRegister.EN_RXADDR(device_ptr, en_rxaddr, &status);
+	
+	/* Auto retransmit delay: 1000 (4x250) us and Up to 15 retransmit trials */
+	
+	setup_retr.ARC = 15;
+	setup_retr.ARD = 3;
+	
+	nrf24_package.SetRegister.SETUP_RETR(device_ptr, setup_retr, &status);
+	
+	/* Dynamic length configurations: No dynamic length */
+	
+	nrf24_package.SetRegister.DYNPD(device_ptr, dynpd, &status);
+	
+	// Clear FIFOs
+	
+	nrf24_package.DeviceControl.FlushRxFifo(device_ptr, &status);
+	nrf24_package.DeviceControl.FlushTxFifo(device_ptr, &status);
+	
+	// Clear interrupts
+	
+	NrfReg_STATUS int_status;
 
-		nrf24_package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
-		
-		trapif(rf_channel.RF_CH != 23);
-		
-		rf_channel.RF_CH = 2;
+	int_status.RX_DR = 1;
+	int_status.TX_DS = 1;
+	int_status.MAX_RT = 1;
 
-		nrf24_package.SetRegister.RF_CH(device_ptr, rf_channel, &status);
-
-		nrf24_package.GetRegister.CONFIG(device_ptr, &(configuration), &status);
-		nrf24_package.GetRegister.EN_AA(device_ptr, &(auto_acknowledge_flags), &status);
-		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &(rx_address), 3, &status);
-		nrf24_package.GetRegister.SETUP_AW(device_ptr, &saw, &status);
-		
-		trapif(saw.AW != 0x03);
-		
-		nrf24_package.GetRegister.STATUS(device_ptr, &status);
-
-		sleep_100_uS();
-	}
+	nrf24_package.SetRegister.STATUS(device_ptr, status, &status);
+	
+	TM_NRF24L01_PowerUpRx(device_ptr);
+	
+	
+	
 }
 
-void trapif(int value)
+void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 {
-	if (!value)
-		return;
+	NrfReg_STATUS status;
+	NrfReg_CONFIG config = { 0 };
+	NrfReg_CONFIG config_mask = { 0 };
 	
-	// Rapidly flash the Nucleo's LED to indicate an unexpected register read.
+	nrf24_hal_support.spi_ce_lo(device_ptr->io_ptr);
 	
-	nrf24_hal_support.flash_led_forever(20);
+	nrf24_package.DeviceControl.FlushRxFifo(device_ptr, &status);
+	
+	status.RX_DR = 1;
+	status.TX_DS = 1;
+	status.MAX_RT = 1;
+	
+	nrf24_package.SetRegister.STATUS(device_ptr, status, &status);
+	
+	config_mask.PWR_UP = 1;
+	config_mask.PRIM_RX = 1;
+	
+	config.PWR_UP = 1;
+	config.PRIM_RX = 1;
+	
+	nrf24_package.UpdateRegister.CONFIG(device_ptr, config, config_mask, &status);
+
+	nrf24_hal_support.spi_ce_hi(device_ptr->io_ptr);
 }
-void print_register(uint8_t Register, uint8_t Value)
+
+void 
+TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr)	
 {
-	switch (Register)
-	{
-	case 0x05:
-		{
-			NrfReg_RF_CH reg;
-//			BYTE_VALUE(reg) = Value;
-//			printf("RF_CH: RF_CH %d, ", reg.RF_CH);
-//			printf("RF.RESERVED %d\n", reg.RESERVED);
-			return;
-		}
-	case 0x06:
-		{
-			NrfReg_RF_SETUP reg;
-//			BYTE_VALUE(reg) = Value;
-//			printf("RF_SETUP: LNA_HCURR %d, ", reg.LNA_HCURR);
-//			printf("RF_PWR %d, ", reg.RF_PWR);
-//			printf("RF_DR %d, ", reg.RF_DR);
-//			printf("PLL_LOCK %d, ", reg.PLL_LOCK);
-//			printf("RF.RESERVED %d\n", reg.RESERVED);
-			return;
-		}
-	}
+	NrfReg_STATUS status;
+	NrfReg_CONFIG config = { 0 };
+	NrfReg_CONFIG config_mask = { 0 };
+	
+	// Clear interrupts
+	
+	status.RX_DR = 1;
+	status.TX_DS = 1;
+	status.MAX_RT = 1;
+	
+	nrf24_package.SetRegister.STATUS(device_ptr, status, &status);
+	
+	// Set mode to TX
+
+	config_mask.PWR_UP = 1;
+	config_mask.PRIM_RX = 1;
+	
+	config.PWR_UP = 1;
+	config.PRIM_RX = 0;
+	
+	nrf24_package.UpdateRegister.CONFIG(device_ptr, config, config_mask, &status);
 }
 
 void EXTI0_IRQHandler(void)

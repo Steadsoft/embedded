@@ -708,6 +708,9 @@
     <ClCompile Include="nrf24_hal_support.c">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="nrf_hal_project_testing.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nrf24_package.types.h">

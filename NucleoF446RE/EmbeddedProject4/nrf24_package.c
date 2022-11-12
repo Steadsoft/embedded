@@ -58,8 +58,11 @@ static void _WriteSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, uint8
 static void _ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
 static void _WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
 static void _SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr);
+static void _FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
+static void _FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 
 static void _ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+static void _WriteTxPayload(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 
 
 // Declare the global library interface with same name as library
@@ -125,7 +128,10 @@ nrf24_package_struct nrf24_package =
 	},
 	.DeviceControl =
 	{ 
-		.PowerOnReset = _SetToPowerOnResetState
+		.PowerOnReset = _SetToPowerOnResetState,
+		.FlushTxFifo = _FlushTxFifo,
+		.FlushRxFifo = _FlushRxFifo,
+		.WriteTxPayload = _WriteTxPayload
 	}
 };
 
@@ -590,4 +596,32 @@ static void _ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_
 	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP4), 4, NrfStatus);
 	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP5), 5, NrfStatus);
 
+}
+
+static void _FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
+{
+	uint8_t command = NrfCommand.FLUSH_TX;
+	
+	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
+	device_ptr->DeselectDevice(device_ptr->io_ptr);
+}
+
+static void _FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
+{
+	uint8_t command = NrfCommand.FLUSH_RX;
+
+	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
+	device_ptr->DeselectDevice(device_ptr->io_ptr);
+}
+
+static void _WriteTxPayload(NrfSpiDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus)
+{
+	uint8_t command = NrfCommand.W_TX_PAYLOAD;
+
+	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
+	device_ptr->WriteBytes(device_ptr->io_ptr, data_ptr, data_len);
+	device_ptr->DeselectDevice(device_ptr->io_ptr);
 }

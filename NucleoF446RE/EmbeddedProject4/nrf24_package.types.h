@@ -60,6 +60,13 @@ struct nrf_spi_device
 
 // Register structures
 
+struct test_struct
+{
+	uint8_t PRIM_RX : 1; // 1 = receiver, 0 = transmitter
+
+};
+
+
 struct NrfReg_CONFIG_struct
 {
 	uint8_t PRIM_RX : 1;		// 1 = receiver, 0 = transmitter
@@ -362,6 +369,10 @@ struct nrf_device_interface
 {
 	
 	void(* PowerOnReset)(NrfSpiDevice_ptr); // Sets all device registers to the same values they have after powering off/on.
+	void(* FlushTxFifo)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+	void(* FlushRxFifo)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+	void(* WriteTxPayload)(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
+	void(* ReadRxPayload)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
 };
 struct nrf24_package_interface
 {
