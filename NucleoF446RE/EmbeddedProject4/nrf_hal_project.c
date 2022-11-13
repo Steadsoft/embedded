@@ -22,7 +22,7 @@ typedef struct
 } BoardId;
 
 
-int interrupt_count = 0;
+volatile int interrupt_count = 0;
 
 void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr);
 void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr);
@@ -88,7 +88,7 @@ int main(void)
 	
 	while (1)
 	{
-		HAL_Delay(50);
+		HAL_Delay(10);
 		
 		TM_NRF24L01_Transmit(&device, buffer, 32);
 		
@@ -128,7 +128,6 @@ void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
 {
 	NrfReg_STATUS status;
 	NrfReg_RX_PW rx_pw = { 0 };
-	NrfReg_CONFIG configuration = { 0 };
 	NrfReg_RF_SETUP rf_setup = { 0 };
 	NrfReg_EN_AA en_aa = { 0 };
 	NrfReg_EN_RXADDR en_rxaddr = { 0 };
@@ -227,9 +226,16 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	
 	config_mask.PWR_UP = 1;
 	config_mask.PRIM_RX = 1;
-	
+	config_mask.MASK_MAX_RT = 1;
+	config_mask.MASK_RX_DR = 1;
+	config_mask.MASK_TX_DS = 1;
+
 	config.PWR_UP = 1;
 	config.PRIM_RX = 1;
+	
+	config.MASK_MAX_RT = 1;
+	config.MASK_RX_DR = 1;
+	config.MASK_TX_DS = 0; // Data sent interrupt will be generated (not masked, not inhibited)
 	
 	nrf24_package.UpdateRegister.CONFIG(device_ptr, config, config_mask, &status);
 
