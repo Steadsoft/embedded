@@ -44,6 +44,14 @@ void sleep_100_uS()
 
 int main(void)
 {
+	NrfReg_ALL_REGISTERS everything_before = { 0 };
+	NrfReg_ALL_REGISTERS everything_after = { 0 };
+	SPI_HandleTypeDef spi = { 0 }; 
+	NrfSpiDevice device = { 0 }; 
+	NrfIoDescriptor descriptor = { 0 };
+	NrfReg_CONFIG cfg = { 0 };
+	NrfReg_SETUP_AW aw = { 0 };
+	NrfReg_STATUS status;
 	uint32_t state;
 	uint8_t buffer[32];
 	
@@ -54,21 +62,9 @@ int main(void)
 		buffer[X] = 0xAA;
 	}
 	
-	NrfReg_ALL_REGISTERS everything_before = { 0 };
-	NrfReg_ALL_REGISTERS everything_after = { 0 };
-	
 	HAL_Delay(1000);
 	
 	int board = get_board_id();
-	
-	// Allocate these data structures on the stack.
-	
-	NrfReg_STATUS status;
-	SPI_HandleTypeDef spi; 
-	NrfSpiDevice device; 
-	NrfIoDescriptor descriptor;
-	NrfReg_CONFIG cfg;
-	NrfReg_SETUP_AW aw = { 0 };
 	
 	// Perform all IO related initialization
 	
