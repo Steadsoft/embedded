@@ -168,7 +168,7 @@ static void read_bytes(void * ptr, uint8_t bytes_in_ptr[], uint8_t count)
 
 static void write_bytes(void * ptr, uint8_t bytes_out_ptr[], uint8_t count)
 {
-	((NrfIoDescriptor_ptr)ptr)->status = HAL_SPI_Receive(((NrfIoDescriptor_ptr)ptr)->spi_ptr, bytes_out_ptr, count, HAL_MAX_DELAY);
+	((NrfIoDescriptor_ptr)ptr)->status = HAL_SPI_Transmit(((NrfIoDescriptor_ptr)ptr)->spi_ptr, bytes_out_ptr, count, HAL_MAX_DELAY);
 	
 	if (((NrfIoDescriptor_ptr)ptr)->status != HAL_OK)
 		pulse_led_forever(100);

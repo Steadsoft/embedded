@@ -90,12 +90,6 @@ int main(void)
 	{
 		HAL_Delay(50);
 		
-		for (int X = 0; X < 32; X++)
-		{
-			buffer[X] = 0xAA;
-		}
-
-		
 		TM_NRF24L01_Transmit(&device, buffer, 32);
 		
 		sleep_100_uS();
