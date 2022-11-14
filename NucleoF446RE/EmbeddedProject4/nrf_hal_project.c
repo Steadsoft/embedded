@@ -23,7 +23,7 @@ typedef struct
 
 
 volatile int interrupt_count = 0;
-
+volatile uint8_t irq_clear_is_pending = 0;
 void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr);
 void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr);
 int get_board_id();
@@ -52,6 +52,15 @@ void sleep_100_uS()
 	}
 }
 
+void sleep_500_uS()
+{
+	for (int X = 0; X < 610; X++)
+	{
+		;
+	}
+}
+
+
 NrfSpiDevice device = { 0 }; 
 
 
@@ -64,6 +73,9 @@ int main(void)
 	NrfReg_CONFIG cfg = { 0 };
 	NrfReg_SETUP_AW aw = { 0 };
 	NrfReg_STATUS status;
+	NrfReg_STATUS status_mask_irq = { 0 };
+	NrfReg_STATUS status_irq;
+
 	uint32_t state;
 	uint8_t buffer[32];
 	uint8_t send_polls = 0;
@@ -106,33 +118,25 @@ int main(void)
 	
 	while (1)
 	{
-		HAL_Delay(1);
+		//HAL_Delay(1);
 		
-		nrf24_package.GetRegister.STATUS(&device, &status);
+		sleep_500_uS();
 		
-		TM_NRF24L01_Transmit(&device, buffer, 32);
-		
-		//sleep_100_uS();
-		
-		nrf24_package.GetRegister.STATUS(&device, &status);
-		
-		send_polls = 0;
-		
-		while (status.TX_DS == 0)
+		if (irq_clear_is_pending)
 		{
-			send_polls += 1;
-			sleep_100_uS();
-			nrf24_package.GetRegister.STATUS(&device, &status);
+			nrf24_package.GetRegister.STATUS(&device, &status_irq);
+
+			if (status_irq.TX_DS)
+			{
+				status_mask_irq.TX_DS = 1; // Update TX_DS set it to OFF
+				status_irq.TX_DS = 1; // The act of writing a 1 sets this bit off !
+				nrf24_package.UpdateRegister.STATUS(&device, status_irq, status_mask_irq, &status_irq);
+			}
+			
+			irq_clear_is_pending = 0;
 		}
 		
-		NrfReg_STATUS status_mask = { 0 };
-	
-		status_mask.TX_DS = 1; // Update TX_DS set it to OFF
-		status.TX_DS = 1; // The act of writing a 1 sets this bit off !
-		
-		nrf24_package.UpdateRegister.STATUS(&device, status, status_mask, &status);
-
-		
+		TM_NRF24L01_Transmit(&device, buffer, 32);
 	}
 	
 	// Slowly flash the Nucleo's LED to indicate that command sending is over.
@@ -184,8 +188,12 @@ void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
 
 	/* Set RF settings (2mbps, output power) */
 	
-	rf_setup.RF_DR_HIGH = 1; // 2 Mbps
-	rf_setup.RF_PWR = 3; // 0 dBm
+	// 0 and 1 here sets speed to 2 Mbps
+	rf_setup.RF_DR_LOW = 0; 
+	rf_setup.RF_DR_HIGH = 1; 
+	
+	// 3 = 0 dBm
+	rf_setup.RF_PWR = 3; 
 	
 	nrf24_package.SetRegister.RF_SETUP(device_ptr, rf_setup, &status);
 	
@@ -238,8 +246,6 @@ void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
 	nrf24_package.SetRegister.STATUS(device_ptr, status, &status);
 	
 	TM_NRF24L01_PowerUpRx(device_ptr);
-	
-	
 	
 }
 
@@ -312,5 +318,6 @@ TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr)
 void EXTI0_IRQHandler(void)
 {
 	interrupt_count++;
+	irq_clear_is_pending = 1;
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 } 

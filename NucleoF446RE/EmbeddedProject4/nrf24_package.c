@@ -301,9 +301,9 @@ static void _WriteStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Valu
 }
 static void _UpdateStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask, NrfReg_STATUS_ptr NrfStatus)
 {
-	uint8_t old_value;
+	NrfReg_STATUS old_value;
 	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.STATUS, &old_value, NrfStatus);
+	_ReadStatusRegister(device_ptr, &old_value);
 	_WriteSingleByteRegister(device_ptr, Nrf24Register.STATUS, TWIDDLE(old_value, Value, Mask), NrfStatus);
 }
 static void _ReadObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX_ptr Value, NrfReg_STATUS_ptr NrfStatus)
