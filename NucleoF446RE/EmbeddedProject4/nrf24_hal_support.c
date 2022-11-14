@@ -86,7 +86,7 @@ static void init_spi(SPI_HandleTypeDef * spi_ptr)
 	spi_ptr->Init.CLKPolarity = SPI_POLARITY_LOW;
 	spi_ptr->Init.CLKPhase = SPI_PHASE_1EDGE;
 	spi_ptr->Init.NSS = SPI_NSS_SOFT; // SPI_NSS_HARD_OUTPUT
-	spi_ptr->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+	spi_ptr->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
 	spi_ptr->Init.FirstBit = SPI_FIRSTBIT_MSB;
 	spi_ptr->Init.TIMode = SPI_TIMODE_DISABLED;
 	spi_ptr->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;

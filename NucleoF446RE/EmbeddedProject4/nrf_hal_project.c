@@ -28,11 +28,21 @@ void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr);
 void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr);
 int get_board_id();
 void sleep_100_uS();
+void sleep_20_uS();
+
 
 void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr);
 
 void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len);
 
+
+void sleep_20_uS()
+{
+	for (int X = 0; X < 25; X++)
+	{
+		;
+	}
+}
 
 void sleep_100_uS()
 {
@@ -41,6 +51,7 @@ void sleep_100_uS()
 		;
 	}
 }
+
 
 int main(void)
 {
@@ -88,7 +99,7 @@ int main(void)
 	
 	while (1)
 	{
-		HAL_Delay(10);
+		HAL_Delay(1);
 		
 		TM_NRF24L01_Transmit(&device, buffer, 32);
 		
@@ -98,6 +109,7 @@ int main(void)
 		
 		while (status.TX_DS == 0 || status.MAX_RT == 1)
 		{
+			sleep_100_uS();
 			nrf24_package.GetRegister.STATUS(&device, &status);
 		}
 		
@@ -122,6 +134,11 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 	nrf24_package.DeviceControl.WriteTxPayload(device_ptr, data, len, &status);
 	
 	nrf24_hal_support.spi_ce_hi(device_ptr->io_ptr);
+	
+	sleep_20_uS();
+	
+	nrf24_hal_support.spi_ce_lo(device_ptr->io_ptr);
+
 }
 
 void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
@@ -248,6 +265,7 @@ TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr)
 	NrfReg_STATUS status;
 	NrfReg_CONFIG config = { 0 };
 	NrfReg_CONFIG config_mask = { 0 };
+	NrfReg_RF_CH rf_ch = { 0 };
 	
 	// Clear interrupts
 	
@@ -266,6 +284,11 @@ TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr)
 	config.PRIM_RX = 0;
 	
 	nrf24_package.UpdateRegister.CONFIG(device_ptr, config, config_mask, &status);
+	
+	rf_ch.RF_CH = 4; // 2404 MHz
+	
+	nrf24_package.SetRegister.RF_CH(device_ptr, rf_ch, &status);
+	
 }
 
 void EXTI0_IRQHandler(void)
