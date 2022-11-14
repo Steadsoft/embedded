@@ -29,7 +29,7 @@ static void _WriteRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP V
 static void _UpdateRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_RF_SETUP Mask, NrfReg_STATUS_ptr NrfStatus);
 static void _ReadStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr Value);
 static void _WriteStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask, NrfReg_STATUS_ptr NrfStatus);
+static void _UpdateStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask);
 static void _ReadObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 static void _WriteObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_STATUS_ptr NrfStatus);
 static void _UpdateObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_OBSERVE_TX Mask, NrfReg_STATUS_ptr NrfStatus);
@@ -132,6 +132,10 @@ nrf24_package_struct nrf24_package =
 		.FlushTxFifo = _FlushTxFifo,
 		.FlushRxFifo = _FlushRxFifo,
 		.WriteTxPayload = _WriteTxPayload
+	},
+	.EmptyRegister =
+	{ 
+		.STATUS = (NrfReg_STATUS)  { 0 }
 	}
 };
 
@@ -179,6 +183,7 @@ const nrf24_command_names NrfCommand =
 	.W_TX_PAYLOAD_NOACK = 0xB0,
 	.NOP = 0xFF
 };
+
 
 // Implementation 
 
@@ -299,12 +304,12 @@ static void _WriteStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Valu
 {
 	_WriteSingleByteRegister(device_ptr, Nrf24Register.STATUS, BYTE_VALUE(Value), NrfStatus);
 }
-static void _UpdateStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask, NrfReg_STATUS_ptr NrfStatus)
+static void _UpdateStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask)
 {
 	NrfReg_STATUS old_value;
 	
 	_ReadStatusRegister(device_ptr, &old_value);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.STATUS, TWIDDLE(old_value, Value, Mask), NrfStatus);
+	_WriteSingleByteRegister(device_ptr, Nrf24Register.STATUS, TWIDDLE(old_value, Value, Mask), &old_value);
 }
 static void _ReadObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {

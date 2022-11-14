@@ -22,7 +22,7 @@ void update(NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP_p
 void enter_rx_mode(NrfSpiDevice_ptr device_ptr);
 
 int get_board_id();
-void sleep_100_uS();
+void spin_100_uS();
 void send_commands(NrfSpiDevice_ptr device_ptr, int count);
 void trapif(int, NrfSpiDevice_ptr);
 void initialize_nrf(NrfSpiDevice_ptr device_ptr);
@@ -190,7 +190,7 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 		
 		nrf24_package.GetRegister.STATUS(device_ptr, &status);
 
-		sleep_100_uS();
+		spin_100_uS();
 	}
 }
 
@@ -205,7 +205,7 @@ void trapif(int value, NrfSpiDevice_ptr device_ptr)
 	while (1)
 	{
 		nrf24_package.GetRegister.SETUP_AW(device_ptr, &saw, &status);
-		sleep_100_uS();
+		spin_100_uS();
 	}
 	
 	// Rapidly flash the Nucleo's LED to indicate an unexpected register read.

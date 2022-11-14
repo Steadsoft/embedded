@@ -357,7 +357,7 @@ struct nrf_upd_register_interface
 	void (* SETUP_RETR)(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_SETUP_RETR Mask, NrfReg_STATUS_ptr NrfStatus);
 	void (* RF_CH)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_RF_CH Mask, NrfReg_STATUS_ptr NrfStatus);
 	void (* RF_SETUP)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_RF_SETUP Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* STATUS)(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* STATUS)(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask);
 	void (* OBSERVE_TX)(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_OBSERVE_TX Mask, NrfReg_STATUS_ptr NrfStatus);
 	void (* RPD)(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_RPD Mask, NrfReg_STATUS_ptr NrfStatus);
 	void (* FIFO_STATUS)(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_FIFO_STATUS Mask, NrfReg_STATUS_ptr NrfStatus);
@@ -374,6 +374,12 @@ struct nrf_device_interface
 	void(* WriteTxPayload)(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 	void(* ReadRxPayload)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
 };
+
+struct nrf_empty
+{
+	
+	const NrfReg_STATUS STATUS;
+};
 struct nrf24_package_interface
 {
 	NrfIoCallbacks_ptr ptr;
@@ -381,6 +387,7 @@ struct nrf24_package_interface
 	struct nrf_get_register_interface GetRegister;
 	struct nrf_upd_register_interface UpdateRegister;
 	struct nrf_device_interface DeviceControl;
+	struct nrf_empty EmptyRegister;
 };
 struct nrf_io_callbacks
 {
