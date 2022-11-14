@@ -52,19 +52,21 @@ void sleep_100_uS()
 	}
 }
 
+NrfSpiDevice device = { 0 }; 
+
 
 int main(void)
 {
 	NrfReg_ALL_REGISTERS everything_before = { 0 };
 	NrfReg_ALL_REGISTERS everything_after = { 0 };
 	SPI_HandleTypeDef spi = { 0 }; 
-	NrfSpiDevice device = { 0 }; 
 	NrfIoDescriptor descriptor = { 0 };
 	NrfReg_CONFIG cfg = { 0 };
 	NrfReg_SETUP_AW aw = { 0 };
 	NrfReg_STATUS status;
 	uint32_t state;
 	uint8_t buffer[32];
+	uint8_t send_polls = 0;
 	
 	HAL_Init();
 	
@@ -97,21 +99,39 @@ int main(void)
 		
 	initialize_nrf24_device(&device);
 	
+	TM_NRF24L01_PowerUpTx(&device);
+	
+	nrf24_package.GetRegister.STATUS(&device, &status);
+
+	
 	while (1)
 	{
 		HAL_Delay(1);
 		
+		nrf24_package.GetRegister.STATUS(&device, &status);
+		
 		TM_NRF24L01_Transmit(&device, buffer, 32);
 		
-		sleep_100_uS();
+		//sleep_100_uS();
 		
 		nrf24_package.GetRegister.STATUS(&device, &status);
 		
-		while (status.TX_DS == 0 || status.MAX_RT == 1)
+		send_polls = 0;
+		
+		while (status.TX_DS == 0)
 		{
+			send_polls += 1;
 			sleep_100_uS();
 			nrf24_package.GetRegister.STATUS(&device, &status);
 		}
+		
+		NrfReg_STATUS status_mask = { 0 };
+	
+		status_mask.TX_DS = 1; // Update TX_DS set it to OFF
+		status.TX_DS = 1; // The act of writing a 1 sets this bit off !
+		
+		nrf24_package.UpdateRegister.STATUS(&device, status, status_mask, &status);
+
 		
 	}
 	
@@ -127,8 +147,6 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 	NrfReg_STATUS status;
 	nrf24_hal_support.spi_ce_lo(device_ptr->io_ptr);
 
-	TM_NRF24L01_PowerUpTx(device_ptr);
-	
 	nrf24_package.DeviceControl.FlushTxFifo(device_ptr, &status);
 	
 	nrf24_package.DeviceControl.WriteTxPayload(device_ptr, data, len, &status);
