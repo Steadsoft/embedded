@@ -5,6 +5,7 @@
 #include <nrf24_package.library.h>
 #include <nrf24_hal_support.library.h>
 
+#define ATOMIC_FLAG_OFF (atomic_flag){0};
 
 //#include <cmsis_gcc.h>
 
@@ -80,7 +81,7 @@ int main(void)
 	uint8_t buffer[32];
 	uint8_t send_polls = 0;
 	bool flag; 
-	atomic_flag lock = ATOMIC_FLAG_INIT;
+	atomic_flag lock = ATOMIC_FLAG_OFF;
 	
 	HAL_Init();
 	
@@ -90,7 +91,6 @@ int main(void)
 	// means it was in the UNLOCKED state but is now in the LOCKED state.	
 	
 	int x = sizeof(flag);
-	
 	flag = atomic_flag_test_and_set_explicit(&lock, memory_order_seq_cst); // Unused here, this is just here to see how it works.
 	
 	for (int X = 0; X < 32; X++)
@@ -126,6 +126,10 @@ int main(void)
 	
 	nrf24_package.GetRegister.STATUS(&device, &status);
 	
+	status_irq = nrf24_package.EmptyRegister.STATUS;
+	status_mask_irq = nrf24_package.EmptyRegister.STATUS;
+	status_mask_irq.TX_DS = 1; // Update TX_DS set it to OFF
+
 	while (1)
 	{
 		for (int X = 0; X < 610; X++)
@@ -140,12 +144,7 @@ int main(void)
 
 			if (status_irq.TX_DS)
 			{
-				status_irq = nrf24_package.EmptyRegister.STATUS;
-				status_mask_irq = nrf24_package.EmptyRegister.STATUS;
-				status_mask_irq.TX_DS = 1; // Update TX_DS set it to OFF
-				status_irq.TX_DS = 1; // The act of writing a 1 sets this bit off !
-				
-				nrf24_package.UpdateRegister.STATUS(&device, status_irq, status_mask_irq);
+				nrf24_package.SetRegister.STATUS(&device, status_irq, &status_irq);
 			}
 			
 			tx_ds_irq_clear_pending = 0;
@@ -161,8 +160,6 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 {
 	NrfReg_STATUS status;
 	
-	//nrf24_hal_support.spi_ce_lo(device_ptr->io_ptr);
-
 	nrf24_package.DeviceControl.FlushTxFifo(device_ptr, &status);
 	
 	nrf24_package.DeviceControl.WriteTxPayload(device_ptr, data, len, &status);
