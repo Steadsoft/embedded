@@ -1,3 +1,5 @@
+#include <stdatomic.h>
+#include <stdbool.h>
 #include <stm32f4xx_hal.h>
 #include <nrf24_package.macros.h>
 #include <nrf24_package.library.h>
@@ -31,11 +33,9 @@ void spin_100_uS();
 void spin_20_uS();
 void spin_500_uS();
 
-
 void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr);
 
 void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len);
-
 
 void spin_20_uS()
 {
@@ -61,8 +61,8 @@ void spin_500_uS()
 	}
 }
 
-
 NrfSpiDevice device = { 0 }; 
+
 
 
 int main(void)
@@ -76,17 +76,23 @@ int main(void)
 	NrfReg_STATUS status_irq = { 0 };
 	SPI_HandleTypeDef spi = { 0 }; 
 	NrfIoDescriptor descriptor = { 0 };
-
-	uint32_t state;
+	uint32_t state = 0;
 	uint8_t buffer[32];
 	uint8_t send_polls = 0;
+	bool flag; 
+	atomic_flag lock = ATOMIC_FLAG_INIT;
 	
 	HAL_Init();
 	
-//	__asm("nop");
-//	__asm("MOV R0, %0" : : "r"(send_polls));
-//	__asm("MOV R0, %0" : : "r"(&send_polls));
-
+	// If we read FALSE we know the datum was FALSE and is now TRUE
+	// If we read TRUE we know the datum was TRUE and remains TRUE
+	// Therefore TRUE means it is already in the LOCKED state and FALSE 
+	// means it was in the UNLOCKED state but is now in the LOCKED state.	
+	
+	int x = sizeof(flag);
+	
+	flag = atomic_flag_test_and_set_explicit(&lock, memory_order_seq_cst); // Unused here, this is just here to see how it works.
+	
 	for (int X = 0; X < 32; X++)
 	{
 		buffer[X] = 0xAA;
@@ -122,8 +128,12 @@ int main(void)
 	
 	while (1)
 	{
-		spin_500_uS();
-		
+		for (int X = 0; X < 610; X++)
+		{
+			if (tx_ds_irq_clear_pending)
+				break;
+		}
+
 		if (tx_ds_irq_clear_pending)
 		{
 			nrf24_package.GetRegister.STATUS(&device, &status_irq);
@@ -151,7 +161,7 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 {
 	NrfReg_STATUS status;
 	
-	nrf24_hal_support.spi_ce_lo(device_ptr->io_ptr);
+	//nrf24_hal_support.spi_ce_lo(device_ptr->io_ptr);
 
 	nrf24_package.DeviceControl.FlushTxFifo(device_ptr, &status);
 	
@@ -238,13 +248,14 @@ void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
 	
 	// Clear interrupts
 	
-	NrfReg_STATUS int_status;
+	status.RX_DR = 1;
+	status.TX_DS = 1;
+	status.MAX_RT = 1;
+	
+	// Since the mask would be the same as the status itself, we can just pass 
+	// it in for both args.
 
-	int_status.RX_DR = 1;
-	int_status.TX_DS = 1;
-	int_status.MAX_RT = 1;
-
-	nrf24_package.SetRegister.STATUS(device_ptr, status, &status);
+	nrf24_package.UpdateRegister.STATUS(device_ptr, status, status);
 	
 	TM_NRF24L01_PowerUpRx(device_ptr);
 	
@@ -297,7 +308,10 @@ void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr)
 	status.TX_DS = 1;
 	status.MAX_RT = 1;
 	
-	nrf24_package.SetRegister.STATUS(device_ptr, status, &status);
+	// Since the mask would be the same as the status itself, we can just pass 
+	// it in for both args.
+	
+	nrf24_package.UpdateRegister.STATUS(device_ptr, status, status);
 	
 	// Set mode to TX
 
