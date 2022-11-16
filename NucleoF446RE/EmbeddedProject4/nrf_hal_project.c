@@ -85,14 +85,6 @@ int main(void)
 	
 	HAL_Init();
 	
-	// If we read FALSE we know the datum was FALSE and is now TRUE
-	// If we read TRUE we know the datum was TRUE and remains TRUE
-	// Therefore TRUE means it is already in the LOCKED state and FALSE 
-	// means it was in the UNLOCKED state but is now in the LOCKED state.	
-	
-	int x = sizeof(flag);
-	flag = atomic_flag_test_and_set_explicit(&lock, memory_order_seq_cst); // Unused here, this is just here to see how it works.
-	
 	for (int X = 0; X < 32; X++)
 	{
 		buffer[X] = 0xAA;
