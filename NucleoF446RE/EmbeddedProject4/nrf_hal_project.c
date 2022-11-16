@@ -324,3 +324,8 @@ void EXTI0_IRQHandler(void)
 	tx_ds_irq_clear_pending = 1;
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 } 
+
+void CreateMemoryPool(uint8_t Size, uint8_t Quantity, uint8_t Alignment)
+{
+	
+}
