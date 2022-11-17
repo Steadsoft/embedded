@@ -1,12 +1,13 @@
 #include <stdatomic.h>
 #include <stdbool.h>
+#include <malloc.h>
 #include <stm32f4xx_hal.h>
 #include <nrf24_package.macros.h>
 #include <nrf24_package.library.h>
 #include <nrf24_hal_support.library.h>
 
 #define ATOMIC_FLAG_OFF (atomic_flag){0};
-
+# define ROUNDUP(N,ALIGN)	        (((N) +  ((ALIGN)-1)) & ~((ALIGN)-1))
 //#include <cmsis_gcc.h>
 
 // SEE: http://blog.gorski.pm/stm32-unique-id
@@ -24,8 +25,19 @@ typedef struct
 	unsigned long fields[3];
 } BoardId;
 
+struct memory_pool_header
+{
+	uint32_t size;
+	uint32_t quantity;
+	uint32_t alignment;
+	uint32_t pool_size;
+	uint8_t bitmap[32];
+};
 
-volatile uint8_t tx_ds_interrupt_count = 0;
+typedef struct memory_pool_header PoolHeader, * PoolHeader_ptr;
+
+
+volatile uint32_t tx_ds_interrupt_count = 0;
 volatile uint8_t tx_ds_irq_clear_pending = 0;
 void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr);
 void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr);
@@ -37,6 +49,8 @@ void spin_500_uS();
 void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr);
 
 void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len);
+void CreateMemoryPool(uint8_t Size, uint8_t Quantity, uint8_t Alignment, PoolHeader_ptr * Pool_ptr);
+void EXTI0_IRQPostHandler(NrfSpiDevice_ptr device_ptr);
 
 void spin_20_uS()
 {
@@ -78,11 +92,14 @@ int main(void)
 	SPI_HandleTypeDef spi = { 0 }; 
 	NrfIoDescriptor descriptor = { 0 };
 	uint32_t state = 0;
-	uint8_t buffer[32];
+	uint8_t buffer[32] = { 0 };
 	uint8_t send_polls = 0;
-	bool flag; 
-	atomic_flag lock = ATOMIC_FLAG_OFF;
+	PoolHeader_ptr pool_ptr; 
 	
+//	CreateMemoryPool(17, 64, 8, &pool_ptr);
+//	CreateMemoryPool(23, 64, 8, &pool_ptr);
+//	CreateMemoryPool(24, 64, 8, &pool_ptr);
+
 	HAL_Init();
 	
 	for (int X = 0; X < 32; X++)
@@ -132,14 +149,7 @@ int main(void)
 
 		if (tx_ds_irq_clear_pending)
 		{
-			nrf24_package.GetRegister.STATUS(&device, &status_irq);
-
-			if (status_irq.TX_DS)
-			{
-				nrf24_package.SetRegister.STATUS(&device, status_irq, &status_irq);
-			}
-			
-			tx_ds_irq_clear_pending = 0;
+			EXTI0_IRQPostHandler(&device);
 		}
 		
 		TM_NRF24L01_Transmit(&device, buffer, 32);
@@ -320,12 +330,45 @@ void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr)
 
 void EXTI0_IRQHandler(void)
 {
-	tx_ds_interrupt_count++;
 	tx_ds_irq_clear_pending = 1;
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 } 
 
-void CreateMemoryPool(uint8_t Size, uint8_t Quantity, uint8_t Alignment)
+void EXTI0_IRQPostHandler(NrfSpiDevice_ptr device_ptr)
+{
+	NrfReg_STATUS status_irq;
+	
+	tx_ds_interrupt_count++;
+	
+	nrf24_package.GetRegister.STATUS(device_ptr, &status_irq);
+
+	if (status_irq.TX_DS)
+	{
+		nrf24_package.SetRegister.STATUS(device_ptr, status_irq, &status_irq);
+	}
+	
+	tx_ds_irq_clear_pending = 0;
+}
+
+
+void CreateMemoryPool(uint8_t Size, uint8_t Quantity, uint8_t Alignment, PoolHeader_ptr * Pool_ptr)
+{
+
+	uint32_t pool_size = (sizeof(PoolHeader)) + (ROUNDUP(Size, Alignment) * Quantity);
+		
+	PoolHeader_ptr allocated_ptr = malloc(pool_size);
+	
+	*allocated_ptr = (PoolHeader) { 0 };
+	
+	allocated_ptr->alignment = Alignment;
+	allocated_ptr->pool_size = pool_size;
+	allocated_ptr->quantity = Quantity;
+	allocated_ptr->size = (ROUNDUP(Size, Alignment));
+	
+	*Pool_ptr = allocated_ptr;
+}
+
+void AllocateInPool(PoolHeader_ptr * Pool_ptr)
 {
 	
 }
