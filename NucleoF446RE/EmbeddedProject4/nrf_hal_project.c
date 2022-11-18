@@ -38,6 +38,8 @@ typedef struct memory_pool_header PoolHeader, * PoolHeader_ptr;
 
 
 volatile uint32_t tx_ds_interrupt_count = 0;
+volatile uint32_t sent_messages_count = 0;
+
 volatile uint8_t tx_ds_irq_clear_pending = 0;
 void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr);
 void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr);
@@ -101,6 +103,8 @@ int main(void)
 //	CreateMemoryPool(24, 64, 8, &pool_ptr);
 
 	HAL_Init();
+	
+	tx_ds_irq_clear_pending = 0;
 	
 	for (int X = 0; X < 32; X++)
 	{
@@ -171,6 +175,7 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 	nrf24_hal_support.spi_ce_hi(device_ptr->io_ptr);
 	spin_20_uS(); 
 	nrf24_hal_support.spi_ce_lo(device_ptr->io_ptr);
+	sent_messages_count++;
 }
 
 void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
