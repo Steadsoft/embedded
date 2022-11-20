@@ -45,6 +45,7 @@
     <ClCompile>
       <InputLanguage>C</InputLanguage>
       <CLanguageStandard>GNU17</CLanguageStandard>
+      <AdditionalIncludeDirectories>D:\Git\GitHub\Steadsoft\embedded\libraries\nrf24_hal_support;D:\Git\GitHub\Steadsoft\embedded\libraries\nrf24_package;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
@@ -64,8 +65,8 @@
   </ImportGroup>
   <ItemGroup>
     <ClCompile Include="nrf_hal_project.c" />
-    <ClCompile Include="nrf24_package.c" />
-    <ClCompile Include="nrf24_hal_support.c" />
+    <ClCompile Include="..\..\..\libraries\nrf24_package\nrf24_package.c" />
+    <ClCompile Include="..\..\..\libraries\nrf24_hal_support\nrf24_hal_support.c" />
     <ClCompile Include="nrf_hal_project_testing.c" />
     <ClCompile Include="system_stm32f4xx.c" />
     <None Include="stm32.props" />
@@ -160,18 +161,6 @@
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_tim.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_usart.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_utils.c" />
-    <ClInclude Include="nrf24_hal_support.docs.h" />
-    <ClInclude Include="nrf24_package.docs.h" />
-    <ClInclude Include="nrf24_package.library.h" />
-    <ClInclude Include="nrf24_package.macros.h" />
-    <ClInclude Include="nrf24_package.externs.h" />
-    <ClInclude Include="nrf24_package.types.h" />
-    <ClInclude Include="nrf24_package.typedefs.h" />
-    <ClInclude Include="nrf24_hal_support.externs.h" />
-    <ClInclude Include="nrf24_hal_support.library.h" />
-    <ClInclude Include="nrf24_hal_support.macros.h" />
-    <ClInclude Include="nrf24_hal_support.types.h" />
-    <ClInclude Include="nrf24_hal_support.typedefs.h" />
     <ClInclude Include="stm32f4xx_hal_conf.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F4xxxx\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc.h" />
