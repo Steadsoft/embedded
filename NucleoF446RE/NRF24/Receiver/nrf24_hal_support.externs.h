@@ -1,1 +1,0 @@
-extern nrf24_hal_support_struct nrf24_hal_support;
