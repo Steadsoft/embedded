@@ -45,6 +45,7 @@
     <ShowMessageAfterExecuting>true</ShowMessageAfterExecuting>
   </CustomShortcuts>
   <UserDefinedVariables />
+  <ImportedPropertySheets />
   <CodeSense>
     <Enabled>Unknown</Enabled>
     <ExtraSettings>
@@ -57,6 +58,8 @@
       <Enabled>false</Enabled>
     </CodeAnalyzerSettings>
   </CodeSense>
+  <Configurations />
+  <ProgramArgumentsSuggestions />
   <Debug xsi:type="com.visualgdb.debug.embedded">
     <AdditionalStartupCommands />
     <AdditionalGDBSettings>
@@ -96,7 +99,7 @@
     <DebugMethod>
       <ID>com.sysprogs.arm.openocd</ID>
       <InterfaceID>stlink-v2-1</InterfaceID>
-      <InterfaceSerialNumber>0667FF323532534157124550</InterfaceSerialNumber>
+      <InterfaceSerialNumber>0669FF485370514867081930</InterfaceSerialNumber>
       <Configuration xsi:type="com.visualgdb.edp.openocd.settings">
         <CommandLine>-f interface/stlink-v2-1.cfg -f target/stm32f4x.cfg -c init -c "reset init"</CommandLine>
         <ExtraParameters>

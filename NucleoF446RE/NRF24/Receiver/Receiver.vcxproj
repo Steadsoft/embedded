@@ -64,7 +64,7 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <ItemGroup>
-    <ClCompile Include="nrf_hal_project.c" />
+    <ClCompile Include="nrf_hal_rx_project.c" />
     <ClCompile Include="..\..\..\libraries\nrf24_package\nrf24_package.c" />
     <ClCompile Include="..\..\..\libraries\nrf24_hal_support\nrf24_hal_support.c" />
     <ClCompile Include="nrf_hal_project_testing.c" />

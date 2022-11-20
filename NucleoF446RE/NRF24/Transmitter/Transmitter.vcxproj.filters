@@ -36,7 +36,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="nrf_hal_project.c">
+    <ClCompile Include="nrf_hal_tx_project.c">
       <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="system_stm32f4xx.c">
