@@ -80,6 +80,7 @@ void spin_500_uS()
 
 NrfSpiDevice device = { 0 }; 
 
+int arr[4][3] = { { 2, 3, 1 }, { 19, 12, 7 }, { 10, 9, 8 }, { 3, 11, 5 } };
 
 
 int main(void)
@@ -95,7 +96,7 @@ int main(void)
 	NrfIoDescriptor descriptor = { 0 };
 	uint32_t state = 0;
 	uint8_t buffer[32] = { 0 };
-	uint8_t send_polls = 0;
+	//uint8_t[4] send_polls = 0;
 	PoolHeader_ptr pool_ptr; 
 	
 //	CreateMemoryPool(17, 64, 8, &pool_ptr);
