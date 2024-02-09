@@ -13,7 +13,6 @@
 
 int main(void)
 {
-	
 	RCC_AHB1ENR->GPIOA_EN = 1;
 	
 	RCC_CFGR->MCO1 = 3;
@@ -28,38 +27,47 @@ int main(void)
 	RCC_CR->HSE_RDY = 0;
 	RCC_CR->HSE_ON = 1;
 	
-	// Set HSE on
-//	RCC->CR &= ~0x000F0000;
-//	RCC->CR |=  0x00010000;
-	
-	WAIT_FOR_HSE;
+	SPIN_UNTIL(RCC_CR->HSE_RDY);
 	
 	RCC_CFGR->SW = 0;
 	
-	RCC->PLLCFGR = 0x00402A04;
-	RCC->CR |=     0x01000000;
+	RCC_PLLCFGR->PLL_M = 4;       // Div factor
+	RCC_PLLCFGR->PLL_N = 168;     // Mul factor
+	RCC_PLLCFGR->PLL_SRC = 1;     // Use HSE
 	
-	WAIT_FOR_PLL;
+	RCC_CR->PLL_ON = 1;
+	
+	SPIN_UNTIL(RCC_CR->PLL_RDY);
 	
 	FLASH->ACR = 0x0705;
 	
 	RCC_CFGR->HPRE = 0;
 	RCC_CFGR->SW = 2;
 	
-	SPIN_WHILE(RCC_CFGR->SWS != 2);
-	
+	SPIN_UNTIL(RCC_CFGR->SWS == 2);
 	
 	//LL_InitTick(16000000, 1000);
 
 	//Warning: if the line below triggers an error, GPIOD is not connected to a AHB1 (Group 1) on this device.
 	//In this case, please search the stm32xxxx_ll_bus.h file for 'PERIPH_GPIOD' to find out the correct
 	//macro name and use it to replace LL_AHB1_GRP1_PERIPH_$$com.sysprogs.examples.lBedblink.LEDPORT$$ and LL_AHB1_GRP1_EnableClock() below. 
+	
+	RCC_AHB1ENR->GPIOD_EN = 1;
+	
+	GPIO_MODER(GPIOD)->MODER_12 = 1;
+	GPIO_OTYPER(GPIOD)->OT_12 = 0;
+	GPIO_OSPEEDR(GPIOD)->SPEED_12 = 0;
+		
+	GPIO_MODER(GPIOD)->MODER_11 = 1;
+	GPIO_OTYPER(GPIOD)->OT_11 = 0;
+	GPIO_OSPEEDR(GPIOD)->SPEED_11 = 0;
+
 	LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOD);
 	
 	LL_GPIO_SetPinMode(GPIOD, LL_GPIO_PIN_12, LL_GPIO_MODE_OUTPUT);
 	LL_GPIO_SetPinOutputType(GPIOD, LL_GPIO_PIN_12, LL_GPIO_OUTPUT_PUSHPULL);
 	LL_GPIO_SetPinSpeed(GPIOD, LL_GPIO_PIN_12, LL_GPIO_SPEED_FREQ_LOW);
-
+	
 	LL_GPIO_SetPinMode(GPIOD, LL_GPIO_PIN_11, LL_GPIO_MODE_OUTPUT);
 	LL_GPIO_SetPinOutputType(GPIOD, LL_GPIO_PIN_11, LL_GPIO_OUTPUT_PUSHPULL);
 	LL_GPIO_SetPinSpeed(GPIOD, LL_GPIO_PIN_11, LL_GPIO_SPEED_FREQ_LOW);
