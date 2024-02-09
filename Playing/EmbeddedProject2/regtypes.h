@@ -4,6 +4,10 @@
 #define RCC_CFGR ((RCC_CFGR_Type_ptr)&(RCC->CFGR)) 
 #define RCC_AHB1ENR ((RCC_AHB1ENR_Type_ptr)&(RCC->AHB1ENR)) 
 #define RCC_CR ((RCC_CR_Type_ptr)&(RCC->CR)) 
+#define RCC_PLLCFGR ((RCC_PLLCFGR_Type_ptr)&(RCC->PLLCFGR)) 
+#define GPIO_MODER(BASE) ((GPIO_MODER_Type_ptr)&((BASE)->MODER)) 
+#define GPIO_OTYPER(BASE) ((GPIO_OTYPER_Type_ptr)&((BASE)->OTYPER)) 
+#define GPIO_OSPEEDR(BASE) ((GPIO_OSPEEDR_Type_ptr)&((BASE)->OSPEEDR)) 
 
 typedef union
 {
@@ -18,7 +22,7 @@ typedef union
 		__IO BIT PPRE2 : 3;
 		__IO BIT RTCPRE : 5;
 		__IO BIT MCO1 : 2;
-		__IO BIT UNUSED1 : 1;
+		__IO BIT I2SSC : 1;
 		__IO BIT MCO1_PRE : 3;
 		__IO BIT MCO2_PRE : 3;
 		__IO BIT MCO2 : 2;
@@ -65,7 +69,7 @@ typedef union
 
 typedef union
 {
-	struct
+	struct // STM32F407
 	{
 		// LSB at top, MSB at bottom
 		__IO BIT HSI_ON : 1;
@@ -82,9 +86,105 @@ typedef union
 		__IO BIT PLL_RDY : 1;
 		__IO BIT PLL_I2S_ON : 1;
 		__IO BIT PLL_I2S_RDY: 1;
-		__IO BIT PLL_SAI_ON : 1;
-		__IO BIT PLL_SAI_RDY : 1;
-		__IO BIT UNUSED3 : 2;
+		__IO BIT UNUSED3 : 4;
 	};
 	uint32_t ALLBITS;
 } RCC_CR_Type, * RCC_CR_Type_ptr;
+
+typedef union
+{
+	struct 
+	{
+		// LSB at top, MSB at bottom
+		__IO BIT PLL_M : 6;
+		__IO BIT PLL_N : 9;
+		__IO BIT UNUSED1 : 1;
+		__IO BIT PLL_P : 2;
+		__IO BIT UNUSED2 : 4;
+		__IO BIT PLL_SRC : 1;
+		__IO BIT UNUSED3 : 1;
+		__IO BIT PLL_Q : 4;
+		__IO BIT UNUSED4 : 4;
+	};
+	uint32_t ALLBITS;
+
+} RCC_PLLCFGR_Type, * RCC_PLLCFGR_Type_ptr;
+
+typedef union
+{
+	struct
+	{
+		// LSB at top, MSB at bottom
+		__IO BIT MODER_0 : 2;
+		__IO BIT MODER_1 : 2;
+		__IO BIT MODER_2 : 2;
+		__IO BIT MODER_3 : 2;
+		__IO BIT MODER_4 : 2;
+		__IO BIT MODER_5 : 2;
+		__IO BIT MODER_6 : 2;
+		__IO BIT MODER_7 : 2;
+		__IO BIT MODER_8 : 2;
+		__IO BIT MODER_9 : 2;
+		__IO BIT MODER_10 : 2;
+		__IO BIT MODER_11 : 2;
+		__IO BIT MODER_12 : 2;
+		__IO BIT MODER_13 : 2;
+		__IO BIT MODER_14 : 2;
+		__IO BIT MODER_15 : 2;
+	};
+	uint32_t ALLBITS;
+
+} GPIO_MODER_Type, * GPIO_MODER_Type_ptr;
+
+typedef union
+{
+	struct
+	{
+		// LSB at top, MSB at bottom
+		__IO BIT OT_0 : 1;
+		__IO BIT OT_1 : 1;
+		__IO BIT OT_2 : 1;
+		__IO BIT OT_3 : 1;
+		__IO BIT OT_4 : 1;
+		__IO BIT OT_5 : 1;
+		__IO BIT OT_6 : 1;
+		__IO BIT OT_7 : 1;
+		__IO BIT OT_8 : 1;
+		__IO BIT OT_9 : 1;
+		__IO BIT OT_10 : 1;
+		__IO BIT OT_11 : 1;
+		__IO BIT OT_12 : 1;
+		__IO BIT OT_13 : 1;
+		__IO BIT OT_14 : 1;
+		__IO BIT OT_15 : 1;
+		__IO BIT UNUSED1 : 16;
+	};
+	uint32_t ALLBITS;
+
+} GPIO_OTYPER_Type, * GPIO_OTYPER_Type_ptr;
+
+typedef union
+{
+	struct
+	{
+		// LSB at top, MSB at bottom
+		__IO BIT SPEED_0 : 2;
+		__IO BIT SPEED_1 : 2;
+		__IO BIT SPEED_2 : 2;
+		__IO BIT SPEED_3 : 2;
+		__IO BIT SPEED_4 : 2;
+		__IO BIT SPEED_5 : 2;
+		__IO BIT SPEED_6 : 2;
+		__IO BIT SPEED_7 : 2;
+		__IO BIT SPEED_8 : 2;
+		__IO BIT SPEED_9 : 2;
+		__IO BIT SPEED_10 : 2;
+		__IO BIT SPEED_11 : 2;
+		__IO BIT SPEED_12 : 2;
+		__IO BIT SPEED_13 : 2;
+		__IO BIT SPEED_14 : 2;
+		__IO BIT SPEED_15 : 2;
+	};
+	uint32_t ALLBITS;
+
+} GPIO_OSPEEDR_Type, * GPIO_OSPEEDR_Type_ptr;
