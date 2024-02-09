@@ -303,6 +303,139 @@ typedef union
 
 } GPIO_IDR_Type, * GPIO_IDR_Type_ptr;
 
+typedef union
+{
+	struct
+	{
+		// LSB at top, MSB at bottom
+		__IO BIT ODR_0 : 1;
+		__IO BIT ODR_1 : 1;
+		__IO BIT ODR_2 : 1;
+		__IO BIT ODR_3 : 1;
+		__IO BIT ODR_4 : 1;
+		__IO BIT ODR_5 : 1;
+		__IO BIT ODR_6 : 1;
+		__IO BIT ODR_7 : 1;
+		__IO BIT ODR_8 : 1;
+		__IO BIT ODR_9 : 1;
+		__IO BIT ODR_10 : 1;
+		__IO BIT ODR_11 : 1;
+		__IO BIT ODR_12 : 1;
+		__IO BIT ODR_13 : 1;
+		__IO BIT ODR_14 : 1;
+		__IO BIT ODR_15 : 1;
+		__IO BIT UNUSED : 16;
+	};
+	uint32_t ALLBITS;
+
+} GPIO_ODR_Type, * GPIO_ODR_Type_ptr;
+
+typedef union
+{
+	struct
+	{
+		// All bits here are write only.
+		// LSB at top, MSB at bottom
+		__IO BIT BS_0 : 1;
+		__IO BIT BS_1 : 1;
+		__IO BIT BS_2 : 1;
+		__IO BIT BS_3 : 1;
+		__IO BIT BS_4 : 1;
+		__IO BIT BS_5 : 1;
+		__IO BIT BS_6 : 1;
+		__IO BIT BS_7 : 1;
+		__IO BIT BS_8 : 1;
+		__IO BIT BS_9 : 1;
+		__IO BIT BS_10 : 1;
+		__IO BIT BS_11 : 1;
+		__IO BIT BS_12 : 1;
+		__IO BIT BS_13 : 1;
+		__IO BIT BS_14 : 1;
+		__IO BIT BS_15 : 1;
+		__IO BIT BR_0 : 1;
+		__IO BIT BR_1 : 1;
+		__IO BIT BR_2 : 1;
+		__IO BIT BR_3 : 1;
+		__IO BIT BR_4 : 1;
+		__IO BIT BR_5 : 1;
+		__IO BIT BR_6 : 1;
+		__IO BIT BR_7 : 1;
+		__IO BIT BR_8 : 1;
+		__IO BIT BR_9 : 1;
+		__IO BIT BR_10 : 1;
+		__IO BIT BR_11 : 1;
+		__IO BIT BR_12 : 1;
+		__IO BIT BR_13 : 1;
+		__IO BIT BR_14 : 1;
+		__IO BIT BR_15 : 1;
+	};
+	uint32_t ALLBITS;
+
+} GPIO_BSRR_Type, * GPIO_BSRR_Type_ptr;
+
+typedef union
+{
+	struct
+	{
+		// LSB at top, MSB at bottom
+		__IO BIT LCK_0 : 1;
+		__IO BIT LCK_1 : 1;
+		__IO BIT LCK_2 : 1;
+		__IO BIT LCK_3 : 1;
+		__IO BIT LCK_4 : 1;
+		__IO BIT LCK_5 : 1;
+		__IO BIT LCK_6 : 1;
+		__IO BIT LCK_7 : 1;
+		__IO BIT LCK_8 : 1;
+		__IO BIT LCK_9 : 1;
+		__IO BIT LCK_10 : 1;
+		__IO BIT LCK_11 : 1;
+		__IO BIT LCK_12 : 1;
+		__IO BIT LCK_13 : 1;
+		__IO BIT LCK_14 : 1;
+		__IO BIT LCK_15 : 1;
+		__IO BIT LCK_K : 1;
+		__IO BIT UNUSED : 15;
+	};
+	uint32_t ALLBITS;
+
+} GPIO_LCKR_Type, * GPIO_LCKR_Type_ptr;
+
+typedef union
+{
+	struct
+	{
+		// LSB at top, MSB at bottom
+		__IO BIT AFRL_0 : 4;
+		__IO BIT AFRL_1 : 4;
+		__IO BIT AFRL_2 : 4;
+		__IO BIT AFRL_3 : 4;
+		__IO BIT AFRL_4 : 4;
+		__IO BIT AFRL_5 : 4;
+		__IO BIT AFRL_6 : 4;
+		__IO BIT AFRL_7 : 4;
+	};
+	uint32_t ALLBITS;
+
+} GPIO_AFRL_Type, * GPIO_AFRL_Type_ptr;
+
+typedef union
+{
+	struct
+	{
+		// LSB at top, MSB at bottom
+		__IO BIT AFRH_8 : 4;
+		__IO BIT AFRH_9 : 4;
+		__IO BIT AFRH_10 : 4;
+		__IO BIT AFRH_11 : 4;
+		__IO BIT AFRH_12 : 4;
+		__IO BIT AFRH_13 : 4;
+		__IO BIT AFRH_14 : 4;
+		__IO BIT AFRH_15 : 4;
+	};
+	uint32_t ALLBITS;
+
+} GPIO_AFRH_Type, * GPIO_AFRH_Type_ptr;
 
 typedef struct
 {
@@ -343,10 +476,41 @@ typedef struct
 	__IO GPIO_MODER_Type MODER;
 	__IO GPIO_OTYPER_Type OTYPER;
 	__IO GPIO_OSPEEDR_Type SPEEDR;
-	
-} GeneralPurposeIO_A, * GeneralPurposeIO_A_ptr;
+	__IO GPIO_PUPDR_Type PUPDR;
+	__IO GPIO_IDR_Type IDR;
+	__IO GPIO_ODR_Type ODR;
+	__IO GPIO_BSRR_Type BSRR;
+	__IO GPIO_LCKR_Type LCKR;
+	__IO GPIO_AFRL_Type AFRL;
+	__IO GPIO_AFRH_Type AFRH;
+
+} GPIO, * GPIO_ptr;
+
+#define PADTO(BYTES,TYPE) (BYTES-sizeof(TYPE))
 
 typedef struct
 {
-	
+	GPIO GPIO_A;
+	char PADA[PADTO(1024,GPIO)];
+	GPIO GPIO_B;
+	char PADB[PADTO(1024, GPIO)];
+	GPIO GPIO_C;
+	char PADC[PADTO(1024, GPIO)];
+	GPIO GPIO_D;
+	char PADD[PADTO(1024, GPIO)];
+	GPIO GPIO_E;
+	char PADE[PADTO(1024, GPIO)];
+	GPIO GPIO_F;
+	char PADF[PADTO(1024, GPIO)];
+	GPIO GPIO_G;
+	char PADG[PADTO(1024, GPIO)];
+	GPIO GPIO_H;
+	char PADH[PADTO(1024, GPIO)];
+	GPIO GPIO_I;
+	char PADI[PADTO(1024, GPIO)];
+	GPIO GPIO_J;
+	char PADJ[PADTO(1024, GPIO)];
+	GPIO GPIO_K;
+	char PADK[PADTO(1024, GPIO)];
+
 } AHB1, *AHB1_ptr;
