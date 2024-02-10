@@ -5,8 +5,7 @@
 #undef TIM4
 #undef TIM5
 
-#define BIT08 volatile uint8_t
-#define BIT16 volatile uint16_t
+#define bit volatile uint32_t
 
 #define RCC_CFGR ((RCC_CFGR_Reg_ptr)&(RCC->CFGR)) 
 #define RCC_AHB1ENR ((RCC_AHB1ENR_Reg_ptr)&(RCC->AHB1ENR)) 
@@ -22,18 +21,18 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 SW : 2;
-		BIT16 SWS : 2;
-		BIT16 HPRE : 4;
-		BIT16 UNUSED2 : 2;
-		BIT16 PPRE1 : 3;
-		BIT16 PPRE2 : 3;
-		BIT16 RTCPRE : 5;
-		BIT16 MCO1 : 2;
-		BIT16 I2SSC : 1;
-		BIT16 MCO1_PRE : 3;
-		BIT16 MCO2_PRE : 3;
-		BIT16 MCO2 : 2;
+		bit SW : 2;
+		bit SWS : 2;
+		bit HPRE : 4;
+		bit UNUSED2 : 2;
+		bit PPRE1 : 3;
+		bit PPRE2 : 3;
+		bit RTCPRE : 5;
+		bit MCO1 : 2;
+		bit I2SSC : 1;
+		bit MCO1_PRE : 3;
+		bit MCO2_PRE : 3;
+		bit MCO2 : 2;
 	};
 	uint32_t ALLBITS;
 } RCC_CFGR_Reg, * RCC_CFGR_Reg_ptr;
@@ -43,34 +42,34 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 GPIOA_EN : 1;
-		BIT16 GPIOB_EN : 1;
-		BIT16 GPIOC_EN : 1;
-		BIT16 GPIOD_EN : 1;
-		BIT16 GPIOE_EN : 1;
-		BIT16 GPIOF_EN : 1;
-		BIT16 GPIOG_EN : 1;
-		BIT16 GPIOH_EN : 1;
-		BIT16 GPIOI_EN : 1;
-		BIT16 GPIOJ_EN : 1;
-		BIT16 GPIOK_EN : 1;
-		BIT16 UNUSED1 : 1;
-		BIT16 CRC_EN : 1;
-		BIT16 UNUSED2 : 5;
-		BIT16 BKPSRAM_EN : 1;
-		BIT16 UNUSED3 : 1;
-		BIT16 CCMDATARAM_EN : 1;
-		BIT16 DMA1_EN : 1;
-		BIT16 DMA2_EN : 1;
-		BIT16 DMA2D_EN : 1;
-		BIT16 UNUSED4 : 1;
-		BIT16 ETHMAC_EN : 1;
-		BIT16 ETHMACTX_EN : 1;
-		BIT16 ETHMACRX_EN : 1;
-		BIT16 ETHMACPTP_EN : 1;
-		BIT16 OTGHS_EN : 1;
-		BIT16 OTGHSULPI_EN : 1;
-		BIT16 UNUSED5 : 1;
+		bit GPIOA_EN : 1;
+		bit GPIOB_EN : 1;
+		bit GPIOC_EN : 1;
+		bit GPIOD_EN : 1;
+		bit GPIOE_EN : 1;
+		bit GPIOF_EN : 1;
+		bit GPIOG_EN : 1;
+		bit GPIOH_EN : 1;
+		bit GPIOI_EN : 1;
+		bit GPIOJ_EN : 1;
+		bit GPIOK_EN : 1;
+		bit UNUSED1 : 1;
+		bit CRC_EN : 1;
+		bit UNUSED2 : 5;
+		bit BKPSRAM_EN : 1;
+		bit UNUSED3 : 1;
+		bit CCMDATARAM_EN : 1;
+		bit DMA1_EN : 1;
+		bit DMA2_EN : 1;
+		bit DMA2D_EN : 1;
+		bit UNUSED4 : 1;
+		bit ETHMAC_EN : 1;
+		bit ETHMACTX_EN : 1;
+		bit ETHMACRX_EN : 1;
+		bit ETHMACPTP_EN : 1;
+		bit OTGHS_EN : 1;
+		bit OTGHSULPI_EN : 1;
+		bit UNUSED5 : 1;
 	};
 	uint32_t ALLBITS;
 } RCC_AHB1ENR_Reg, * RCC_AHB1ENR_Reg_ptr;
@@ -80,14 +79,52 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 DCMI_EN : 1;
-		BIT16 UNUSED1 : 3;
-		BIT16 CRYP_EN : 1;
-		BIT16 HASH_EN : 1;
-		BIT16 RNG_EN : 1;
-		BIT16 OTGFS_EN : 1;
-		BIT16 UNUSED2: 8;
-		BIT16 UNUSED3 : 16;
+		bit TIM2_EN : 1;
+		bit TIM3_EN : 1;
+		bit TIM4_EN : 1;
+		bit TIM5_EN : 1;
+		bit TIM6_EN : 1;
+		bit TIM7_EN : 1;
+		bit TIM12_EN : 1;
+		bit TIM13_EN : 1;
+		bit TIM14_EN : 1;
+		bit RESERVED1 : 2;
+		bit WWDG_EN : 1;
+		bit RESERVED2 : 2;
+		bit SPI2_EN : 1;
+		bit SPI3_EN : 1;
+		bit RESERVED3 : 1;
+		bit USART2_EN : 1;
+		bit USART3_EN : 1;
+		bit UART4_EN : 1;
+		bit UART5_EN : 1;
+		bit I2C1_EN : 1;
+		bit I2C2_EN : 1;
+		bit I2C3_EN : 1;
+		bit RESEEVED4 : 1;
+		bit CAN1_EN : 1;
+		bit CAN2_EN : 1;
+		bit RESERVED5 : 1;
+		bit PWR_EN : 1;
+		bit DAC_EN : 1;
+		bit RESERVED6 : 2;
+		uint32_t ALLBITS;
+	};
+} RCC_APB1ENR_Reg, *RCC_APB1ENR_Reg_ptr;
+
+typedef union
+{
+	struct
+	{
+		// LSB at top, MSB at bottom
+		bit DCMI_EN : 1;
+		bit UNUSED1 : 3;
+		bit CRYP_EN : 1;
+		bit HASH_EN : 1;
+		bit RNG_EN : 1;
+		bit OTGFS_EN : 1;
+		bit UNUSED2: 8;
+		bit UNUSED3 : 16;
 	};
 	uint32_t ALLBITS;
 } RCC_AHB2ENR_Reg, * RCC_AHB2ENR_Reg_ptr;
@@ -97,9 +134,9 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT08 FSMC_EN : 1;
-		BIT16 UNUSED1 : 15;
-		BIT16 UNUSED2 : 16;
+		bit FSMC_EN : 1;
+		bit UNUSED1 : 15;
+		bit UNUSED2 : 16;
 	};
 	uint32_t ALLBITS;
 } RCC_AHB3ENR_Reg, * RCC_AHB3ENR_Reg_ptr;
@@ -109,21 +146,21 @@ typedef union
 	struct // STM32F407
 	{
 		// LSB at top, MSB at bottom
-		BIT16 HSI_ON : 1;
-		BIT16 HSI_RDY : 1;
-		BIT16 UNUSED1 : 1;
-		BIT16 HSI_TRIM : 5;
-		BIT16 HSI_CAL : 8;
-		BIT16 HSE_ON : 1;
-		BIT16 HSE_RDY : 1;
-		BIT16 HSE_BYP : 1;
-		BIT16 CSS_ON : 1;
-		BIT16 UNUSED2 : 4;
-		BIT16 PLL_ON : 1;
-		BIT16 PLL_RDY : 1;
-		BIT16 PLL_I2S_ON : 1;
-		BIT16 PLL_I2S_RDY: 1;
-		BIT16 UNUSED3 : 4;
+		bit HSI_ON : 1;
+		bit HSI_RDY : 1;
+		bit UNUSED1 : 1;
+		bit HSI_TRIM : 5;
+		bit HSI_CAL : 8;
+		bit HSE_ON : 1;
+		bit HSE_RDY : 1;
+		bit HSE_BYP : 1;
+		bit CSS_ON : 1;
+		bit UNUSED2 : 4;
+		bit PLL_ON : 1;
+		bit PLL_RDY : 1;
+		bit PLL_I2S_ON : 1;
+		bit PLL_I2S_RDY: 1;
+		bit UNUSED3 : 4;
 	};
 	uint32_t ALLBITS;
 } RCC_CR_Reg, * RCC_CR_Reg_ptr;
@@ -133,30 +170,30 @@ typedef union
 	struct // STM32F407
 	{
 		// LSB at top, MSB at bottom
-		BIT16 LSI_RDY_F : 1;
-		BIT16 LSE_RDY_F : 1;
-		BIT16 HSI_RDY_F : 1;
-		BIT16 HSE_RDY_F : 1;
-		BIT16 PLL_RDY_F : 1;
-		BIT16 PLL_I2S_RDY_F : 1;
-		BIT16 UNUSED : 1;
-		BIT16 CSS_F : 1;
-		BIT16 LSI_RDY_E : 1;
-		BIT16 LSE_RDY_E : 1;
-		BIT16 HSI_RDY_E : 1;
-		BIT16 HSE_RDY_E : 1;
-		BIT16 PLL_RDY_E : 1;
-		BIT16 PLL_I2S_RDY_E : 1;
-		BIT16 UNUSED2 : 2;
-		BIT16 LSI_RDY_C : 1;
-		BIT16 LSE_RDY_C : 1;
-		BIT16 HSI_RDY_C : 1;
-		BIT16 HSE_RDY_C : 1;
-		BIT16 PLL_RDY_C : 1;
-		BIT16 PLL_I2S_RDY_C : 1;
-		BIT16 UNUSED3 : 1;
-		BIT16 CSS_C : 1;
-		BIT16 UNUSED4 : 8;
+		bit LSI_RDY_F : 1;
+		bit LSE_RDY_F : 1;
+		bit HSI_RDY_F : 1;
+		bit HSE_RDY_F : 1;
+		bit PLL_RDY_F : 1;
+		bit PLL_I2S_RDY_F : 1;
+		bit UNUSED : 1;
+		bit CSS_F : 1;
+		bit LSI_RDY_E : 1;
+		bit LSE_RDY_E : 1;
+		bit HSI_RDY_E : 1;
+		bit HSE_RDY_E : 1;
+		bit PLL_RDY_E : 1;
+		bit PLL_I2S_RDY_E : 1;
+		bit UNUSED2 : 2;
+		bit LSI_RDY_C : 1;
+		bit LSE_RDY_C : 1;
+		bit HSI_RDY_C : 1;
+		bit HSE_RDY_C : 1;
+		bit PLL_RDY_C : 1;
+		bit PLL_I2S_RDY_C : 1;
+		bit UNUSED3 : 1;
+		bit CSS_C : 1;
+		bit UNUSED4 : 8;
 	};
 	uint32_t ALLBITS;
 } RCC_CIR_Reg, * RCC_CIR_Reg_ptr;
@@ -166,15 +203,15 @@ typedef union
 	struct 
 	{
 		// LSB at top, MSB at bottom
-		BIT16 PLL_M : 6;
-		BIT16 PLL_N : 9;
-		BIT16 UNUSED1 : 1;
-		BIT16 PLL_P : 2;
-		BIT16 UNUSED2 : 4;
-		BIT16 PLL_SRC : 1;
-		BIT16 UNUSED3 : 1;
-		BIT16 PLL_Q : 4;
-		BIT16 UNUSED4 : 4;
+		bit PLL_M : 6;
+		bit PLL_N : 9;
+		bit UNUSED1 : 1;
+		bit PLL_P : 2;
+		bit UNUSED2 : 4;
+		bit PLL_SRC : 1;
+		bit UNUSED3 : 1;
+		bit PLL_Q : 4;
+		bit UNUSED4 : 4;
 	};
 	uint32_t ALLBITS;
 
@@ -185,22 +222,22 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 MODER_0 : 2;
-		BIT16 MODER_1 : 2;
-		BIT16 MODER_2 : 2;
-		BIT16 MODER_3 : 2;
-		BIT16 MODER_4 : 2;
-		BIT16 MODER_5 : 2;
-		BIT16 MODER_6 : 2;
-		BIT16 MODER_7 : 2;
-		BIT16 MODER_8 : 2;
-		BIT16 MODER_9 : 2;
-		BIT16 MODER_10 : 2;
-		BIT16 MODER_11 : 2;
-		BIT16 MODER_12 : 2;
-		BIT16 MODER_13 : 2;
-		BIT16 MODER_14 : 2;
-		BIT16 MODER_15 : 2;
+		bit MODER_0 : 2;
+		bit MODER_1 : 2;
+		bit MODER_2 : 2;
+		bit MODER_3 : 2;
+		bit MODER_4 : 2;
+		bit MODER_5 : 2;
+		bit MODER_6 : 2;
+		bit MODER_7 : 2;
+		bit MODER_8 : 2;
+		bit MODER_9 : 2;
+		bit MODER_10 : 2;
+		bit MODER_11 : 2;
+		bit MODER_12 : 2;
+		bit MODER_13 : 2;
+		bit MODER_14 : 2;
+		bit MODER_15 : 2;
 	};
 	uint32_t ALLBITS;
 
@@ -211,23 +248,23 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 OT_0 : 1;
-		BIT16 OT_1 : 1;
-		BIT16 OT_2 : 1;
-		BIT16 OT_3 : 1;
-		BIT16 OT_4 : 1;
-		BIT16 OT_5 : 1;
-		BIT16 OT_6 : 1;
-		BIT16 OT_7 : 1;
-		BIT16 OT_8 : 1;
-		BIT16 OT_9 : 1;
-		BIT16 OT_10 : 1;
-		BIT16 OT_11 : 1;
-		BIT16 OT_12 : 1;
-		BIT16 OT_13 : 1;
-		BIT16 OT_14 : 1;
-		BIT16 OT_15 : 1;
-		BIT16 UNUSED1 : 16;
+		bit OT_0 : 1;
+		bit OT_1 : 1;
+		bit OT_2 : 1;
+		bit OT_3 : 1;
+		bit OT_4 : 1;
+		bit OT_5 : 1;
+		bit OT_6 : 1;
+		bit OT_7 : 1;
+		bit OT_8 : 1;
+		bit OT_9 : 1;
+		bit OT_10 : 1;
+		bit OT_11 : 1;
+		bit OT_12 : 1;
+		bit OT_13 : 1;
+		bit OT_14 : 1;
+		bit OT_15 : 1;
+		bit UNUSED1 : 16;
 	};
 	uint32_t ALLBITS;
 
@@ -238,22 +275,22 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 SPEED_0 : 2;
-		BIT16 SPEED_1 : 2;
-		BIT16 SPEED_2 : 2;
-		BIT16 SPEED_3 : 2;
-		BIT16 SPEED_4 : 2;
-		BIT16 SPEED_5 : 2;
-		BIT16 SPEED_6 : 2;
-		BIT16 SPEED_7 : 2;
-		BIT16 SPEED_8 : 2;
-		BIT16 SPEED_9 : 2;
-		BIT16 SPEED_10 : 2;
-		BIT16 SPEED_11 : 2;
-		BIT16 SPEED_12 : 2;
-		BIT16 SPEED_13 : 2;
-		BIT16 SPEED_14 : 2;
-		BIT16 SPEED_15 : 2;
+		bit SPEED_0 : 2;
+		bit SPEED_1 : 2;
+		bit SPEED_2 : 2;
+		bit SPEED_3 : 2;
+		bit SPEED_4 : 2;
+		bit SPEED_5 : 2;
+		bit SPEED_6 : 2;
+		bit SPEED_7 : 2;
+		bit SPEED_8 : 2;
+		bit SPEED_9 : 2;
+		bit SPEED_10 : 2;
+		bit SPEED_11 : 2;
+		bit SPEED_12 : 2;
+		bit SPEED_13 : 2;
+		bit SPEED_14 : 2;
+		bit SPEED_15 : 2;
 	};
 	uint32_t ALLBITS;
 
@@ -264,22 +301,22 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 PUPDR_0 : 2;
-		BIT16 PUPDR_1 : 2;
-		BIT16 PUPDR_2 : 2;
-		BIT16 PUPDR_3 : 2;
-		BIT16 PUPDR_4 : 2;
-		BIT16 PUPDR_5 : 2;
-		BIT16 PUPDR_6 : 2;
-		BIT16 PUPDR_7 : 2;
-		BIT16 PUPDR_8 : 2;
-		BIT16 PUPDR_9 : 2;
-		BIT16 PUPDR_10 : 2;
-		BIT16 PUPDR_11 : 2;
-		BIT16 PUPDR_12 : 2;
-		BIT16 PUPDR_13 : 2;
-		BIT16 PUPDR_14 : 2;
-		BIT16 PUPDR_15 : 2;
+		bit PUPDR_0 : 2;
+		bit PUPDR_1 : 2;
+		bit PUPDR_2 : 2;
+		bit PUPDR_3 : 2;
+		bit PUPDR_4 : 2;
+		bit PUPDR_5 : 2;
+		bit PUPDR_6 : 2;
+		bit PUPDR_7 : 2;
+		bit PUPDR_8 : 2;
+		bit PUPDR_9 : 2;
+		bit PUPDR_10 : 2;
+		bit PUPDR_11 : 2;
+		bit PUPDR_12 : 2;
+		bit PUPDR_13 : 2;
+		bit PUPDR_14 : 2;
+		bit PUPDR_15 : 2;
 	};
 	uint32_t ALLBITS;
 
@@ -290,23 +327,23 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 IDR_0 : 1;
-		BIT16 IDR_1 : 1;
-		BIT16 IDR_2 : 1;
-		BIT16 IDR_3 : 1;
-		BIT16 IDR_4 : 1;
-		BIT16 IDR_5 : 1;
-		BIT16 IDR_6 : 1;
-		BIT16 IDR_7 : 1;
-		BIT16 IDR_8 : 1;
-		BIT16 IDR_9 : 1;
-		BIT16 IDR_10 : 1;
-		BIT16 IDR_11 : 1;
-		BIT16 IDR_12 : 1;
-		BIT16 IDR_13 : 1;
-		BIT16 IDR_14 : 1;
-		BIT16 IDR_15 : 1;
-		BIT16 UNUSED : 16;
+		bit IDR_0 : 1;
+		bit IDR_1 : 1;
+		bit IDR_2 : 1;
+		bit IDR_3 : 1;
+		bit IDR_4 : 1;
+		bit IDR_5 : 1;
+		bit IDR_6 : 1;
+		bit IDR_7 : 1;
+		bit IDR_8 : 1;
+		bit IDR_9 : 1;
+		bit IDR_10 : 1;
+		bit IDR_11 : 1;
+		bit IDR_12 : 1;
+		bit IDR_13 : 1;
+		bit IDR_14 : 1;
+		bit IDR_15 : 1;
+		bit UNUSED : 16;
 	};
 	uint32_t ALLBITS;
 
@@ -317,23 +354,23 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 ODR_0 : 1;
-		BIT16 ODR_1 : 1;
-		BIT16 ODR_2 : 1;
-		BIT16 ODR_3 : 1;
-		BIT16 ODR_4 : 1;
-		BIT16 ODR_5 : 1;
-		BIT16 ODR_6 : 1;
-		BIT16 ODR_7 : 1;
-		BIT16 ODR_8 : 1;
-		BIT16 ODR_9 : 1;
-		BIT16 ODR_10 : 1;
-		BIT16 ODR_11 : 1;
-		BIT16 ODR_12 : 1;
-		BIT16 ODR_13 : 1;
-		BIT16 ODR_14 : 1;
-		BIT16 ODR_15 : 1;
-		BIT16 UNUSED : 16;
+		bit ODR_0 : 1;
+		bit ODR_1 : 1;
+		bit ODR_2 : 1;
+		bit ODR_3 : 1;
+		bit ODR_4 : 1;
+		bit ODR_5 : 1;
+		bit ODR_6 : 1;
+		bit ODR_7 : 1;
+		bit ODR_8 : 1;
+		bit ODR_9 : 1;
+		bit ODR_10 : 1;
+		bit ODR_11 : 1;
+		bit ODR_12 : 1;
+		bit ODR_13 : 1;
+		bit ODR_14 : 1;
+		bit ODR_15 : 1;
+		bit UNUSED : 16;
 	};
 	uint32_t ALLBITS;
 
@@ -345,38 +382,38 @@ typedef union
 	{
 		// All bits here are write only.
 		// LSB at top, MSB at bottom
-		BIT16 BS_0 : 1;
-		BIT16 BS_1 : 1;
-		BIT16 BS_2 : 1;
-		BIT16 BS_3 : 1;
-		BIT16 BS_4 : 1;
-		BIT16 BS_5 : 1;
-		BIT16 BS_6 : 1;
-		BIT16 BS_7 : 1;
-		BIT16 BS_8 : 1;
-		BIT16 BS_9 : 1;
-		BIT16 BS_10 : 1;
-		BIT16 BS_11 : 1;
-		BIT16 BS_12 : 1;
-		BIT16 BS_13 : 1;
-		BIT16 BS_14 : 1;
-		BIT16 BS_15 : 1;
-		BIT16 BR_0 : 1;
-		BIT16 BR_1 : 1;
-		BIT16 BR_2 : 1;
-		BIT16 BR_3 : 1;
-		BIT16 BR_4 : 1;
-		BIT16 BR_5 : 1;
-		BIT16 BR_6 : 1;
-		BIT16 BR_7 : 1;
-		BIT16 BR_8 : 1;
-		BIT16 BR_9 : 1;
-		BIT16 BR_10 : 1;
-		BIT16 BR_11 : 1;
-		BIT16 BR_12 : 1;
-		BIT16 BR_13 : 1;
-		BIT16 BR_14 : 1;
-		BIT16 BR_15 : 1;
+		bit BS_0 : 1;
+		bit BS_1 : 1;
+		bit BS_2 : 1;
+		bit BS_3 : 1;
+		bit BS_4 : 1;
+		bit BS_5 : 1;
+		bit BS_6 : 1;
+		bit BS_7 : 1;
+		bit BS_8 : 1;
+		bit BS_9 : 1;
+		bit BS_10 : 1;
+		bit BS_11 : 1;
+		bit BS_12 : 1;
+		bit BS_13 : 1;
+		bit BS_14 : 1;
+		bit BS_15 : 1;
+		bit BR_0 : 1;
+		bit BR_1 : 1;
+		bit BR_2 : 1;
+		bit BR_3 : 1;
+		bit BR_4 : 1;
+		bit BR_5 : 1;
+		bit BR_6 : 1;
+		bit BR_7 : 1;
+		bit BR_8 : 1;
+		bit BR_9 : 1;
+		bit BR_10 : 1;
+		bit BR_11 : 1;
+		bit BR_12 : 1;
+		bit BR_13 : 1;
+		bit BR_14 : 1;
+		bit BR_15 : 1;
 	};
 	uint32_t ALLBITS;
 
@@ -387,24 +424,24 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 LCK_0 : 1;
-		BIT16 LCK_1 : 1;
-		BIT16 LCK_2 : 1;
-		BIT16 LCK_3 : 1;
-		BIT16 LCK_4 : 1;
-		BIT16 LCK_5 : 1;
-		BIT16 LCK_6 : 1;
-		BIT16 LCK_7 : 1;
-		BIT16 LCK_8 : 1;
-		BIT16 LCK_9 : 1;
-		BIT16 LCK_10 : 1;
-		BIT16 LCK_11 : 1;
-		BIT16 LCK_12 : 1;
-		BIT16 LCK_13 : 1;
-		BIT16 LCK_14 : 1;
-		BIT16 LCK_15 : 1;
-		BIT16 LCK_K : 1;
-		BIT16 UNUSED : 15;
+		bit LCK_0 : 1;
+		bit LCK_1 : 1;
+		bit LCK_2 : 1;
+		bit LCK_3 : 1;
+		bit LCK_4 : 1;
+		bit LCK_5 : 1;
+		bit LCK_6 : 1;
+		bit LCK_7 : 1;
+		bit LCK_8 : 1;
+		bit LCK_9 : 1;
+		bit LCK_10 : 1;
+		bit LCK_11 : 1;
+		bit LCK_12 : 1;
+		bit LCK_13 : 1;
+		bit LCK_14 : 1;
+		bit LCK_15 : 1;
+		bit LCK_K : 1;
+		bit UNUSED : 15;
 	};
 	uint32_t ALLBITS;
 
@@ -415,14 +452,14 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 AFRL_0 : 4;
-		BIT16 AFRL_1 : 4;
-		BIT16 AFRL_2 : 4;
-		BIT16 AFRL_3 : 4;
-		BIT16 AFRL_4 : 4;
-		BIT16 AFRL_5 : 4;
-		BIT16 AFRL_6 : 4;
-		BIT16 AFRL_7 : 4;
+		bit AFRL_0 : 4;
+		bit AFRL_1 : 4;
+		bit AFRL_2 : 4;
+		bit AFRL_3 : 4;
+		bit AFRL_4 : 4;
+		bit AFRL_5 : 4;
+		bit AFRL_6 : 4;
+		bit AFRL_7 : 4;
 	};
 	uint32_t ALLBITS;
 
@@ -433,14 +470,14 @@ typedef union
 	struct
 	{
 		// LSB at top, MSB at bottom
-		BIT16 AFRH_8 : 4;
-		BIT16 AFRH_9 : 4;
-		BIT16 AFRH_10 : 4;
-		BIT16 AFRH_11 : 4;
-		BIT16 AFRH_12 : 4;
-		BIT16 AFRH_13 : 4;
-		BIT16 AFRH_14 : 4;
-		BIT16 AFRH_15 : 4;
+		bit AFRH_8 : 4;
+		bit AFRH_9 : 4;
+		bit AFRH_10 : 4;
+		bit AFRH_11 : 4;
+		bit AFRH_12 : 4;
+		bit AFRH_13 : 4;
+		bit AFRH_14 : 4;
+		bit AFRH_15 : 4;
 	};
 	uint32_t ALLBITS;
 
@@ -463,7 +500,7 @@ typedef struct
 	RCC_AHB2ENR_Reg AHB2ENR; /*!< RCC AHB2 peripheral clock register,                          Address offset: 0x34 */
 	RCC_AHB3ENR_Reg AHB3ENR; /*!< RCC AHB3 peripheral clock register,                          Address offset: 0x38 */
 	uint32_t      RESERVED2; /*!< Reserved, 0x3C                                                                    */
-	uint32_t APB1ENR; /*!< RCC APB1 peripheral clock enable register,                   Address offset: 0x40 */
+	RCC_APB1ENR_Reg APB1ENR; /*!< RCC APB1 peripheral clock enable register,                   Address offset: 0x40 */
 	uint32_t APB2ENR; /*!< RCC APB2 peripheral clock enable register,                   Address offset: 0x44 */
 	uint32_t      RESERVED3[2]; /*!< Reserved, 0x48-0x4C                                                               */
 	uint32_t AHB1LPENR; /*!< RCC AHB1 peripheral clock enable in low power mode register, Address offset: 0x50 */
@@ -521,108 +558,171 @@ typedef struct
 
 typedef struct
 {
-	BIT08 CEN : 1;
-	BIT08 UDIS : 1;
-	BIT08 URS : 1;
-	BIT08 OPM : 1;
-	BIT08 DIR : 1;
-	BIT08 CMS : 2;
-	BIT08 ARPE : 1;
-	BIT08 CKD : 2;
-	BIT08 UNUSED : 6;
+	bit CEN : 1;
+	bit UDIS : 1;
+	bit URS : 1;
+	bit OPM : 1;
+	bit DIR : 1;
+	bit CMS : 2;
+	bit ARPE : 1;
+	bit CKD : 2;
+	bit RESERVED1 : 6;
+	bit RESERVED2 : 16;
 } TIM_CR1, *TIM_CR1_ptr;
 typedef struct
 {
-	BIT16 UNUSED1 : 3;
-	BIT16 CCDS : 1;
-	BIT16 MMS : 3;
-	BIT16 TI1 : 1;
-	BIT16 UNUSED2 : 8;
+	bit UNUSED1 : 3;
+	bit CCDS : 1;
+	bit MMS : 3;
+	bit TI1 : 1;
+	bit RESERVED1 : 8;
+	bit RESERVED2 : 16;
 } TIM_CR2, *TIM_CR2_ptr;
 typedef struct
 {
-	BIT16 SMS : 3;
-	BIT16 UNUSED1 : 1;
-	BIT16 TS : 3;
-	BIT16 MSM : 1;
-	BIT16 ETF : 4;
-	BIT16 ETPS : 2;
-	BIT16 ECE : 1;
-	BIT16 ETP : 1;
-	BIT16 UNUSED2 : 16;
+	bit SMS : 3;
+	bit UNUSED1 : 1;
+	bit TS : 3;
+	bit MSM : 1;
+	bit ETF : 4;
+	bit ETPS : 2;
+	bit ECE : 1;
+	bit ETP : 1;
+	bit UNUSED2 : 16;
 } TIM_SMCR, *TIM_SMCR_ptr;
 typedef struct
 {
-	BIT16 UIE : 1;
-	BIT16 CC1IE : 1;
-	BIT16 CC2IE : 1;
-	BIT16 CC3IE : 1;
-	BIT16 CC4IE : 1;
-	BIT16 UNUSED1 : 1;
-	BIT16 TIE : 1;
-	BIT16 UNUSED2 : 1;
-	BIT16 UDE : 1;
-	BIT16 CC1DE : 1;
-	BIT16 CC2DE : 1;
-	BIT16 CC3DE : 1;
-	BIT16 CC4DE : 1;
-	BIT16 UNUSED3 : 1;
-	BIT16 TDE : 1;
-	BIT16 UNUSED4 : 1;
-	BIT16 UNUSED5 : 16;
+	bit UIE : 1;
+	bit CC1IE : 1;
+	bit CC2IE : 1;
+	bit CC3IE : 1;
+	bit CC4IE : 1;
+	bit UNUSED1 : 1;
+	bit TIE : 1;
+	bit UNUSED2 : 1;
+	bit UDE : 1;
+	bit CC1DE : 1;
+	bit CC2DE : 1;
+	bit CC3DE : 1;
+	bit CC4DE : 1;
+	bit UNUSED3 : 1;
+	bit TDE : 1;
+	bit UNUSED4 : 1;
+	bit UNUSED5 : 16;
 } TIM_DIER, *TIM_DIER_ptr;
 typedef struct
 {
-	BIT16 UIF : 1;
-	BIT16 CC1IF : 1;
-	BIT16 CC2IF : 1;
-	BIT16 CC3IF : 1;
-	BIT16 CC4IF : 1;
-	BIT16 RESERVED1 : 1;
-	BIT16 TIF : 1;
-	BIT16 RESERVED2 : 2;
-	BIT16 CC1OF : 1;
-	BIT16 CC2OF : 1;
-	BIT16 CC3OF : 1;
-	BIT16 CC4OF : 1;
-	BIT16 RESERVED3 : 3;
-	BIT16 RESERVED4 : 16;
+	bit UIF : 1;
+	bit CC1IF : 1;
+	bit CC2IF : 1;
+	bit CC3IF : 1;
+	bit CC4IF : 1;
+	bit RESERVED1 : 1;
+	bit TIF : 1;
+	bit RESERVED2 : 2;
+	bit CC1OF : 1;
+	bit CC2OF : 1;
+	bit CC3OF : 1;
+	bit CC4OF : 1;
+	bit RESERVED3 : 3;
+	bit RESERVED4 : 16;
 } TIM_SR, *TIM_SR_ptr;
 typedef struct
 {
-	
+	bit UG : 1;
+	bit CC1G :1;
+	bit CC2G : 1;
+	bit CC3G : 1;
+	bit CC4G : 1;
+	bit RESERVED1 : 1;
+	bit TG : 1;
+	bit RESERVED : 25;
 } TIM_EGR, *TIM_EGR_ptr;
 // CCMR1 register when in output capture mode
 typedef struct
 {
-	
+	bit CC1S : 2;
+	bit OC1FE : 1;
+	bit OC1PE : 1;
+	bit OC1M : 3;
+	bit OC1CE : 1;
+	bit CC2S : 2;
+	bit OC2FE : 1;
+	bit OC2PE : 1;
+	bit OC2M : 3;
+	bit OC2CE : 1;
+	bit RESERVED : 16;
 } TIM_CCMR1_OCM, *TIM_CCMR1_OCM_ptr;
 // CCMR1 register when in input compare mode
 typedef struct
 {
-	
+	bit CC1S : 2;
+	bit IC1PSC : 2;
+	bit IC1F : 4;
+	bit CC2S : 2;
+	bit IC2PSC : 2;
+	bit IC2F : 4;
+	bit RESERVED : 16;
 } TIM_CCMR1_ICM, *TIM_CCMR1_ICM_ptr;
 // CCMR2 register when in output capture mode
 typedef struct
 {
+	bit CC3S : 2;
+	bit OC3FE : 1;
+	bit OC3PE : 1;
+	bit OC3M : 3;
+	bit OC3CE : 1;
+	bit CC4S : 2;
+	bit OC4FE : 1;
+	bit OC4PE : 1;
+	bit OC4M : 3;
+	bit OC4CE : 1;
+	bit RESERVED : 16;
 	
 } TIM_CCMR2_OCM, *TIM_CCMR2_OCM_ptr;
 // CCMR2 register when in input compare mode
 typedef struct
 {
+	bit CC3S : 2;
+	bit IC3PSC : 2;
+	bit IC3F : 4;
+	bit CC4S : 2;
+	bit IC4PSC : 2;
+	bit IC4F : 4;
+	bit RESERVED : 16;
 	
 } TIM_CCMR2_ICM, *TIM_CCMR2_ICM_ptr;
 typedef struct
 {
+	bit CC1E : 1;
+	bit CC1P : 1;
+	bit RESERVED1 : 1;
+	bit CC1NP : 1;
+	bit CC2E : 1;
+	bit CC2P : 1;
+	bit RESERVED2 : 1;
+	bit CC2NP : 1;
+	bit CC3E : 1;
+	bit CC3P : 1;
+    bit RESERVED3:1;
+	bit CC3NP : 1;
+	bit CC4E : 1;
+	bit CC4P : 1;
+	bit RESERVED4 : 1;
+	bit CC4NP : 1;
+	bit RESERVED5 : 16;
 	
 } TIM_CCER, *TIM_CCER_ptr;
 typedef struct
 {
+	bit CNT : 16;
+	bit RESERVED : 16;
 	
 } TIM_CNT, *TIM_CNT_ptr;
 typedef struct
 {
-	
+	bit PSC : 16;
+	bit RESERVED : 16;
 } TIM_PSC, *TIM_PSC_ptr;
 typedef struct
 {
