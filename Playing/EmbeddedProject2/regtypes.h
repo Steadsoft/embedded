@@ -4,17 +4,21 @@
 #undef TIM3
 #undef TIM4
 #undef TIM5
+#undef RCC
+#undef CRC
 
 #define bit volatile uint32_t
 
-#define RCC_CFGR ((RCC_CFGR_Reg_ptr)&(RCC->CFGR)) 
-#define RCC_AHB1ENR ((RCC_AHB1ENR_Reg_ptr)&(RCC->AHB1ENR)) 
-#define RCC_CR ((RCC_CR_Reg_ptr)&(RCC->CR)) 
-#define RCC_PLLCFGR ((RCC_PLLCFGR_Reg_ptr)&(RCC->PLLCFGR)) 
-#define GPIO_MODER(BASE) ((GPIO_MODER_Reg_ptr)&((BASE)->MODER)) 
-#define GPIO_OTYPER(BASE) ((GPIO_OTYPER_Reg_ptr)&((BASE)->OTYPER)) 
-#define GPIO_OSPEEDR(BASE) ((GPIO_OSPEEDR_Reg_ptr)&((BASE)->OSPEEDR)) 
+//#define RCC_CFGR ((RCC_CFGR_Reg_ptr)&(RCC->CFGR)) 
+//#define RCC_AHB1ENR ((RCC_AHB1ENR_Reg_ptr)&(RCC->AHB1ENR)) 
+//#define RCC_CR ((RCC_CR_Reg_ptr)&(RCC->CR)) 
+//#define RCC_PLLCFGR ((RCC_PLLCFGR_Reg_ptr)&(RCC->PLLCFGR)) 
+//#define GPIO_MODER(BASE) ((GPIO_MODER_Reg_ptr)&((BASE)->MODER)) 
+//#define GPIO_OTYPER(BASE) ((GPIO_OTYPER_Reg_ptr)&((BASE)->OTYPER)) 
+//#define GPIO_OSPEEDR(BASE) ((GPIO_OSPEEDR_Reg_ptr)&((BASE)->OSPEEDR)) 
 #define PADTO(NAME,BYTES,TYPE) char NAME[BYTES-sizeof(TYPE)]
+
+// RCC Registers
 
 typedef union
 {
@@ -36,7 +40,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } RCC_CFGR_Reg, * RCC_CFGR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -73,7 +76,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } RCC_AHB1ENR_Reg, * RCC_AHB1ENR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -111,7 +113,6 @@ typedef union
 		uint32_t ALLBITS;
 	};
 } RCC_APB1ENR_Reg, *RCC_APB1ENR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -128,7 +129,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } RCC_AHB2ENR_Reg, * RCC_AHB2ENR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -140,7 +140,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } RCC_AHB3ENR_Reg, * RCC_AHB3ENR_Reg_ptr;
-
 typedef union
 {
 	struct // STM32F407
@@ -164,7 +163,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } RCC_CR_Reg, * RCC_CR_Reg_ptr;
-
 typedef union
 {
 	struct // STM32F407
@@ -197,7 +195,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } RCC_CIR_Reg, * RCC_CIR_Reg_ptr;
-
 typedef union
 {
 	struct 
@@ -216,6 +213,8 @@ typedef union
 	uint32_t ALLBITS;
 
 } RCC_PLLCFGR_Reg, * RCC_PLLCFGR_Reg_ptr;
+
+// GPIO Registers
 
 typedef union
 {
@@ -242,7 +241,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } GPIO_MODER_Reg, * GPIO_MODER_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -269,7 +267,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } GPIO_OTYPER_Reg, * GPIO_OTYPER_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -295,7 +292,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } GPIO_OSPEEDR_Reg, * GPIO_OSPEEDR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -321,7 +317,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } GPIO_PUPDR_Reg, * GPIO_PUPDR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -348,7 +343,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } GPIO_IDR_Reg, * GPIO_IDR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -375,7 +369,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } GPIO_ODR_Reg, * GPIO_ODR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -418,7 +411,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } GPIO_BSRR_Reg, * GPIO_BSRR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -446,7 +438,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } GPIO_LCKR_Reg, * GPIO_LCKR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -464,7 +455,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } GPIO_AFRL_Reg, * GPIO_AFRL_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -482,41 +472,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } GPIO_AFRH_Reg, * GPIO_AFRH_Reg_ptr;
-
-typedef struct
-{
-	RCC_CR_Reg CR; /*!< RCC clock control register,                                  Address offset: 0x00 */
-	RCC_PLLCFGR_Reg PLLCFGR; /*!< RCC PLL configuration register,                              Address offset: 0x04 */
-	RCC_CFGR_Reg CFGR; /*!< RCC clock configuration register,                            Address offset: 0x08 */
-	RCC_CIR_Reg CIR; /*!< RCC clock interrupt register,                                Address offset: 0x0C */
-	uint32_t AHB1RSTR; /*!< RCC AHB1 peripheral reset register,                          Address offset: 0x10 */
-	uint32_t AHB2RSTR; /*!< RCC AHB2 peripheral reset register,                          Address offset: 0x14 */
-	uint32_t AHB3RSTR; /*!< RCC AHB3 peripheral reset register,                          Address offset: 0x18 */
-	uint32_t      RESERVED0; /*!< Reserved, 0x1C                                                                    */
-	uint32_t APB1RSTR; /*!< RCC APB1 peripheral reset register,                          Address offset: 0x20 */
-	uint32_t APB2RSTR; /*!< RCC APB2 peripheral reset register,                          Address offset: 0x24 */
-	uint32_t      RESERVED1[2]; /*!< Reserved, 0x28-0x2C                                                               */
-	RCC_AHB1ENR_Reg AHB1ENR; /*!< RCC AHB1 peripheral clock register,                          Address offset: 0x30 */
-	RCC_AHB2ENR_Reg AHB2ENR; /*!< RCC AHB2 peripheral clock register,                          Address offset: 0x34 */
-	RCC_AHB3ENR_Reg AHB3ENR; /*!< RCC AHB3 peripheral clock register,                          Address offset: 0x38 */
-	uint32_t      RESERVED2; /*!< Reserved, 0x3C                                                                    */
-	RCC_APB1ENR_Reg APB1ENR; /*!< RCC APB1 peripheral clock enable register,                   Address offset: 0x40 */
-	uint32_t APB2ENR; /*!< RCC APB2 peripheral clock enable register,                   Address offset: 0x44 */
-	uint32_t      RESERVED3[2]; /*!< Reserved, 0x48-0x4C                                                               */
-	uint32_t AHB1LPENR; /*!< RCC AHB1 peripheral clock enable in low power mode register, Address offset: 0x50 */
-	uint32_t AHB2LPENR; /*!< RCC AHB2 peripheral clock enable in low power mode register, Address offset: 0x54 */
-	uint32_t AHB3LPENR; /*!< RCC AHB3 peripheral clock enable in low power mode register, Address offset: 0x58 */
-	uint32_t      RESERVED4; /*!< Reserved, 0x5C                                                                    */
-	uint32_t APB1LPENR; /*!< RCC APB1 peripheral clock enable in low power mode register, Address offset: 0x60 */
-	uint32_t APB2LPENR; /*!< RCC APB2 peripheral clock enable in low power mode register, Address offset: 0x64 */
-	uint32_t      RESERVED5[2]; /*!< Reserved, 0x68-0x6C                                                               */
-	uint32_t BDCR; /*!< RCC Backup domain control register,                          Address offset: 0x70 */
-	uint32_t CSR; /*!< RCC clock control & status register,                         Address offset: 0x74 */
-	uint32_t      RESERVED6[2]; /*!< Reserved, 0x78-0x7C                                                               */
-	uint32_t SSCGR; /*!< RCC spread spectrum clock generation register,               Address offset: 0x80 */
-	uint32_t PLLI2SCFGR; /*!< RCC PLLI2S configuration register,                           Address offset: 0x84 */
-} ResetAndClockControl, *ResetAndClockControl_ptr;
-
 typedef struct
 {
 	GPIO_MODER_Reg MODER;
@@ -531,28 +486,11 @@ typedef struct
 	GPIO_AFRH_Reg AFRH;
 
 } GPIO_Registers, * GPIO_Registers_ptr;
-
 typedef struct
 {
 	GPIO_Registers Registers;
 	PADTO(RESERVED, 1024, GPIO_Registers);
-} GPIO, GPIO_ptr;
-
-typedef struct
-{
-	GPIO GPIO_A;
-	GPIO GPIO_B;
-	GPIO GPIO_C;
-	GPIO GPIO_D;
-	GPIO GPIO_E;
-	GPIO GPIO_F;
-	GPIO GPIO_G;
-	GPIO GPIO_H;
-	GPIO GPIO_I;
-	GPIO GPIO_J;
-	GPIO GPIO_K;
-
-} AHB1, *AHB1_ptr;
+} GPIO_Device, GPIO_ptr;
 
 // TIM2 - TIM5 Registers
 
@@ -808,3 +746,94 @@ typedef struct
 	TIM_Basic TIM5;
 
 } APB1, *APB1_ptr;
+
+typedef struct
+{
+	bit DRLOW : 16;
+	bit DRHIGH : 16;
+} CRC_DR, *CRC_DR_ptr;
+
+typedef struct
+{
+	bit IDR : 8;
+	bit RESERVED1 : 8;
+	bit RESERVED2 : 16;
+} CRC_IDR, *CRC_IDR_ptr;
+
+typedef struct
+{
+	bit RESET : 1;
+	bit RESERVED1 : 15;
+	bit RESERVED2 : 16;
+} CRC_CR, *CRC_CR_ptr;
+
+typedef struct
+{
+	CRC_DR DR;
+	CRC_IDR IDR;
+	CRC_CR CR;
+} CRC_Registers, CRC_Registers_ptr;
+
+typedef struct
+{
+	RCC_CR_Reg CR; /*!< RCC clock control register,                                  Address offset: 0x00 */
+	RCC_PLLCFGR_Reg PLLCFGR; /*!< RCC PLL configuration register,                              Address offset: 0x04 */
+	RCC_CFGR_Reg CFGR; /*!< RCC clock configuration register,                            Address offset: 0x08 */
+	RCC_CIR_Reg CIR; /*!< RCC clock interrupt register,                                Address offset: 0x0C */
+	uint32_t AHB1RSTR; /*!< RCC AHB1 peripheral reset register,                          Address offset: 0x10 */
+	uint32_t AHB2RSTR; /*!< RCC AHB2 peripheral reset register,                          Address offset: 0x14 */
+	uint32_t AHB3RSTR; /*!< RCC AHB3 peripheral reset register,                          Address offset: 0x18 */
+	uint32_t      RESERVED0; /*!< Reserved, 0x1C                                                                    */
+	uint32_t APB1RSTR; /*!< RCC APB1 peripheral reset register,                          Address offset: 0x20 */
+	uint32_t APB2RSTR; /*!< RCC APB2 peripheral reset register,                          Address offset: 0x24 */
+	uint32_t      RESERVED1[2]; /*!< Reserved, 0x28-0x2C                                                               */
+	RCC_AHB1ENR_Reg AHB1ENR; /*!< RCC AHB1 peripheral clock register,                          Address offset: 0x30 */
+	RCC_AHB2ENR_Reg AHB2ENR; /*!< RCC AHB2 peripheral clock register,                          Address offset: 0x34 */
+	RCC_AHB3ENR_Reg AHB3ENR; /*!< RCC AHB3 peripheral clock register,                          Address offset: 0x38 */
+	uint32_t      RESERVED2; /*!< Reserved, 0x3C                                                                    */
+	RCC_APB1ENR_Reg APB1ENR; /*!< RCC APB1 peripheral clock enable register,                   Address offset: 0x40 */
+	uint32_t APB2ENR; /*!< RCC APB2 peripheral clock enable register,                   Address offset: 0x44 */
+	uint32_t      RESERVED3[2]; /*!< Reserved, 0x48-0x4C                                                               */
+	uint32_t AHB1LPENR; /*!< RCC AHB1 peripheral clock enable in low power mode register, Address offset: 0x50 */
+	uint32_t AHB2LPENR; /*!< RCC AHB2 peripheral clock enable in low power mode register, Address offset: 0x54 */
+	uint32_t AHB3LPENR; /*!< RCC AHB3 peripheral clock enable in low power mode register, Address offset: 0x58 */
+	uint32_t      RESERVED4; /*!< Reserved, 0x5C                                                                    */
+	uint32_t APB1LPENR; /*!< RCC APB1 peripheral clock enable in low power mode register, Address offset: 0x60 */
+	uint32_t APB2LPENR; /*!< RCC APB2 peripheral clock enable in low power mode register, Address offset: 0x64 */
+	uint32_t      RESERVED5[2]; /*!< Reserved, 0x68-0x6C                                                               */
+	uint32_t BDCR; /*!< RCC Backup domain control register,                          Address offset: 0x70 */
+	uint32_t CSR; /*!< RCC clock control & status register,                         Address offset: 0x74 */
+	uint32_t      RESERVED6[2]; /*!< Reserved, 0x78-0x7C                                                               */
+	uint32_t SSCGR; /*!< RCC spread spectrum clock generation register,               Address offset: 0x80 */
+	uint32_t PLLI2SCFGR; /*!< RCC PLLI2S configuration register,                           Address offset: 0x84 */
+} RCC_Registers, *RCC_Registers_ptr;
+
+
+typedef struct
+{
+	RCC_Registers Registers;
+	PADTO(RESERVED, 1024, RCC_Registers);
+} RCC_Device, *RCC_ptr;
+
+typedef struct
+{
+	CRC_Registers Registers;
+	PADTO(RESERVED, 1024, CRC_Registers);
+} CRC_Device, *CRC_ptr;
+
+typedef struct
+{
+	GPIO_Device GPIO_A;
+	GPIO_Device GPIO_B;
+	GPIO_Device GPIO_C;
+	GPIO_Device GPIO_D;
+	GPIO_Device GPIO_E;
+	GPIO_Device GPIO_F;
+	GPIO_Device GPIO_G;
+	GPIO_Device GPIO_H;
+	GPIO_Device GPIO_I;
+	GPIO_Device GPIO_J;
+	GPIO_Device GPIO_K;
+	CRC_Device CRC; 
+	RCC_Device RCC;
+} AHB1, *AHB1_ptr;
