@@ -3,7 +3,7 @@
 #include <stm32f4xx_ll_utils.h>
 
 #include <regtypes.h>
-
+#include <stdlib.h>
 #define WAIT_FOR_HSE while (!(RCC->CR & 0x00020000))
 #define WAIT_FOR_PLL while (!(RCC->CR & 0x02000000))
 #define SPIN_WHILE(X) while((X))
@@ -13,38 +13,56 @@
 
 int main(void)
 {
-	RCC_AHB1ENR->GPIOA_EN = 1;
+	RCC_Registers_ptr rcc_ptr = (RCC_Registers_ptr)(RCC_BASE);
+	AHB1_ptr ahb1_ptr = (AHB1_ptr)AHB1PERIPH_BASE;
+	APB1_ptr apb1_ptr = (APB1_ptr)(APB1PERIPH_BASE);
 	
-	RCC_CFGR->MCO1 = 3;
-	RCC_CFGR->MCO1_PRE = 7;
+	void *p = &(ahb1_ptr->CRC);
+	void *q = &(ahb1_ptr->RCC);
+	void *e = &(ahb1_ptr->GPIO_K);
 	
-	GPIOA->MODER |= 0x00020000;
-	GPIOA->AFR[1] &= ~3;
-	GPIOA->OSPEEDR |= 3 << 8 * 2;
+	rcc_ptr->APB1ENR.TIM2_EN = 1;
 	
-	RCC_CR->CSS_ON = 0;
-	RCC_CR->HSE_BYP = 0;
-	RCC_CR->HSE_RDY = 0;
-	RCC_CR->HSE_ON = 1;
+	apb1_ptr->TIM2.Registers.PSC.PSC = 1600 - 1;
+	apb1_ptr->TIM2.Registers.CCMR1_OCR.OC1FE = 1;
 	
-	SPIN_UNTIL(RCC_CR->HSE_RDY);
+	void * ppp = &(apb1_ptr->TIM2.Registers.PSC);
 	
-	RCC_CFGR->SW = 0;
+	rcc_ptr->AHB1ENR.GPIOA_EN = 1;
 	
-	RCC_PLLCFGR->PLL_M = 4;       // Div factor
-	RCC_PLLCFGR->PLL_N = 168;     // Mul factor
-	RCC_PLLCFGR->PLL_SRC = 1;     // Use HSE
+	ahb1_ptr->GPIO_A.MODER.MODER_11 = 3;
 	
-	RCC_CR->PLL_ON = 1;
+	ahb1_ptr->RCC.AHB1ENR.GPIOA_EN = 1;
 	
-	SPIN_UNTIL(RCC_CR->PLL_RDY);
+	ahb1_ptr->RCC.CFGR.MCO1 = 3;
+	
+	ahb1_ptr->RCC.CFGR.MCO1_PRE = 7;
+	
+	ahb1_ptr->GPIO_A.MODER.MODER_8 = 2;
+	ahb1_ptr->GPIO_A.AFRH.AFRH_8 = 0;
+	ahb1_ptr->GPIO_A.SPEEDR.SPEED_8 = 0;
+	
+	ahb1_ptr->RCC.CR.CSS_ON = 0;
+	ahb1_ptr->RCC.CR.HSE_BYP = 0;
+	ahb1_ptr->RCC.CR.HSE_RDY = 0;
+	ahb1_ptr->RCC.CR.HSE_ON = 1;
+	
+	SPIN_UNTIL(ahb1_ptr->RCC.CR.HSE_RDY);
+
+	ahb1_ptr->RCC.CFGR.SW = 0;
+	ahb1_ptr->RCC.PLLCFGR.PLL_M = 4;
+	ahb1_ptr->RCC.PLLCFGR.PLL_N = 168;
+	ahb1_ptr->RCC.PLLCFGR.PLL_SRC = 1;
+	ahb1_ptr->RCC.CR.PLL_ON = 1;
+	
+	SPIN_UNTIL(ahb1_ptr->RCC.CR.PLL_RDY);
 	
 	FLASH->ACR = 0x0705;
 	
-	RCC_CFGR->HPRE = 0;
-	RCC_CFGR->SW = 2;
+	ahb1_ptr->RCC.CFGR.HPRE = 0;
+	ahb1_ptr->RCC.CFGR.SW = 2;
 	
-	SPIN_UNTIL(RCC_CFGR->SWS == 2);
+	SPIN_UNTIL(ahb1_ptr->RCC.CFGR.SWS == 2);
 	
 	//LL_InitTick(16000000, 1000);
 
@@ -52,15 +70,16 @@ int main(void)
 	//In this case, please search the stm32xxxx_ll_bus.h file for 'PERIPH_GPIOD' to find out the correct
 	//macro name and use it to replace LL_AHB1_GRP1_PERIPH_$$com.sysprogs.examples.lBedblink.LEDPORT$$ and LL_AHB1_GRP1_EnableClock() below. 
 	
-	RCC_AHB1ENR->GPIOD_EN = 1;
 	
-	GPIO_MODER(GPIOD)->MODER_12 = 1;
-	GPIO_OTYPER(GPIOD)->OT_12 = 0;
-	GPIO_OSPEEDR(GPIOD)->SPEED_12 = 0;
+	ahb1_ptr->RCC.AHB1ENR.GPIOD_EN = 1;
+	
+	ahb1_ptr->GPIO_D.MODER.MODER_12 = 1;
+	ahb1_ptr->GPIO_D.OTYPER.OT_12 = 0;
+	ahb1_ptr->GPIO_D.SPEEDR.SPEED_12 = 0;
 		
-	GPIO_MODER(GPIOD)->MODER_11 = 1;
-	GPIO_OTYPER(GPIOD)->OT_11 = 0;
-	GPIO_OSPEEDR(GPIOD)->SPEED_11 = 0;
+	ahb1_ptr->GPIO_D.MODER.MODER_11 = 1;
+	ahb1_ptr->GPIO_D.OTYPER.OT_11 = 0;
+	ahb1_ptr->GPIO_D.SPEEDR.SPEED_11 = 0;
 
 	LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOD);
 	
