@@ -17,7 +17,7 @@
 //#define GPIO_OTYPER(BASE) ((GPIO_OTYPER_Reg_ptr)&((BASE)->OTYPER)) 
 //#define GPIO_OSPEEDR(BASE) ((GPIO_OSPEEDR_Reg_ptr)&((BASE)->OSPEEDR)) 
 #define PADTO(NAME,BYTES,TYPE) char NAME[BYTES-sizeof(TYPE)]
-
+#define PADBY(NAME,BYTES) char NAME[BYTES]
 // RCC Registers
 
 typedef union
@@ -808,32 +808,36 @@ typedef struct
 	uint32_t PLLI2SCFGR; /*!< RCC PLLI2S configuration register,                           Address offset: 0x84 */
 } RCC_Registers, *RCC_Registers_ptr;
 
-
 typedef struct
 {
-	RCC_Registers Registers;
-	PADTO(RESERVED, 1024, RCC_Registers);
-} RCC_Device, *RCC_ptr;
+	// There is padding between peripherals that forces
+	// each one to be at a particular offset from the
+	// preceding peripheral.
+	GPIO_Registers GPIO_A;
+	PADTO(RESERVED1, 1024, GPIO_Registers);
+	GPIO_Registers GPIO_B;
+	PADTO(RESERVED2, 1024, GPIO_Registers);
+	GPIO_Registers GPIO_C;
+	PADTO(RESERVED3, 1024, GPIO_Registers);
+	GPIO_Registers GPIO_D;
+	PADTO(RESERVED4, 1024, GPIO_Registers);
+	GPIO_Registers GPIO_E;
+	PADTO(RESERVED5, 1024, GPIO_Registers);
+	GPIO_Registers GPIO_F;
+	PADTO(RESERVED6, 1024, GPIO_Registers);
+	GPIO_Registers GPIO_G;
+	PADTO(RESERVED7, 1024, GPIO_Registers);
+	GPIO_Registers GPIO_H;
+	PADTO(RESERVED8, 1024, GPIO_Registers);
+	GPIO_Registers GPIO_I;
+	PADTO(RESERVED9, 1024, GPIO_Registers);
+	GPIO_Registers GPIO_J;
+	PADTO(RESERVED10, 1024, GPIO_Registers);
+	GPIO_Registers GPIO_K;
+	PADTO(RESERVED11, 2048, GPIO_Registers);
+	CRC_Registers CRC; 
+	PADTO(RESERVED12, 2048, CRC_Registers);
+	RCC_Registers RCC;
+	PADTO(RESERVED13, 1024, RCC_Registers);
 
-typedef struct
-{
-	CRC_Registers Registers;
-	PADTO(RESERVED, 1024, CRC_Registers);
-} CRC_Device, *CRC_ptr;
-
-typedef struct
-{
-	GPIO_Device GPIO_A;
-	GPIO_Device GPIO_B;
-	GPIO_Device GPIO_C;
-	GPIO_Device GPIO_D;
-	GPIO_Device GPIO_E;
-	GPIO_Device GPIO_F;
-	GPIO_Device GPIO_G;
-	GPIO_Device GPIO_H;
-	GPIO_Device GPIO_I;
-	GPIO_Device GPIO_J;
-	GPIO_Device GPIO_K;
-	CRC_Device CRC; 
-	RCC_Device RCC;
 } AHB1, *AHB1_ptr;
