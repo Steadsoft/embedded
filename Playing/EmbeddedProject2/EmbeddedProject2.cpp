@@ -64,12 +64,6 @@ int main(void)
 	
 	SPIN_UNTIL(ahb1_ptr->RCC.CFGR.SWS == 2);
 	
-	//LL_InitTick(16000000, 1000);
-
-	//Warning: if the line below triggers an error, GPIOD is not connected to a AHB1 (Group 1) on this device.
-	//In this case, please search the stm32xxxx_ll_bus.h file for 'PERIPH_GPIOD' to find out the correct
-	//macro name and use it to replace LL_AHB1_GRP1_PERIPH_$$com.sysprogs.examples.lBedblink.LEDPORT$$ and LL_AHB1_GRP1_EnableClock() below. 
-	
 	
 	ahb1_ptr->RCC.AHB1ENR.GPIOD_EN = 1;
 	
@@ -94,12 +88,12 @@ int main(void)
 	for (;;)
 	{
 		//LL_GPIO_SetOutputPin(GPIOD, LL_GPIO_PIN_12);
-		//LL_GPIO_SetOutputPin(GPIOD, LL_GPIO_PIN_11);
-		WRITE_REG(GPIOD->BSRR, LL_GPIO_PIN_11);
+		LL_GPIO_SetOutputPin(GPIOD, LL_GPIO_PIN_11);
+		//WRITE_REG(GPIOD->BSRR, LL_GPIO_PIN_11);
 		//LL_mDelay(5);
 		//LL_GPIO_ResetOutputPin(GPIOD, LL_GPIO_PIN_12);
-		//LL_GPIO_ResetOutputPin(GPIOD, LL_GPIO_PIN_11);
-		WRITE_REG(GPIOD->BSRR, (LL_GPIO_PIN_11 << 16));
+		LL_GPIO_ResetOutputPin(GPIOD, LL_GPIO_PIN_11);
+		//WRITE_REG(GPIOD->BSRR, (LL_GPIO_PIN_11 << 16));
 		//LL_mDelay(5);
 	}
 }
