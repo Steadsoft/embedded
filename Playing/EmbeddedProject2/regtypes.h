@@ -7,7 +7,7 @@
 #undef RCC
 #undef CRC
 
-#define bit volatile uint32_t
+#define bit  uint32_t
 
 //#define RCC_CFGR ((RCC_CFGR_Reg_ptr)&(RCC->CFGR)) 
 //#define RCC_AHB1ENR ((RCC_AHB1ENR_Reg_ptr)&(RCC->AHB1ENR)) 
@@ -474,16 +474,16 @@ typedef union
 } GPIO_AFRH_Reg, * GPIO_AFRH_Reg_ptr;
 typedef struct
 {
-	GPIO_MODER_Reg MODER;
-	GPIO_OTYPER_Reg OTYPER;
-	GPIO_OSPEEDR_Reg SPEEDR;
-	GPIO_PUPDR_Reg PUPDR;
-	GPIO_IDR_Reg IDR;
-	GPIO_ODR_Reg ODR;
-	GPIO_BSRR_Reg BSRR;
-	GPIO_LCKR_Reg LCKR;
-	GPIO_AFRL_Reg AFRL;
-	GPIO_AFRH_Reg AFRH;
+	volatile GPIO_MODER_Reg MODER;
+	volatile GPIO_OTYPER_Reg OTYPER;
+	volatile GPIO_OSPEEDR_Reg SPEEDR;
+	volatile GPIO_PUPDR_Reg PUPDR;
+	volatile GPIO_IDR_Reg IDR;
+	volatile GPIO_ODR_Reg ODR;
+	volatile GPIO_BSRR_Reg BSRR;
+	volatile GPIO_LCKR_Reg LCKR;
+	volatile GPIO_AFRL_Reg AFRL;
+	volatile GPIO_AFRH_Reg AFRH;
 
 } GPIO_Registers, * GPIO_Registers_ptr;
 typedef struct
@@ -776,10 +776,10 @@ typedef struct
 
 typedef struct
 {
-	RCC_CR_Reg CR; /*!< RCC clock control register,                                  Address offset: 0x00 */
-	RCC_PLLCFGR_Reg PLLCFGR; /*!< RCC PLL configuration register,                              Address offset: 0x04 */
-	RCC_CFGR_Reg CFGR; /*!< RCC clock configuration register,                            Address offset: 0x08 */
-	RCC_CIR_Reg CIR; /*!< RCC clock interrupt register,                                Address offset: 0x0C */
+	volatile RCC_CR_Reg CR; /*!< RCC clock control register,                                  Address offset: 0x00 */
+	volatile RCC_PLLCFGR_Reg PLLCFGR; /*!< RCC PLL configuration register,                              Address offset: 0x04 */
+	volatile RCC_CFGR_Reg CFGR; /*!< RCC clock configuration register,                            Address offset: 0x08 */
+	volatile RCC_CIR_Reg CIR; /*!< RCC clock interrupt register,                                Address offset: 0x0C */
 	uint32_t AHB1RSTR; /*!< RCC AHB1 peripheral reset register,                          Address offset: 0x10 */
 	uint32_t AHB2RSTR; /*!< RCC AHB2 peripheral reset register,                          Address offset: 0x14 */
 	uint32_t AHB3RSTR; /*!< RCC AHB3 peripheral reset register,                          Address offset: 0x18 */
@@ -787,11 +787,11 @@ typedef struct
 	uint32_t APB1RSTR; /*!< RCC APB1 peripheral reset register,                          Address offset: 0x20 */
 	uint32_t APB2RSTR; /*!< RCC APB2 peripheral reset register,                          Address offset: 0x24 */
 	uint32_t      RESERVED1[2]; /*!< Reserved, 0x28-0x2C                                                               */
-	RCC_AHB1ENR_Reg AHB1ENR; /*!< RCC AHB1 peripheral clock register,                          Address offset: 0x30 */
-	RCC_AHB2ENR_Reg AHB2ENR; /*!< RCC AHB2 peripheral clock register,                          Address offset: 0x34 */
-	RCC_AHB3ENR_Reg AHB3ENR; /*!< RCC AHB3 peripheral clock register,                          Address offset: 0x38 */
+	volatile RCC_AHB1ENR_Reg AHB1ENR; /*!< RCC AHB1 peripheral clock register,                          Address offset: 0x30 */
+	volatile RCC_AHB2ENR_Reg AHB2ENR; /*!< RCC AHB2 peripheral clock register,                          Address offset: 0x34 */
+	volatile RCC_AHB3ENR_Reg AHB3ENR; /*!< RCC AHB3 peripheral clock register,                          Address offset: 0x38 */
 	uint32_t      RESERVED2; /*!< Reserved, 0x3C                                                                    */
-	RCC_APB1ENR_Reg APB1ENR; /*!< RCC APB1 peripheral clock enable register,                   Address offset: 0x40 */
+	volatile RCC_APB1ENR_Reg APB1ENR; /*!< RCC APB1 peripheral clock enable register,                   Address offset: 0x40 */
 	uint32_t APB2ENR; /*!< RCC APB2 peripheral clock enable register,                   Address offset: 0x44 */
 	uint32_t      RESERVED3[2]; /*!< Reserved, 0x48-0x4C                                                               */
 	uint32_t AHB1LPENR; /*!< RCC AHB1 peripheral clock enable in low power mode register, Address offset: 0x50 */
