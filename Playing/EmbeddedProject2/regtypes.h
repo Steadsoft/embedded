@@ -9,15 +9,9 @@
 
 #define bit  uint32_t
 
-//#define RCC_CFGR ((RCC_CFGR_Reg_ptr)&(RCC->CFGR)) 
-//#define RCC_AHB1ENR ((RCC_AHB1ENR_Reg_ptr)&(RCC->AHB1ENR)) 
-//#define RCC_CR ((RCC_CR_Reg_ptr)&(RCC->CR)) 
-//#define RCC_PLLCFGR ((RCC_PLLCFGR_Reg_ptr)&(RCC->PLLCFGR)) 
-//#define GPIO_MODER(BASE) ((GPIO_MODER_Reg_ptr)&((BASE)->MODER)) 
-//#define GPIO_OTYPER(BASE) ((GPIO_OTYPER_Reg_ptr)&((BASE)->OTYPER)) 
-//#define GPIO_OSPEEDR(BASE) ((GPIO_OSPEEDR_Reg_ptr)&((BASE)->OSPEEDR)) 
-#define PADTO(NAME,BYTES,TYPE) char NAME[BYTES-sizeof(TYPE)]
-#define PADBY(NAME,BYTES) char NAME[BYTES]
+#define PADTO(BYTES,TYPE,ID) const char DEADSPACE_ ## ID [BYTES-sizeof(TYPE)]
+#define PADBY(NAME,BYTES) const char NAME[BYTES]
+
 // RCC Registers
 
 typedef union
@@ -470,42 +464,26 @@ typedef union
 		bit AFRH_15 : 4;
 	};
 	uint32_t ALLBITS;
-
 } GPIO_AFRH_Reg, * GPIO_AFRH_Reg_ptr;
-typedef struct
-{
-	volatile GPIO_MODER_Reg MODER;
-	volatile GPIO_OTYPER_Reg OTYPER;
-	volatile GPIO_OSPEEDR_Reg SPEEDR;
-	volatile GPIO_PUPDR_Reg PUPDR;
-	volatile GPIO_IDR_Reg IDR;
-	volatile GPIO_ODR_Reg ODR;
-	volatile GPIO_BSRR_Reg BSRR;
-	volatile GPIO_LCKR_Reg LCKR;
-	volatile GPIO_AFRL_Reg AFRL;
-	volatile GPIO_AFRH_Reg AFRH;
-
-} GPIO_Registers, * GPIO_Registers_ptr;
-typedef struct
-{
-	GPIO_Registers Registers;
-	PADTO(RESERVED, 1024, GPIO_Registers);
-} GPIO_Device, GPIO_ptr;
 
 // TIM2 - TIM5 Registers
 
-typedef struct
+typedef union
 {
-	bit CEN : 1;
-	bit UDIS : 1;
-	bit URS : 1;
-	bit OPM : 1;
-	bit DIR : 1;
-	bit CMS : 2;
-	bit ARPE : 1;
-	bit CKD : 2;
-	bit RESERVED1 : 6;
-	bit RESERVED2 : 16;
+	struct
+	{
+		bit CEN : 1;
+		bit UDIS : 1;
+		bit URS : 1;
+		bit OPM : 1;
+		bit DIR : 1;
+		bit CMS : 2;
+		bit ARPE : 1;
+		bit CKD : 2;
+		bit RESERVED1 : 6;
+		bit RESERVED2 : 16;
+	};
+	uint32_t ALLBITS;
 } TIM_CR1, *TIM_CR1_ptr;
 typedef struct
 {
@@ -576,9 +554,9 @@ typedef struct
 	bit TG : 1;
 	bit RESERVED : 25;
 } TIM_EGR, *TIM_EGR_ptr;
-// CCMR1 register when in output capture mode
 typedef struct
-{
+{	// CCMR1 register when in output capture mode
+
 	bit CC1S : 2;
 	bit OC1FE : 1;
 	bit OC1PE : 1;
@@ -591,9 +569,9 @@ typedef struct
 	bit OC2CE : 1;
 	bit RESERVED : 16;
 } TIM_CCMR1_OCM, *TIM_CCMR1_OCM_ptr;
-// CCMR1 register when in input compare mode
 typedef struct
 {
+	// CCMR1 register when in input compare mode
 	bit CC1S : 2;
 	bit IC1PSC : 2;
 	bit IC1F : 4;
@@ -602,9 +580,9 @@ typedef struct
 	bit IC2F : 4;
 	bit RESERVED : 16;
 } TIM_CCMR1_ICM, *TIM_CCMR1_ICM_ptr;
-// CCMR2 register when in output capture mode
 typedef struct
 {
+	// CCMR2 register when in output capture mode
 	bit CC3S : 2;
 	bit OC3FE : 1;
 	bit OC3PE : 1;
@@ -618,9 +596,9 @@ typedef struct
 	bit RESERVED : 16;
 	
 } TIM_CCMR2_OCM, *TIM_CCMR2_OCM_ptr;
-// CCMR2 register when in input compare mode
 typedef struct
 {
+	// CCMR2 register when in input compare mode
 	bit CC3S : 2;
 	bit IC3PSC : 2;
 	bit IC3F : 4;
@@ -699,67 +677,19 @@ typedef struct
 	
 } TIM5_OR, *TIM5_OR_ptr;
 
-typedef struct
-{
-	TIM_CR1 CR1;
-	TIM_CR2 CR2;
-	TIM_SMCR SMCR;
-	TIM_DIER DIER;
-	TIM_SR SR;
-	TIM_EGR EGR;
-	union
-	{
-		TIM_CCMR1_OCM CCMR1_OCR;
-		TIM_CCMR1_ICM CCMR1_ICM;
-	};
-	union
-	{
-		TIM_CCMR2_OCM CCMR2_OCR;
-		TIM_CCMR2_ICM CCMR2_ICM;
-	};
-	TIM_CCER CCER;
-	TIM_CNT CNT;
-	TIM_PSC PSC;
-	TIM_ARR ARR;
-	TIM_CCR1 CCR1;
-	TIM_CCR2 CCR2;
-	TIM_CCR3 CCR3;
-	TIM_CCR4 CCR4;
-	TIM_DCR DCR;
-	TIM_DMAR DMAR;
-	TIM2_OR OR2;
-	TIM5_OR OR5;
-
-} TIM_BASIC_Registers, *TIM_BASIC_Registers_ptr;
-
-
-typedef struct
-{
-	TIM_BASIC_Registers Registers;
-	PADTO(RESERVED, 1024, TIM_BASIC_Registers);
-} TIM_Basic, * TIM_Basic_ptr;
-typedef struct
-{
-	TIM_Basic TIM2;
-	TIM_Basic TIM3;
-	TIM_Basic TIM4;
-	TIM_Basic TIM5;
-
-} APB1, *APB1_ptr;
+// CRC Registers
 
 typedef struct
 {
 	bit DRLOW : 16;
 	bit DRHIGH : 16;
 } CRC_DR, *CRC_DR_ptr;
-
 typedef struct
 {
 	bit IDR : 8;
 	bit RESERVED1 : 8;
 	bit RESERVED2 : 16;
 } CRC_IDR, *CRC_IDR_ptr;
-
 typedef struct
 {
 	bit RESET : 1;
@@ -767,13 +697,14 @@ typedef struct
 	bit RESERVED2 : 16;
 } CRC_CR, *CRC_CR_ptr;
 
+// Register sets
+
 typedef struct
 {
-	CRC_DR DR;
-	CRC_IDR IDR;
-	CRC_CR CR;
-} CRC_Registers, CRC_Registers_ptr;
-
+	volatile CRC_DR DR;
+	volatile CRC_IDR IDR;
+	volatile CRC_CR CR;
+} CRC_Regset, CRC_Regset_ptr;
 typedef struct
 {
 	volatile RCC_CR_Reg CR; /*!< RCC clock control register,                                  Address offset: 0x00 */
@@ -806,38 +737,97 @@ typedef struct
 	uint32_t      RESERVED6[2]; /*!< Reserved, 0x78-0x7C                                                               */
 	uint32_t SSCGR; /*!< RCC spread spectrum clock generation register,               Address offset: 0x80 */
 	uint32_t PLLI2SCFGR; /*!< RCC PLLI2S configuration register,                           Address offset: 0x84 */
-} RCC_Registers, *RCC_Registers_ptr;
+} RCC_Regset, *RCC_Regset_ptr;
+typedef struct
+{
+	volatile GPIO_MODER_Reg MODER;
+	volatile GPIO_OTYPER_Reg OTYPER;
+	volatile GPIO_OSPEEDR_Reg SPEEDR;
+	volatile GPIO_PUPDR_Reg PUPDR;
+	volatile GPIO_IDR_Reg IDR;
+	volatile GPIO_ODR_Reg ODR;
+	volatile GPIO_BSRR_Reg BSRR;
+	volatile GPIO_LCKR_Reg LCKR;
+	volatile GPIO_AFRL_Reg AFRL;
+	volatile GPIO_AFRH_Reg AFRH;
 
+} GPIO_Regset, * GPIO_Regset_ptr;
+typedef struct
+{
+	volatile TIM_CR1 CR1;
+	volatile TIM_CR2 CR2;
+	volatile TIM_SMCR SMCR;
+	volatile TIM_DIER DIER;
+	volatile TIM_SR SR;
+	volatile TIM_EGR EGR;
+	union
+	{
+		TIM_CCMR1_OCM CCMR1_OCR;
+		TIM_CCMR1_ICM CCMR1_ICM;
+	};
+	union
+	{
+		TIM_CCMR2_OCM CCMR2_OCR;
+		TIM_CCMR2_ICM CCMR2_ICM;
+	};
+	volatile TIM_CCER CCER;
+	volatile TIM_CNT CNT;
+	volatile TIM_PSC PSC;
+	volatile TIM_ARR ARR;
+	volatile TIM_CCR1 CCR1;
+	volatile TIM_CCR2 CCR2;
+	volatile TIM_CCR3 CCR3;
+	volatile TIM_CCR4 CCR4;
+	volatile TIM_DCR DCR;
+	volatile TIM_DMAR DMAR;
+	volatile TIM2_OR OR2;
+	volatile TIM5_OR OR5;
+
+} TIM_BASIC_Regset, *TIM_BASIC_Regset_ptr;
+
+// Bus peripheral groups
+typedef struct
+{
+	TIM_BASIC_Regset TIM2;
+	PADTO(1024, TIM_BASIC_Regset,a);
+	TIM_BASIC_Regset TIM3;
+	PADTO(1024, TIM_BASIC_Regset,b);
+	TIM_BASIC_Regset TIM4;
+	PADTO(1024, TIM_BASIC_Regset,c);
+	TIM_BASIC_Regset TIM5;
+	PADTO(1024, TIM_BASIC_Regset,d);
+
+} APB1, *APB1_ptr;
 typedef struct
 {
 	// There is padding between peripherals that forces
-	// each one to be at a particular offset from the
-	// preceding peripheral.
-	GPIO_Registers GPIO_A;
-	PADTO(RESERVED1, 1024, GPIO_Registers);
-	GPIO_Registers GPIO_B;
-	PADTO(RESERVED2, 1024, GPIO_Registers);
-	GPIO_Registers GPIO_C;
-	PADTO(RESERVED3, 1024, GPIO_Registers);
-	GPIO_Registers GPIO_D;
-	PADTO(RESERVED4, 1024, GPIO_Registers);
-	GPIO_Registers GPIO_E;
-	PADTO(RESERVED5, 1024, GPIO_Registers);
-	GPIO_Registers GPIO_F;
-	PADTO(RESERVED6, 1024, GPIO_Registers);
-	GPIO_Registers GPIO_G;
-	PADTO(RESERVED7, 1024, GPIO_Registers);
-	GPIO_Registers GPIO_H;
-	PADTO(RESERVED8, 1024, GPIO_Registers);
-	GPIO_Registers GPIO_I;
-	PADTO(RESERVED9, 1024, GPIO_Registers);
-	GPIO_Registers GPIO_J;
-	PADTO(RESERVED10, 1024, GPIO_Registers);
-	GPIO_Registers GPIO_K;
-	PADTO(RESERVED11, 2048, GPIO_Registers);
-	CRC_Registers CRC; 
-	PADTO(RESERVED12, 2048, CRC_Registers);
-	RCC_Registers RCC;
-	PADTO(RESERVED13, 1024, RCC_Registers);
+	// each one's start address to be at a particular offset 
+	// from the preceding peripherals start address.
+	GPIO_Regset GPIO_A;
+	PADTO(1024, GPIO_Regset,a);
+	GPIO_Regset GPIO_B;
+	PADTO(1024, GPIO_Regset,b);
+	GPIO_Regset GPIO_C;
+	PADTO(1024, GPIO_Regset,c);
+	GPIO_Regset GPIO_D;
+	PADTO(1024, GPIO_Regset,d);
+	GPIO_Regset GPIO_E;
+	PADTO(1024, GPIO_Regset,e);
+	GPIO_Regset GPIO_F;
+	PADTO(1024, GPIO_Regset,f);
+	GPIO_Regset GPIO_G;
+	PADTO(1024, GPIO_Regset,g);
+	GPIO_Regset GPIO_H;
+	PADTO(1024, GPIO_Regset,h);
+	GPIO_Regset GPIO_I;
+	PADTO(1024, GPIO_Regset,i);
+	GPIO_Regset GPIO_J;
+	PADTO(1024, GPIO_Regset,j);
+	GPIO_Regset GPIO_K;
+	PADTO(2048, GPIO_Regset,k);
+	CRC_Regset CRC; 
+	PADTO(2048, CRC_Regset,l);
+	RCC_Regset RCC;
+	PADTO(1024, RCC_Regset,m);
 
 } AHB1, *AHB1_ptr;
