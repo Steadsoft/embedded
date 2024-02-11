@@ -1,3 +1,5 @@
+// See also: https://developer.arm.com/documentation/dui0491/i/Compiler-specific-Features/Type-attributes
+
 #pragma once
 // Undefine stuff defined by STM32 HAL/LL support headers.
 #undef TIM2
@@ -212,7 +214,7 @@ typedef union
 
 typedef union
 {
-	struct
+	struct //__attribute__((packed))
 	{
 		// LSB at top, MSB at bottom
 		bit MODER_0 : 2;
@@ -786,6 +788,7 @@ typedef struct
 } TIM_BASIC_Regset, *TIM_BASIC_Regset_ptr;
 
 // Bus peripheral groups
+
 typedef struct
 {
 	TIM_BASIC_Regset TIM2;

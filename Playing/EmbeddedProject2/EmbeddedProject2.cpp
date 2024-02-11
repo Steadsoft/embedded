@@ -24,42 +24,49 @@ int main(void)
 // This code runs fine debug or release on the Discovery STM32F407VG
 void Page_374(void)
 {
-	RCC->AHB1ENR |= 1;
-	RCC->CFGR &= ~0x07E00000;
-	RCC->CFGR |=  0x07600000;
-	
-	GPIOA->MODER |=   0x00020000;
-	GPIOA->AFR[1] &= ~0x00000003; // F ?
-	GPIOA->OSPEEDR |= 3 << 8 * 2;
-	
-	// Set HSE on
-	RCC->CR &= ~0x000F0000;
-	RCC->CR |=  0x00010000;
-	
-	while (!(RCC->CR & 0x00020000)) ;
-	
-	RCC->CFGR &=  ~0x00000003;
-	RCC->PLLCFGR = 0x00402D04;
-	RCC->CR |=     0x01000000;
-	
-	while (!(RCC->CR & 0x02000000)) ;
-	
-	FLASH->ACR = 0x0705;
-	
-	RCC->CFGR &= ~0x000000F0;
-	RCC->CFGR |=  0x00000002;
-	
-	while ((RCC->CFGR & 0x0C) != 0x08) ;
+//	RCC->AHB1ENR |= 1;
+//	RCC->CFGR &= ~0x07E00000;
+//	RCC->CFGR |=  0x07600000;
+//	
+//	GPIOA->MODER |=   0x00020000;
+//	GPIOA->AFR[1] &= ~0x00000003; // F ?
+//	GPIOA->OSPEEDR |= 3 << 8 * 2;
+//	
+//	// Set HSE on
+//	RCC->CR &= ~0x000F0000;
+//	RCC->CR |=  0x00010000;
+//	
+//	while (!(RCC->CR & 0x00020000)) ;
+//	
+//	RCC->CFGR &=  ~0x00000003;
+//	RCC->PLLCFGR = 0x00402D04;
+//	RCC->CR |=     0x01000000;
+//	
+//	while (!(RCC->CR & 0x02000000)) ;
+//	
+//	FLASH->ACR = 0x0705;
+//	
+//	RCC->CFGR &= ~0x000000F0;
+//	RCC->CFGR |=  0x00000002;
+//	
+//	while ((RCC->CFGR & 0x0C) != 0x08) ;
+//	
+//	while (1)
+//	{
+//		;
+//	}
+
 }
 
 #include <regtypes.h>
 
 void UseBitfields()
 {
-	AHB1_ptr ahb1_ptr = (AHB1_ptr)AHB1PERIPH_BASE;
+	AHB1_ptr ahb1_ptr = (AHB1_ptr)(AHB1PERIPH_BASE);
 	APB1_ptr apb1_ptr = (APB1_ptr)(APB1PERIPH_BASE);
 	
 	ahb1_ptr->RCC.AHB1ENR.GPIOA_EN = 1;
+	ahb1_ptr->RCC.AHB1ENR.GPIOD_EN = 1;
 	
 	// RCC->CFGR &= ~0x07E00000;
 	// RCC->CFGR |=  0x07600000;
@@ -112,8 +119,23 @@ void UseBitfields()
 	
 	SPIN_UNTIL(ahb1_ptr->RCC.CFGR.SWS == 2);
 	
+	
+	ahb1_ptr->GPIO_D.MODER.MODER_12 = 1;
+	ahb1_ptr->GPIO_D.OTYPER.OT_12 = 0;
+	ahb1_ptr->GPIO_D.SPEEDR.SPEED_12 = 0;
+	
 	while (1)
 	{
-		;
+		ahb1_ptr->GPIO_D.ODR.ODR_12 = 1;
+		
+		for (unsigned int X = 0; X < 2000000; X++)
+		{
+		}
+		
+		ahb1_ptr->GPIO_D.ODR.ODR_12 = 0;
+		
+		for (unsigned int X = 0; X < 2000000; X++)
+		{
+		}
 	}
 }
