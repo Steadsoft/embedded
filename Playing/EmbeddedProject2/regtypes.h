@@ -8,6 +8,7 @@
 #undef TIM5
 #undef RCC
 #undef CRC
+#undef FLASH
 
 #define bit  uint32_t
 
@@ -699,6 +700,52 @@ typedef struct
 	bit RESERVED2 : 16;
 } CRC_CR, *CRC_CR_ptr;
 
+// FLASH Registers
+
+typedef struct
+{
+	bit LATENCY : 3;
+	bit RESERVED1 : 5;
+	bit PRFTEN : 1;
+	bit ICEN : 1;
+	bit DCEN : 1;
+	bit ICRST : 1;
+	bit DCRST : 1;
+	bit RESERVED2 : 3;
+	bit RESERVED3 : 16;
+} FLASH_ACR, * FLASH_ACR_ptr;
+
+typedef struct
+{
+	
+} FLASH_KEYR, * FLASH_KEYR_ptr;
+
+typedef struct
+{
+	
+} FLASH_OPTKEYR, * FLASH_OPTKEYR_ptr;
+
+
+typedef struct
+{
+	
+} FLASH_SR, * FLASH_SR_ptr;
+
+typedef struct
+{
+	
+} FLASH_CR, * FLASH_CR_ptr;
+
+typedef struct
+{
+	
+} FLASH_OPTCR, * FLASH_OPTCR_ptr;
+
+typedef struct
+{
+	
+} FLASH_OPTCR1, * FLASH_OPTCR1_ptr;
+
 // Register sets
 
 typedef struct
@@ -786,7 +833,10 @@ typedef struct
 	volatile TIM5_OR OR5;
 
 } TIM_BASIC_Regset, *TIM_BASIC_Regset_ptr;
-
+typedef struct 
+{
+	FLASH_ACR ACR;
+} FLASH_Regset, *FLASH_Regset_ptr;
 // Bus peripheral groups
 
 typedef struct
@@ -800,7 +850,7 @@ typedef struct
 	TIM_BASIC_Regset TIM5;
 	PADTO(1024, TIM_BASIC_Regset,d);
 
-} APB1, *APB1_ptr;
+} APB1_Bus, *APB1_Bus_ptr;
 typedef struct
 {
 	// There is padding between peripherals that forces
@@ -832,5 +882,26 @@ typedef struct
 	PADTO(2048, CRC_Regset,l);
 	RCC_Regset RCC;
 	PADTO(1024, RCC_Regset,m);
+	FLASH_Regset FLASH;
 
-} AHB1, *AHB1_ptr;
+} AHB1_Bus, *AHB1_Bus_ptr;
+
+typedef struct 
+{
+	
+} APB2_Bus, *APB2_Bus_ptr;
+
+typedef struct 
+{
+	
+} AHB2_Bus, *AHB2_Bus_ptr;
+
+
+typedef struct
+{
+	APB1_Bus APB1;
+	APB2_Bus APB2;
+	AHB1_Bus AHB1;
+	AHB2_Bus AHB2;
+} Peripherals, *Peripherals_ptr;
+
