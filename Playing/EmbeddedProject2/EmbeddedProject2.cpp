@@ -1,12 +1,19 @@
-#include <stm32f4xx_ll_bus.h>
-#include <stm32f4xx_ll_gpio.h>
-#include <stm32f4xx_ll_utils.h>
+//#include <stm32f4xx_ll_bus.h>
+//#include <stm32f4xx_ll_gpio.h>
+//#include <stm32f4xx_ll_utils.h>
 
+#include <stdint.h>
 #include <stdlib.h>
-//#define WAIT_FOR_HSE while (!(RCC->CR & 0x00020000))
-//#define WAIT_FOR_PLL while (!(RCC->CR & 0x02000000))
+
+// Simply runs a loop while or until some condition is true
 #define SPIN_WHILE(X) while((X))
 #define SPIN_UNTIL(X) while(!(X))
+
+// Runs a loop while or until some condition is true and increments 
+// a counter which is useful when debugging to see the number of actual iterations.
+#define COUNT_WHILE(X,Y) (*Y)=0;while((X))(*Y)++;
+#define COUNT_UNTIL(X,Y) (*Y)=0;while(!(X))(*Y)++;
+
 
 #define SPEEDR_LOW 0
 #define SPEEDR_MEDIUM 1
@@ -71,46 +78,47 @@ int main(void)
 // This code runs fine debug or release on the Discovery STM32F407VG
 void Page_374(void)
 {
-	RCC->AHB1ENR |= 1;
-
-	RCC->CFGR &= ~0x07E00000;
-	RCC->CFGR |=  0x07600000;
-	
-	GPIOA->MODER |=   0x00020000;
-	GPIOA->AFR[1] &= ~0x00000003; // F ?
-	GPIOA->OSPEEDR |= 3 << 8 * 2;
-	
-	// Set HSE on
-	RCC->CR &= ~0x000F0000;
-	RCC->CR |=  0x00010000;
-	
-	while (!(RCC->CR & 0x00020000)) ;
-	
-	RCC->CFGR &=  ~0x00000003;
-	RCC->PLLCFGR = 0x00402D04;
-	RCC->CR |=     0x01000000;
-	
-	while (!(RCC->CR & 0x02000000)) ;
-	
-	FLASH->ACR = 0x0705;
-	
-	RCC->CFGR &= ~0x000000F0;
-	RCC->CFGR |=  0x00000002;
-	
-	while ((RCC->CFGR & 0x0C) != 0x08) ;
-	
-	while (1)
-	{
-		;
-	}
+//	RCC->AHB1ENR |= 1;
+//
+//	RCC->CFGR &= ~0x07E00000;
+//	RCC->CFGR |=  0x07600000;
+//	
+//	GPIOA->MODER |=   0x00020000;
+//	GPIOA->AFR[1] &= ~0x00000003; // F ?
+//	GPIOA->OSPEEDR |= 3 << 8 * 2;
+//	
+//	// Set HSE on
+//	RCC->CR &= ~0x000F0000;
+//	RCC->CR |=  0x00010000;
+//	
+//	while (!(RCC->CR & 0x00020000)) ;
+//	
+//	RCC->CFGR &=  ~0x00000003;
+//	RCC->PLLCFGR = 0x00402D04;
+//	RCC->CR |=     0x01000000;
+//	
+//	while (!(RCC->CR & 0x02000000)) ;
+//	
+//	FLASH->ACR = 0x0705;
+//	
+//	RCC->CFGR &= ~0x000000F0;
+//	RCC->CFGR |=  0x00000002;
+//	
+//	while ((RCC->CFGR & 0x0C) != 0x08) ;
+//	
+//	while (1)
+//	{
+//		;
+//	}
 }
 
 #include <regtypes.h>
 
 void UseBitfields()
 {
-	AHB1_Bus_ptr ahb1_ptr = (AHB1_Bus_ptr)(AHB1PERIPH_BASE);
-	APB1_Bus_ptr apb1_ptr = (APB1_Bus_ptr)(APB1PERIPH_BASE);
+	uint32_t spinner = 0;
+	AHB1_Bus_ptr ahb1_ptr = (AHB1_Bus_ptr)(0x40020000);
+	APB1_Bus_ptr apb1_ptr = (APB1_Bus_ptr)(0x40000000);
 	
 	ahb1_ptr->RCC.AHB1ENR.GPIOA_EN = 1;
 	ahb1_ptr->RCC.AHB1ENR.GPIOD_EN = 1;
@@ -142,7 +150,7 @@ void UseBitfields()
 	ahb1_ptr->RCC.CR.HSE_RDY = 0;
 	ahb1_ptr->RCC.CR.HSE_ON = 1;
 	
-	SPIN_UNTIL(ahb1_ptr->RCC.CR.HSE_RDY);
+	COUNT_UNTIL(ahb1_ptr->RCC.CR.HSE_RDY,&spinner);
 
 	//	RCC->CFGR &=  ~0x00000003;
 	//	RCC->PLLCFGR = 0x00402D04;
@@ -154,7 +162,7 @@ void UseBitfields()
 	ahb1_ptr->RCC.PLLCFGR.PLL_SRC = 1;
 	ahb1_ptr->RCC.CR.PLL_ON = 1;
 	
-	SPIN_UNTIL(ahb1_ptr->RCC.CR.PLL_RDY);
+	COUNT_UNTIL(ahb1_ptr->RCC.CR.PLL_RDY,&spinner);
 	
 	// FLASH->ACR = 0x0705;
 	
@@ -169,7 +177,7 @@ void UseBitfields()
 	ahb1_ptr->RCC.CFGR.HPRE = 0;
 	ahb1_ptr->RCC.CFGR.SW = SW(PLL);
 	
-	SPIN_UNTIL(ahb1_ptr->RCC.CFGR.SWS == SWS(PLL));
+	COUNT_UNTIL(ahb1_ptr->RCC.CFGR.SWS == SWS(PLL),&spinner);
 	
 	ahb1_ptr->GPIO_D.MODER.MODER_12 = MODER(GENERAL);
 	ahb1_ptr->GPIO_D.OTYPER.OT_12 = 0;
