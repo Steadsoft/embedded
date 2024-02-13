@@ -21,7 +21,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EmbeddedProject2.cpp">
+    <ClCompile Include="BitFieldDemo1.c">
       <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="system_stm32f4xx.c">

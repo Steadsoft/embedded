@@ -48,7 +48,7 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <ItemGroup>
-    <ClCompile Include="EmbeddedProject2.cpp" />
+    <ClCompile Include="BitFieldDemo1.c" />
     <ClCompile Include="system_stm32f4xx.c" />
     <None Include="stm32.props" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\StartupFiles\startup_stm32f407xx.c" />
