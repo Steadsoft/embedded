@@ -5,9 +5,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <regtypes.h>
+
 // Simply runs a loop while or until some condition is true
 #define SPIN_WHILE(X) while((X))
 #define SPIN_UNTIL(X) while(!(X))
+#define DAWDLE(Y) for (unsigned int X = 0; X < Y; X++){}
 
 // Runs a loop while or until some condition is true and increments 
 // a counter which is useful when debugging to see the number of actual iterations.
@@ -62,11 +65,16 @@
 
 #define MODER(X) MODER_ ## X
 
+// This is helpful but only useable of the X is constant.
+#define MODERBIT(Y) MODER_ ## Y
+// e.g. 	ahb1_ptr->GPIO_D.MODER.MODERBIT(12)  = MODER(GENERAL);
+
 
 // STM32F407VG
 
 void Page_374(void);
 void UseBitfields(void);
+void SetPLLCFGR(RCC_PLLCFGR_Reg_ptr reg_ptr, int N, int M, int SRC);
 
 int main(void)
 {
@@ -112,7 +120,6 @@ void Page_374(void)
 //	}
 }
 
-#include <regtypes.h>
 
 void UseBitfields()
 {
@@ -157,6 +164,9 @@ void UseBitfields()
 	//	RCC->CR |=     0x01000000;
 	
 	ahb1_ptr->RCC.CFGR.SW = 0;
+	
+	SetPLLCFGR(&(ahb1_ptr->RCC.PLLCFGR), 4, 180, 1);
+	
 	ahb1_ptr->RCC.PLLCFGR.PLL_M = 4;
 	ahb1_ptr->RCC.PLLCFGR.PLL_N = 180;
 	ahb1_ptr->RCC.PLLCFGR.PLL_SRC = 1;
@@ -178,23 +188,56 @@ void UseBitfields()
 	ahb1_ptr->RCC.CFGR.SW = SW(PLL);
 	
 	COUNT_UNTIL(ahb1_ptr->RCC.CFGR.SWS == SWS(PLL),&spinner);
-	
+
 	ahb1_ptr->GPIO_D.MODER.MODER_12 = MODER(GENERAL);
 	ahb1_ptr->GPIO_D.OTYPER.OT_12 = 0;
 	ahb1_ptr->GPIO_D.SPEEDR.SPEED_12 = SPEEDR(LOW);
 	
+	ahb1_ptr->GPIO_D.MODER.MODER_13 = MODER(GENERAL);
+	ahb1_ptr->GPIO_D.OTYPER.OT_13 = 0;
+	ahb1_ptr->GPIO_D.SPEEDR.SPEED_13 = SPEEDR(LOW);
+	
+	ahb1_ptr->GPIO_D.MODER.MODER_14 = MODER(GENERAL);
+	ahb1_ptr->GPIO_D.OTYPER.OT_14 = 0;
+	ahb1_ptr->GPIO_D.SPEEDR.SPEED_14 = SPEEDR(LOW);
+	
+	ahb1_ptr->GPIO_D.MODER.MODER_15 = MODER(GENERAL);
+	ahb1_ptr->GPIO_D.OTYPER.OT_15 = 0;
+	ahb1_ptr->GPIO_D.SPEEDR.SPEED_15 = SPEEDR(LOW);
+
+	
+	int lock = 0;
+	int unlocked = 0;
+	int locked = 1;
+	
+	char flag = __atomic_compare_exchange(&lock,&unlocked,&locked,0,0,0);
+	
 	while (1)
 	{
-		ahb1_ptr->GPIO_D.BSRR.BS_12 = 1;   // The "act" of writing (rather than the value being written) sets the bit 
-		
-		for (unsigned int X = 0; X < 2000000; X++)
-		{
-		}
-		
-		ahb1_ptr->GPIO_D.BSRR.BR_12 = 1;  // The "act" of writing (rather than the value being written) resets the bit 
-		
-		for (unsigned int X = 0; X < 2000000; X++)
-		{
-		}
+		ahb1_ptr->GPIO_D.BSRR.BS_12 = 1; // The "act" of writing (rather than the value being written) sets the bit 
+		DAWDLE(1000000);
+		ahb1_ptr->GPIO_D.BSRR.BS_13 = 1; // The "act" of writing (rather than the value being written) sets the bit 
+		DAWDLE(1000000);
+		ahb1_ptr->GPIO_D.BSRR.BS_14 = 1; // The "act" of writing (rather than the value being written) sets the bit 
+		DAWDLE(1000000);
+		ahb1_ptr->GPIO_D.BSRR.BS_15 = 1; // The "act" of writing (rather than the value being written) sets the bit 
+		DAWDLE(1000000);
+		ahb1_ptr->GPIO_D.BSRR.BR_15 = 1; // The "act" of writing (rather than the value being written) resets the bit 
+		DAWDLE(1000000);
+		ahb1_ptr->GPIO_D.BSRR.BR_14 = 1; // The "act" of writing (rather than the value being written) resets the bit 
+		DAWDLE(1000000);
+		ahb1_ptr->GPIO_D.BSRR.BR_13 = 1; // The "act" of writing (rather than the value being written) resets the bit 
+		DAWDLE(1000000);
+		ahb1_ptr->GPIO_D.BSRR.BR_12 = 1; // The "act" of writing (rather than the value being written) resets the bit 
+		DAWDLE(1000000);
 	}
 }
+
+void SetPLLCFGR(RCC_PLLCFGR_Reg_ptr reg_ptr, int M, int N, int SRC)
+{
+	reg_ptr->PLL_M = M;
+	reg_ptr->PLL_N = N;
+	reg_ptr->PLL_SRC = SRC;
+}
+
+	
