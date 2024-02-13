@@ -15,6 +15,93 @@
 #define PADTO(BYTES,TYPE,ID) const char DEADSPACE_ ## ID [BYTES-sizeof(TYPE)]
 #define PADBY(NAME,BYTES) const char NAME[BYTES]
 
+// SCB - System Control Block registers
+
+typedef union
+{
+	struct
+	{
+		bit REVISION : 4;
+		bit PARTNO : 12;
+		bit CONSTANT : 4;
+		bit VARIANT : 4;
+		bit IMPLEMENTER : 8;
+	};
+	uint32_t ALLBITS;
+} SCB_CPUID_Reg, *SCB_CPUID_Reg_ptr;
+
+typedef union
+{
+	struct
+	{
+		bit VECTACTIVATE : 9;
+		bit RESERVED1 : 2;
+		bit RETOBASE : 1;
+		bit VECTPENDING : 7;
+		bit RESERVED2 : 3;
+		bit ISRPENDING : 1;
+		bit RESERVED3 : 2;
+		bit PENDSTCLR : 1;
+		bit PENDSTSET : 1;
+		bit PENDSVCCLR : 1;
+		bit PENDSVCSET : 1;
+		bit RESERVED :2;
+		bit NMIPENDSET : 1;
+	};
+	uint32_t ALLBITS;
+} SCB_ICSR_Reg, *SCB_ICSR_Reg_ptr;
+
+// SysTick Registers
+typedef union
+{
+	struct
+	{
+		bit ENABLE : 1;
+		bit TICKINT : 1;
+		bit CLKSOURCE : 1;
+		bit RESERVED1 : 13;
+		bit COUNTFLAG : 1;
+		bit RESERVED : 15;
+	};
+	uint32_t ALLBITS;
+
+} SYST_CTRL_Reg, *SYST_CTRL_Reg_ptr;
+
+typedef union
+{
+	struct
+	{
+		bit RELOAD : 24;
+		bit RESERVED1 : 8;
+	};
+	uint32_t ALLBITS;
+
+} SYST_RVR_Reg, *SYST_RVR_Reg_ptr;
+
+typedef union
+{
+	struct
+	{
+		bit CURRENT : 24;
+		bit RESERVED1 : 8;
+	};
+	uint32_t ALLBITS;
+
+} SYST_CVR_Reg, *SYST_CVR_Reg_ptr;
+
+typedef union
+{
+	struct
+	{
+		bit TENMS : 24;
+		bit RESERVED1 : 6;
+		bit SKEW : 1;
+		bit NOREF : 1;
+	};
+	uint32_t ALLBITS;
+
+} SYST_CALIB_Reg, *SYST_CALIB_Reg_ptr;
+
 // RCC Registers
 
 typedef union
@@ -748,6 +835,19 @@ typedef struct
 
 // Register sets
 
+typedef struct
+{
+	volatile SCB_CPUID_Reg CPUID;
+	volatile SCB_ICSR_Reg ICSR;
+} SCB_Regset, *SCB_Regset_ptr;
+
+typedef struct
+{
+	volatile SYST_CTRL_Reg SYST_CTRL;
+	volatile SYST_RVR_Reg SYST_RVR;
+	volatile SYST_CVR_Reg SYST_CVR;
+	volatile SYST_CALIB_Reg SYST_CALIB;
+} SYST_Regset, *SYST_Regset_ptr;
 typedef struct
 {
 	volatile CRC_DR DR;

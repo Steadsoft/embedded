@@ -58,27 +58,54 @@
 #define SWS(X) SWS_ ## X
 
 
+#define MODER(X) MODER_ ## X
+
 #define MODER_INPUT 0
 #define MODER_GENERAL 1
 #define MODER_ALTERNATE 2
 #define MODER_ANALOG 3
 
-#define MODER(X) MODER_ ## X
 
 // This is helpful but only useable of the X is constant.
 #define MODERBIT(Y) MODER_ ## Y
 // e.g. 	ahb1_ptr->GPIO_D.MODER.MODERBIT(12)  = MODER(GENERAL);
 
+static AHB1_Bus_ptr ahb1_ptr;
+static APB1_Bus_ptr apb1_ptr;
+static SYST_Regset_ptr syst_ptr;
+static SCB_Regset_ptr scb_ptr;
+
+const int count = 0;
+
+void InitStaticPointers()
+{
+	ahb1_ptr = (AHB1_Bus_ptr)(0x40020000);
+	apb1_ptr = (APB1_Bus_ptr)(0x40000000);
+	syst_ptr = (SYST_Regset_ptr)(0xE000E010);
+	scb_ptr = (SCB_Regset_ptr)(0xE000ED00);
+}
+
+void SysTick_Handler(void)
+{
+	;//count++;
+}
+
 
 // STM32F407VG
 
 void Page_374(void);
-void UseBitfields(void);
-void SetPLLCFGR(RCC_PLLCFGR_Reg_ptr reg_ptr, int N, int M, int SRC);
+void BitfieldExampleA(void);
+void SetupSystemClock(void);
 
 int main(void)
 {
-	UseBitfields();
+	InitStaticPointers();
+	
+	syst_ptr->SYST_RVR.ALLBITS = 9;
+	syst_ptr->SYST_CVR.ALLBITS = 0;
+	syst_ptr->SYST_CTRL.ALLBITS = 5;
+	
+	BitfieldExampleA();
 }
 
 // This is our reference code. It causes the clock to run at 180MHz 
@@ -120,75 +147,11 @@ void Page_374(void)
 //	}
 }
 
-
-void UseBitfields()
+void BitfieldExampleA()
 {
-	uint32_t spinner = 0;
-	AHB1_Bus_ptr ahb1_ptr = (AHB1_Bus_ptr)(0x40020000);
-	APB1_Bus_ptr apb1_ptr = (APB1_Bus_ptr)(0x40000000);
-	
-	ahb1_ptr->RCC.AHB1ENR.GPIOA_EN = 1;
-	ahb1_ptr->RCC.AHB1ENR.GPIOD_EN = 1;
-	
-	// RCC->CFGR &= ~0x07E00000;
-	// RCC->CFGR |=  0x07600000;
 
-	ahb1_ptr->RCC.CFGR.MCO1_PRE = MCOPRE(5);
-	ahb1_ptr->RCC.CFGR.I2SSC = I2SSRC(PLLI2S);
-	ahb1_ptr->RCC.CFGR.MCO1 = MCO1(PLL);
-
-	// GPIOA->MODER |= 0x00020000;
-
-	ahb1_ptr->GPIO_A.MODER.MODER_8 = MODER(ALTERNATE);
+	//SetupSystemClock();
 	
-	// GPIOA->AFR[1] &= ~3; // F ? confusing because an AFRH is 4 bits
-	
-	ahb1_ptr->GPIO_A.AFRH.AFRH_8 = 0;
-	
-	// 	GPIOA->OSPEEDR |= 3 << 8 * 2;
-
-	ahb1_ptr->GPIO_A.SPEEDR.SPEED_8 = SPEEDR(HIGH);
-	
-	// RCC->CR &= ~0x000F0000;
-	// RCC->CR |=  0x00010000;
-
-	ahb1_ptr->RCC.CR.CSS_ON = 0;
-	ahb1_ptr->RCC.CR.HSE_BYP = 0;
-	ahb1_ptr->RCC.CR.HSE_RDY = 0;
-	ahb1_ptr->RCC.CR.HSE_ON = 1;
-	
-	COUNT_UNTIL(ahb1_ptr->RCC.CR.HSE_RDY,&spinner);
-
-	//	RCC->CFGR &=  ~0x00000003;
-	//	RCC->PLLCFGR = 0x00402D04;
-	//	RCC->CR |=     0x01000000;
-	
-	ahb1_ptr->RCC.CFGR.SW = 0;
-	
-	SetPLLCFGR(&(ahb1_ptr->RCC.PLLCFGR), 4, 180, 1);
-	
-	ahb1_ptr->RCC.PLLCFGR.PLL_M = 4;
-	ahb1_ptr->RCC.PLLCFGR.PLL_N = 180;
-	ahb1_ptr->RCC.PLLCFGR.PLL_SRC = 1;
-	ahb1_ptr->RCC.CR.PLL_ON = 1;
-	
-	COUNT_UNTIL(ahb1_ptr->RCC.CR.PLL_RDY,&spinner);
-	
-	// FLASH->ACR = 0x0705;
-	
-	ahb1_ptr->FLASH.ACR.LATENCY = 5;
-	ahb1_ptr->FLASH.ACR.PRFTEN = 1;
-	ahb1_ptr->FLASH.ACR.ICEN = 1;
-	ahb1_ptr->FLASH.ACR.DCEN = 1;
-	
-	//	RCC->CFGR &= ~0x000000F0;
-	//	RCC->CFGR |=  0x00000002;
-
-	ahb1_ptr->RCC.CFGR.HPRE = 0;
-	ahb1_ptr->RCC.CFGR.SW = SW(PLL);
-	
-	COUNT_UNTIL(ahb1_ptr->RCC.CFGR.SWS == SWS(PLL),&spinner);
-
 	ahb1_ptr->GPIO_D.MODER.MODER_12 = MODER(GENERAL);
 	ahb1_ptr->GPIO_D.OTYPER.OT_12 = 0;
 	ahb1_ptr->GPIO_D.SPEEDR.SPEED_12 = SPEEDR(LOW);
@@ -233,11 +196,70 @@ void UseBitfields()
 	}
 }
 
-void SetPLLCFGR(RCC_PLLCFGR_Reg_ptr reg_ptr, int M, int N, int SRC)
-{
-	reg_ptr->PLL_M = M;
-	reg_ptr->PLL_N = N;
-	reg_ptr->PLL_SRC = SRC;
-}
 
+
+void SetupSystemClock()
+{
+	uint32_t spinner = 0;
 	
+	ahb1_ptr->RCC.AHB1ENR.GPIOA_EN = 1;
+	ahb1_ptr->RCC.AHB1ENR.GPIOD_EN = 1;
+	
+	// RCC->CFGR &= ~0x07E00000;
+	// RCC->CFGR |=  0x07600000;
+
+	ahb1_ptr->RCC.CFGR.MCO1_PRE = MCOPRE(5);
+	ahb1_ptr->RCC.CFGR.I2SSC = I2SSRC(PLLI2S);
+	ahb1_ptr->RCC.CFGR.MCO1 = MCO1(PLL);
+
+	// GPIOA->MODER |= 0x00020000;
+
+	ahb1_ptr->GPIO_A.MODER.MODER_8 = MODER(ALTERNATE);
+	
+	// GPIOA->AFR[1] &= ~3; // F ? confusing because an AFRH is 4 bits
+	
+	ahb1_ptr->GPIO_A.AFRH.AFRH_8 = 0;
+	
+	// 	GPIOA->OSPEEDR |= 3 << 8 * 2;
+
+	ahb1_ptr->GPIO_A.SPEEDR.SPEED_8 = SPEEDR(HIGH);
+	
+	// RCC->CR &= ~0x000F0000;
+	// RCC->CR |=  0x00010000;
+
+	ahb1_ptr->RCC.CR.CSS_ON = 0;
+	ahb1_ptr->RCC.CR.HSE_BYP = 0;
+	ahb1_ptr->RCC.CR.HSE_RDY = 0;
+	ahb1_ptr->RCC.CR.HSE_ON = 1;
+	
+	COUNT_UNTIL(ahb1_ptr->RCC.CR.HSE_RDY, &spinner);
+
+	//	RCC->CFGR &=  ~0x00000003;
+	//	RCC->PLLCFGR = 0x00402D04;
+	//	RCC->CR |=     0x01000000;
+	
+	ahb1_ptr->RCC.CFGR.SW = 0;
+	
+	ahb1_ptr->RCC.PLLCFGR.PLL_M = 4;
+	ahb1_ptr->RCC.PLLCFGR.PLL_N = 180;
+	ahb1_ptr->RCC.PLLCFGR.PLL_SRC = 1;
+	ahb1_ptr->RCC.CR.PLL_ON = 1;
+	
+	COUNT_UNTIL(ahb1_ptr->RCC.CR.PLL_RDY, &spinner);
+	
+	// FLASH->ACR = 0x0705;
+	
+	ahb1_ptr->FLASH.ACR.LATENCY = 5;
+	ahb1_ptr->FLASH.ACR.PRFTEN = 1;
+	ahb1_ptr->FLASH.ACR.ICEN = 1;
+	ahb1_ptr->FLASH.ACR.DCEN = 1;
+	
+	//	RCC->CFGR &= ~0x000000F0;
+	//	RCC->CFGR |=  0x00000002;
+
+	ahb1_ptr->RCC.CFGR.HPRE = 0;
+	ahb1_ptr->RCC.CFGR.SW = SW(PLL);
+	
+	COUNT_UNTIL(ahb1_ptr->RCC.CFGR.SWS == SWS(PLL), &spinner);
+
+}
