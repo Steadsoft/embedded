@@ -269,7 +269,9 @@ void SetupSysTick()
 {
 
 	SCB_AIRCR_Reg aircr;
-	SYST_CTRL_Reg ctrl;
+	
+	syst_ptr->CTRL.ENABLE = 0;
+	
 	// Must be written a single 32 bit write.
 	
 	aircr = scb_ptr->AIRCR;
@@ -283,9 +285,7 @@ void SetupSysTick()
 	
 	syst_ptr->VAL.ALLBITS = 0;
 	
-	ctrl = syst_ptr->CTRL;
-	ctrl.TICKINT = 1;
-	ctrl.CLKSOURCE = 1;
-	ctrl.ENABLE = 1;
-	syst_ptr->CTRL = ctrl;
+	syst_ptr->CTRL.TICKINT = 1;
+	syst_ptr->CTRL.CLKSOURCE = 1;
+	syst_ptr->CTRL.ENABLE = 1;
 }
