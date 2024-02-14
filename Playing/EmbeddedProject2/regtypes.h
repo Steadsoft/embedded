@@ -103,6 +103,26 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } SCB_SHPR_Reg, *SCB_SHPR_Reg_ptr;
+
+typedef union
+{
+	struct
+	{
+		bit ____1 : 32;
+	};
+	uint32_t ALLBITS;
+} SCB_SCR_Reg, *SCB_SCR_Reg_ptr;
+
+typedef union
+{
+	struct
+	{
+		bit ____1 : 32;
+	};
+	uint32_t ALLBITS;
+} SCB_CCR_Reg, *SCB_CCR_Reg_ptr;
+
+
 // SysTick Registers
 typedef union
 {
@@ -893,6 +913,9 @@ typedef struct
 	volatile SCB_ICSR_Reg ICSR;
 	volatile SCB_VTOR_Reg VTOR;
 	volatile SCB_AIRCR_Reg AIRCR;
+	volatile SCB_SCR_Reg SCR;
+	volatile SCB_CCR_Reg CCR;
+	volatile SCB_SHPR_Reg SHPR;
 } SCB_Regset, *SCB_Regset_ptr;
 
 typedef struct

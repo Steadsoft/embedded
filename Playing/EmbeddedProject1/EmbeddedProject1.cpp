@@ -56,7 +56,7 @@ void InitializeTimer()
 
 int main(void)
 {
-	//
+	    //
 	    //  Uncomment this line to see the effect of
 	    //  the clock change.
 	    //
@@ -64,6 +64,11 @@ int main(void)
 	    //
 	    //  Initialise the peripheral clock.
 	    //
+	
+	HAL_InitTick(TICK_INT_PRIORITY);
+	
+	
+	
 	RCC->AHB1ENR |= RCC_AHB1Periph_GPIOD;
 	//
 	//  Initialise the GPIO port.
@@ -77,9 +82,11 @@ int main(void)
 	//
 	while (1)
 	{
-		GPIOD->BSRRL = GPIO_Pin_0;
-		GPIOD->BSRRH = GPIO_Pin_0;
+//		GPIOD->BSRRL = GPIO_Pin_0;
+//		GPIOD->BSRRH = GPIO_Pin_0;
 	}	
+	
+	SysTick->LOAD = 5;
 }
 
 int oldmain(void)
