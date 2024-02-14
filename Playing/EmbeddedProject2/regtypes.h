@@ -14,8 +14,10 @@
 
 #define PADTO(BYTES,TYPE,ID) const char DEADSPACE_ ## ID [BYTES-sizeof(TYPE)]
 #define PADBY(NAME,BYTES) const char NAME[BYTES]
+#define SCB_AIRCR_VECTKEY 0x5FAUL
 
 // SCB - System Control Block registers
+// See: https://www.st.com/resource/en/programming_manual/pm0214-stm32-cortexm4-mcus-and-mpus-programming-manual-stmicroelectronics.pdf
 
 typedef union
 {
@@ -35,22 +37,72 @@ typedef union
 	struct
 	{
 		bit VECTACTIVATE : 9;
-		bit RESERVED1 : 2;
+		bit ____1 : 2;
 		bit RETOBASE : 1;
 		bit VECTPENDING : 7;
-		bit RESERVED2 : 3;
+		bit ____2 : 3;
 		bit ISRPENDING : 1;
-		bit RESERVED3 : 2;
+		bit ____3 : 2;
 		bit PENDSTCLR : 1;
 		bit PENDSTSET : 1;
 		bit PENDSVCCLR : 1;
 		bit PENDSVCSET : 1;
-		bit RESERVED :2;
+		bit ____4 :2;
 		bit NMIPENDSET : 1;
 	};
 	uint32_t ALLBITS;
 } SCB_ICSR_Reg, *SCB_ICSR_Reg_ptr;
 
+typedef union
+{
+	struct
+	{
+		bit ____1 : 9;
+		bit TBLOFF : 21;
+		bit ____2 : 2;
+	};
+	uint32_t ALLBITS;
+} SCB_VTOR_Reg, *SCB_VTOR_Reg_ptr;
+
+typedef union
+{
+	// This register must be written to as a single 32 bit write.
+	struct
+	{
+		bit VECTRESET : 1;
+		bit VECTCLRACTIVE : 1;
+		bit SYSRESETREQ : 1;
+		bit ____1 : 5;
+		bit PRIGROUP : 3;
+		bit ____2 : 4;
+		bit ENDIANESS : 1;
+		bit VECTKEY : 16; // To write to this register, you must write 0x5FA to the VECTKEY field, otherwise the processor ignores the write. 
+	};
+	uint32_t ALLBITS;
+} SCB_AIRCR_Reg, *SCB_AIRCR_Reg_ptr;
+
+typedef union 
+{
+	struct
+	{
+		bit pri_4 : 4;
+		bit PRI_4 : 4;
+		bit pri_5:	4;
+		bit PRI_5 : 4;
+		bit pri_6 : 4;
+		bit PRI_6 : 4;
+		bit ____1 : 8;
+		bit ____2 : 24;
+		bit pri_11 : 4;
+		bit PRI_11 : 4;
+		bit ____3 : 16;
+		bit pri_14 : 4;
+		bit PRI_14 :4;
+		bit pri_15 : 4;
+		bit PRI_15 : 4;
+	};
+	uint32_t ALLBITS;
+} SCB_SHPR_Reg, *SCB_SHPR_Reg_ptr;
 // SysTick Registers
 typedef union
 {
@@ -59,9 +111,9 @@ typedef union
 		bit ENABLE : 1;
 		bit TICKINT : 1;
 		bit CLKSOURCE : 1;
-		bit RESERVED1 : 13;
+		bit ____1 : 13;
 		bit COUNTFLAG : 1;
-		bit RESERVED : 15;
+		bit ____2 : 15;
 	};
 	uint32_t ALLBITS;
 
@@ -72,7 +124,7 @@ typedef union
 	struct
 	{
 		bit RELOAD : 24;
-		bit RESERVED1 : 8;
+		bit ____1 : 8;
 	};
 	uint32_t ALLBITS;
 
@@ -83,7 +135,7 @@ typedef union
 	struct
 	{
 		bit CURRENT : 24;
-		bit RESERVED1 : 8;
+		bit ____1 : 8;
 	};
 	uint32_t ALLBITS;
 
@@ -94,7 +146,7 @@ typedef union
 	struct
 	{
 		bit TENMS : 24;
-		bit RESERVED1 : 6;
+		bit ____1 : 6;
 		bit SKEW : 1;
 		bit NOREF : 1;
 	};
@@ -174,12 +226,12 @@ typedef union
 		bit TIM12_EN : 1;
 		bit TIM13_EN : 1;
 		bit TIM14_EN : 1;
-		bit RESERVED1 : 2;
+		bit ____1 : 2;
 		bit WWDG_EN : 1;
-		bit RESERVED2 : 2;
+		bit ____2 : 2;
 		bit SPI2_EN : 1;
 		bit SPI3_EN : 1;
-		bit RESERVED3 : 1;
+		bit ____3 : 1;
 		bit USART2_EN : 1;
 		bit USART3_EN : 1;
 		bit UART4_EN : 1;
@@ -190,10 +242,10 @@ typedef union
 		bit RESEEVED4 : 1;
 		bit CAN1_EN : 1;
 		bit CAN2_EN : 1;
-		bit RESERVED5 : 1;
+		bit ____5 : 1;
 		bit PWR_EN : 1;
 		bit DAC_EN : 1;
-		bit RESERVED6 : 2;
+		bit ____6 : 2;
 		uint32_t ALLBITS;
 	};
 } RCC_APB1ENR_Reg, *RCC_APB1ENR_Reg_ptr;
@@ -570,8 +622,8 @@ typedef union
 		bit CMS : 2;
 		bit ARPE : 1;
 		bit CKD : 2;
-		bit RESERVED1 : 6;
-		bit RESERVED2 : 16;
+		bit ____1 : 6;
+		bit ____2 : 16;
 	};
 	uint32_t ALLBITS;
 } TIM_CR1, *TIM_CR1_ptr;
@@ -581,8 +633,8 @@ typedef struct
 	bit CCDS : 1;
 	bit MMS : 3;
 	bit TI1 : 1;
-	bit RESERVED1 : 8;
-	bit RESERVED2 : 16;
+	bit ____1 : 8;
+	bit ____2 : 16;
 } TIM_CR2, *TIM_CR2_ptr;
 typedef struct
 {
@@ -623,15 +675,15 @@ typedef struct
 	bit CC2IF : 1;
 	bit CC3IF : 1;
 	bit CC4IF : 1;
-	bit RESERVED1 : 1;
+	bit ____1 : 1;
 	bit TIF : 1;
-	bit RESERVED2 : 2;
+	bit ____2 : 2;
 	bit CC1OF : 1;
 	bit CC2OF : 1;
 	bit CC3OF : 1;
 	bit CC4OF : 1;
-	bit RESERVED3 : 3;
-	bit RESERVED4 : 16;
+	bit ____3 : 3;
+	bit ____4 : 16;
 } TIM_SR, *TIM_SR_ptr;
 typedef struct
 {
@@ -640,9 +692,9 @@ typedef struct
 	bit CC2G : 1;
 	bit CC3G : 1;
 	bit CC4G : 1;
-	bit RESERVED1 : 1;
+	bit ____1 : 1;
 	bit TG : 1;
-	bit RESERVED : 25;
+	bit ____ : 25;
 } TIM_EGR, *TIM_EGR_ptr;
 typedef struct
 {	// CCMR1 register when in output capture mode
@@ -657,7 +709,7 @@ typedef struct
 	bit OC2PE : 1;
 	bit OC2M : 3;
 	bit OC2CE : 1;
-	bit RESERVED : 16;
+	bit ____ : 16;
 } TIM_CCMR1_OCM, *TIM_CCMR1_OCM_ptr;
 typedef struct
 {
@@ -668,7 +720,7 @@ typedef struct
 	bit CC2S : 2;
 	bit IC2PSC : 2;
 	bit IC2F : 4;
-	bit RESERVED : 16;
+	bit ____ : 16;
 } TIM_CCMR1_ICM, *TIM_CCMR1_ICM_ptr;
 typedef struct
 {
@@ -683,7 +735,7 @@ typedef struct
 	bit OC4PE : 1;
 	bit OC4M : 3;
 	bit OC4CE : 1;
-	bit RESERVED : 16;
+	bit ____ : 16;
 	
 } TIM_CCMR2_OCM, *TIM_CCMR2_OCM_ptr;
 typedef struct
@@ -695,40 +747,40 @@ typedef struct
 	bit CC4S : 2;
 	bit IC4PSC : 2;
 	bit IC4F : 4;
-	bit RESERVED : 16;
+	bit ____ : 16;
 	
 } TIM_CCMR2_ICM, *TIM_CCMR2_ICM_ptr;
 typedef struct
 {
 	bit CC1E : 1;
 	bit CC1P : 1;
-	bit RESERVED1 : 1;
+	bit ____1 : 1;
 	bit CC1NP : 1;
 	bit CC2E : 1;
 	bit CC2P : 1;
-	bit RESERVED2 : 1;
+	bit ____2 : 1;
 	bit CC2NP : 1;
 	bit CC3E : 1;
 	bit CC3P : 1;
-    bit RESERVED3:1;
+    bit ____3:1;
 	bit CC3NP : 1;
 	bit CC4E : 1;
 	bit CC4P : 1;
-	bit RESERVED4 : 1;
+	bit ____4 : 1;
 	bit CC4NP : 1;
-	bit RESERVED5 : 16;
+	bit ____5 : 16;
 	
 } TIM_CCER, *TIM_CCER_ptr;
 typedef struct
 {
 	bit CNT : 16;
-	bit RESERVED : 16;
+	bit ____ : 16;
 	
 } TIM_CNT, *TIM_CNT_ptr;
 typedef struct
 {
 	bit PSC : 16;
-	bit RESERVED : 16;
+	bit ____ : 16;
 } TIM_PSC, *TIM_PSC_ptr;
 typedef struct
 {
@@ -777,14 +829,14 @@ typedef struct
 typedef struct
 {
 	bit IDR : 8;
-	bit RESERVED1 : 8;
-	bit RESERVED2 : 16;
+	bit ____1 : 8;
+	bit ____2 : 16;
 } CRC_IDR, *CRC_IDR_ptr;
 typedef struct
 {
 	bit RESET : 1;
-	bit RESERVED1 : 15;
-	bit RESERVED2 : 16;
+	bit ____1 : 15;
+	bit ____2 : 16;
 } CRC_CR, *CRC_CR_ptr;
 
 // FLASH Registers
@@ -792,14 +844,14 @@ typedef struct
 typedef struct
 {
 	bit LATENCY : 3;
-	bit RESERVED1 : 5;
+	bit ____1 : 5;
 	bit PRFTEN : 1;
 	bit ICEN : 1;
 	bit DCEN : 1;
 	bit ICRST : 1;
 	bit DCRST : 1;
-	bit RESERVED2 : 3;
-	bit RESERVED3 : 16;
+	bit ____2 : 3;
+	bit ____3 : 16;
 } FLASH_ACR, * FLASH_ACR_ptr;
 
 typedef struct
@@ -839,14 +891,16 @@ typedef struct
 {
 	volatile SCB_CPUID_Reg CPUID;
 	volatile SCB_ICSR_Reg ICSR;
+	volatile SCB_VTOR_Reg VTOR;
+	volatile SCB_AIRCR_Reg AIRCR;
 } SCB_Regset, *SCB_Regset_ptr;
 
 typedef struct
 {
-	volatile SYST_CTRL_Reg SYST_CTRL;
-	volatile SYST_RVR_Reg SYST_RVR;
-	volatile SYST_CVR_Reg SYST_CVR;
-	volatile SYST_CALIB_Reg SYST_CALIB;
+	volatile SYST_CTRL_Reg CTRL;
+	volatile SYST_RVR_Reg LOAD;
+	volatile SYST_CVR_Reg VAL;
+	volatile SYST_CALIB_Reg CALIB;
 } SYST_Regset, *SYST_Regset_ptr;
 typedef struct
 {
@@ -863,27 +917,27 @@ typedef struct
 	uint32_t AHB1RSTR; /*!< RCC AHB1 peripheral reset register,                          Address offset: 0x10 */
 	uint32_t AHB2RSTR; /*!< RCC AHB2 peripheral reset register,                          Address offset: 0x14 */
 	uint32_t AHB3RSTR; /*!< RCC AHB3 peripheral reset register,                          Address offset: 0x18 */
-	uint32_t      RESERVED0; /*!< Reserved, 0x1C                                                                    */
+	uint32_t      ____0; /*!< Reserved, 0x1C                                                                    */
 	uint32_t APB1RSTR; /*!< RCC APB1 peripheral reset register,                          Address offset: 0x20 */
 	uint32_t APB2RSTR; /*!< RCC APB2 peripheral reset register,                          Address offset: 0x24 */
-	uint32_t      RESERVED1[2]; /*!< Reserved, 0x28-0x2C                                                               */
+	uint32_t      ____1[2]; /*!< Reserved, 0x28-0x2C                                                               */
 	volatile RCC_AHB1ENR_Reg AHB1ENR; /*!< RCC AHB1 peripheral clock register,                          Address offset: 0x30 */
 	volatile RCC_AHB2ENR_Reg AHB2ENR; /*!< RCC AHB2 peripheral clock register,                          Address offset: 0x34 */
 	volatile RCC_AHB3ENR_Reg AHB3ENR; /*!< RCC AHB3 peripheral clock register,                          Address offset: 0x38 */
-	uint32_t      RESERVED2; /*!< Reserved, 0x3C                                                                    */
+	uint32_t      ____2; /*!< Reserved, 0x3C                                                                    */
 	volatile RCC_APB1ENR_Reg APB1ENR; /*!< RCC APB1 peripheral clock enable register,                   Address offset: 0x40 */
 	uint32_t APB2ENR; /*!< RCC APB2 peripheral clock enable register,                   Address offset: 0x44 */
-	uint32_t      RESERVED3[2]; /*!< Reserved, 0x48-0x4C                                                               */
+	uint32_t      ____3[2]; /*!< Reserved, 0x48-0x4C                                                               */
 	uint32_t AHB1LPENR; /*!< RCC AHB1 peripheral clock enable in low power mode register, Address offset: 0x50 */
 	uint32_t AHB2LPENR; /*!< RCC AHB2 peripheral clock enable in low power mode register, Address offset: 0x54 */
 	uint32_t AHB3LPENR; /*!< RCC AHB3 peripheral clock enable in low power mode register, Address offset: 0x58 */
-	uint32_t      RESERVED4; /*!< Reserved, 0x5C                                                                    */
+	uint32_t      ____4; /*!< Reserved, 0x5C                                                                    */
 	uint32_t APB1LPENR; /*!< RCC APB1 peripheral clock enable in low power mode register, Address offset: 0x60 */
 	uint32_t APB2LPENR; /*!< RCC APB2 peripheral clock enable in low power mode register, Address offset: 0x64 */
-	uint32_t      RESERVED5[2]; /*!< Reserved, 0x68-0x6C                                                               */
+	uint32_t      ____5[2]; /*!< Reserved, 0x68-0x6C                                                               */
 	uint32_t BDCR; /*!< RCC Backup domain control register,                          Address offset: 0x70 */
 	uint32_t CSR; /*!< RCC clock control & status register,                         Address offset: 0x74 */
-	uint32_t      RESERVED6[2]; /*!< Reserved, 0x78-0x7C                                                               */
+	uint32_t      ____6[2]; /*!< Reserved, 0x78-0x7C                                                               */
 	uint32_t SSCGR; /*!< RCC spread spectrum clock generation register,               Address offset: 0x80 */
 	uint32_t PLLI2SCFGR; /*!< RCC PLLI2S configuration register,                           Address offset: 0x84 */
 } RCC_Regset, *RCC_Regset_ptr;

@@ -75,7 +75,7 @@ static APB1_Bus_ptr apb1_ptr;
 static SYST_Regset_ptr syst_ptr;
 static SCB_Regset_ptr scb_ptr;
 
-const int count = 0;
+static int count = 0;
 
 void InitStaticPointers()
 {
@@ -87,7 +87,7 @@ void InitStaticPointers()
 
 void SysTick_Handler(void)
 {
-	;//count++;
+	count++;
 }
 
 
@@ -96,14 +96,14 @@ void SysTick_Handler(void)
 void Page_374(void);
 void BitfieldExampleA(void);
 void SetupSystemClock(void);
+void SetupSysTick();
 
 int main(void)
 {
 	InitStaticPointers();
 	
-	syst_ptr->SYST_RVR.ALLBITS = 9;
-	syst_ptr->SYST_CVR.ALLBITS = 0;
-	syst_ptr->SYST_CTRL.ALLBITS = 5;
+	SetupSysTick();
+	
 	
 	BitfieldExampleA();
 }
@@ -151,6 +151,10 @@ void BitfieldExampleA()
 {
 
 	//SetupSystemClock();
+	
+	ahb1_ptr->RCC.AHB1ENR.GPIOA_EN = 1;
+	ahb1_ptr->RCC.AHB1ENR.GPIOD_EN = 1;
+
 	
 	ahb1_ptr->GPIO_D.MODER.MODER_12 = MODER(GENERAL);
 	ahb1_ptr->GPIO_D.OTYPER.OT_12 = 0;
@@ -202,8 +206,6 @@ void SetupSystemClock()
 {
 	uint32_t spinner = 0;
 	
-	ahb1_ptr->RCC.AHB1ENR.GPIOA_EN = 1;
-	ahb1_ptr->RCC.AHB1ENR.GPIOD_EN = 1;
 	
 	// RCC->CFGR &= ~0x07E00000;
 	// RCC->CFGR |=  0x07600000;
@@ -261,5 +263,25 @@ void SetupSystemClock()
 	ahb1_ptr->RCC.CFGR.SW = SW(PLL);
 	
 	COUNT_UNTIL(ahb1_ptr->RCC.CFGR.SWS == SWS(PLL), &spinner);
+
+}
+
+void SetupSysTick()
+{
+	// HAL
+	// Set Interrupt Group Priority 
+	// HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+	
+	SCB_AIRCR_Reg aircr;
+	
+	aircr = scb_ptr->AIRCR;
+	aircr.VECTKEY = SCB_AIRCR_VECTKEY;
+	aircr.PRIGROUP = 3;
+	scb_ptr->AIRCR = aircr;
+	
+	syst_ptr->LOAD.ALLBITS = 9;
+	syst_ptr->VAL.ALLBITS = 0;
+	syst_ptr->CTRL.ALLBITS = 5;
+
 
 }
