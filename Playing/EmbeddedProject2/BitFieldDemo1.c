@@ -104,7 +104,6 @@ int main(void)
 	
 	SetupSysTick();
 	
-	
 	BitfieldExampleA();
 }
 
@@ -268,20 +267,25 @@ void SetupSystemClock()
 
 void SetupSysTick()
 {
-	// HAL
-	// Set Interrupt Group Priority 
-	// HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
-	
+
 	SCB_AIRCR_Reg aircr;
+	SYST_CTRL_Reg ctrl;
+	// Must be written a single 32 bit write.
 	
 	aircr = scb_ptr->AIRCR;
 	aircr.VECTKEY = SCB_AIRCR_VECTKEY;
 	aircr.PRIGROUP = 3;
 	scb_ptr->AIRCR = aircr;
 	
-	syst_ptr->LOAD.ALLBITS = 9;
+	syst_ptr->LOAD.ALLBITS = 16000;
+	
+	scb_ptr->SHPR.PRI_15 = 15; // NVIC_SetPriority
+	
 	syst_ptr->VAL.ALLBITS = 0;
-	syst_ptr->CTRL.ALLBITS = 5;
-
-
+	
+	ctrl = syst_ptr->CTRL;
+	ctrl.TICKINT = 1;
+	ctrl.CLKSOURCE = 1;
+	ctrl.ENABLE = 1;
+	syst_ptr->CTRL = ctrl;
 }
