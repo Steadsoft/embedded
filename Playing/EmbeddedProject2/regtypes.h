@@ -46,7 +46,7 @@ typedef union
 		bit PENDSTSET : 1;
 		bit PENDSVCCLR : 1;
 		bit PENDSVCSET : 1;
-		bit ____4 :2;
+		bit ____4 : 2;
 		bit NMIPENDSET : 1;
 	};
 	uint32_t ALLBITS;
@@ -83,7 +83,7 @@ typedef union
 	{
 		bit pri_4 : 4;
 		bit PRI_4 : 4;
-		bit pri_5:	4;
+		bit pri_5 :	4;
 		bit PRI_5 : 4;
 		bit pri_6 : 4;
 		bit PRI_6 : 4;
@@ -93,7 +93,7 @@ typedef union
 		bit PRI_11 : 4;
 		bit ____3 : 16;
 		bit pri_14 : 4;
-		bit PRI_14 :4;
+		bit PRI_14 : 4;
 		bit pri_15 : 4;
 		bit PRI_15 : 4;
 	};
@@ -117,6 +117,7 @@ typedef union
 } SCB_CCR_Reg, *SCB_CCR_Reg_ptr;
 
 // SysTick Registers
+
 typedef union
 {
 	struct
@@ -270,7 +271,7 @@ typedef union
 		bit HASH_EN : 1;
 		bit RNG_EN : 1;
 		bit OTGFS_EN : 1;
-		bit UNUSED2: 8;
+		bit UNUSED2 : 8;
 		bit UNUSED3 : 16;
 	};
 	uint32_t ALLBITS;
@@ -304,7 +305,7 @@ typedef union
 		bit PLL_ON : 1;
 		bit PLL_RDY : 1;
 		bit PLL_I2S_ON : 1;
-		bit PLL_I2S_RDY: 1;
+		bit PLL_I2S_RDY : 1;
 		bit UNUSED3 : 4;
 	};
 	uint32_t ALLBITS;
@@ -618,7 +619,7 @@ typedef union
 	uint32_t ALLBITS;
 } GPIO_AFRH_Reg, * GPIO_AFRH_Reg_ptr;
 
-// TIM2 - TIM5 Registers
+// TIM2 - TIM5 Registers General Purpose Timers
 
 typedef union
 {
@@ -637,196 +638,307 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } TIM_CR1, *TIM_CR1_ptr;
-typedef struct
+typedef union
 {
-	bit UNUSED1 : 3;
-	bit CCDS : 1;
-	bit MMS : 3;
-	bit TI1 : 1;
-	bit ____1 : 8;
-	bit ____2 : 16;
+	struct 
+	{
+		bit UNUSED1 : 3;
+		bit CCDS : 1;
+		bit MMS : 3;
+		bit TI1 : 1;
+		bit ____1 : 8;
+		bit ____2 : 16;
+	};
+	uint32_t ALLBITS;
 } TIM_CR2, *TIM_CR2_ptr;
-typedef struct
+typedef union
 {
-	bit SMS : 3;
-	bit UNUSED1 : 1;
-	bit TS : 3;
-	bit MSM : 1;
-	bit ETF : 4;
-	bit ETPS : 2;
-	bit ECE : 1;
-	bit ETP : 1;
-	bit UNUSED2 : 16;
-} TIM_SMCR, *TIM_SMCR_ptr;
-typedef struct
-{
-	bit UIE : 1;
-	bit CC1IE : 1;
-	bit CC2IE : 1;
-	bit CC3IE : 1;
-	bit CC4IE : 1;
-	bit UNUSED1 : 1;
-	bit TIE : 1;
-	bit UNUSED2 : 1;
-	bit UDE : 1;
-	bit CC1DE : 1;
-	bit CC2DE : 1;
-	bit CC3DE : 1;
-	bit CC4DE : 1;
-	bit UNUSED3 : 1;
-	bit TDE : 1;
-	bit UNUSED4 : 1;
-	bit UNUSED5 : 16;
-} TIM_DIER, *TIM_DIER_ptr;
-typedef struct
-{
-	bit UIF : 1;
-	bit CC1IF : 1;
-	bit CC2IF : 1;
-	bit CC3IF : 1;
-	bit CC4IF : 1;
-	bit ____1 : 1;
-	bit TIF : 1;
-	bit ____2 : 2;
-	bit CC1OF : 1;
-	bit CC2OF : 1;
-	bit CC3OF : 1;
-	bit CC4OF : 1;
-	bit ____3 : 3;
-	bit ____4 : 16;
-} TIM_SR, *TIM_SR_ptr;
-typedef struct
-{
-	bit UG : 1;
-	bit CC1G :1;
-	bit CC2G : 1;
-	bit CC3G : 1;
-	bit CC4G : 1;
-	bit ____1 : 1;
-	bit TG : 1;
-	bit ____ : 25;
-} TIM_EGR, *TIM_EGR_ptr;
-typedef struct
-{	// CCMR1 register when in output capture mode
+	struct
+	{
+		bit SMS : 3;
+		bit UNUSED1 : 1;
+		bit TS : 3;
+		bit MSM : 1;
+		bit ETF : 4;
+		bit ETPS : 2;
+		bit ECE : 1;
+		bit ETP : 1;
+		bit UNUSED2 : 16;
+	};
+	uint32_t ALLBITS;
 
-	bit CC1S : 2;
-	bit OC1FE : 1;
-	bit OC1PE : 1;
-	bit OC1M : 3;
-	bit OC1CE : 1;
-	bit CC2S : 2;
-	bit OC2FE : 1;
-	bit OC2PE : 1;
-	bit OC2M : 3;
-	bit OC2CE : 1;
-	bit ____ : 16;
-} TIM_CCMR1_OCM, *TIM_CCMR1_OCM_ptr;
-typedef struct
+} TIM_SMCR, *TIM_SMCR_ptr;
+typedef union
+{
+	struct
+	{
+		bit UIE : 1;
+		bit CC1IE : 1;
+		bit CC2IE : 1;
+		bit CC3IE : 1;
+		bit CC4IE : 1;
+		bit UNUSED1 : 1;
+		bit TIE : 1;
+		bit UNUSED2 : 1;
+		bit UDE : 1;
+		bit CC1DE : 1;
+		bit CC2DE : 1;
+		bit CC3DE : 1;
+		bit CC4DE : 1;
+		bit UNUSED3 : 1;
+		bit TDE : 1;
+		bit UNUSED4 : 1;
+		bit UNUSED5 : 16;
+	};
+	uint32_t ALLBITS;
+} TIM_DIER, *TIM_DIER_ptr;
+typedef union
+{
+	struct
+	{
+		
+		bit UIF : 1;
+		bit CC1IF : 1;
+		bit CC2IF : 1;
+		bit CC3IF : 1;
+		bit CC4IF : 1;
+		bit ____1 : 1;
+		bit TIF : 1;
+		bit ____2 : 2;
+		bit CC1OF : 1;
+		bit CC2OF : 1;
+		bit CC3OF : 1;
+		bit CC4OF : 1;
+		bit ____3 : 3;
+		bit ____4 : 16;
+	};
+	uint32_t ALLBITS;
+
+	} TIM_SR, *TIM_SR_ptr;
+typedef union
+{ struct
+	{
+		
+		bit UG : 1;
+		bit CC1G : 1;
+		bit CC2G : 1;
+		bit CC3G : 1;
+		bit CC4G : 1;
+		bit ____1 : 1;
+		bit TG : 1;
+		bit ____ : 25;
+	};
+	uint32_t ALLBITS;
+
+	} TIM_EGR, *TIM_EGR_ptr;
+typedef union
+{
+	// CCMR1 register when in output capture mode
+	struct
+	{
+		
+		bit CC1S : 2;
+		bit OC1FE : 1;
+		bit OC1PE : 1;
+		bit OC1M : 3;
+		bit OC1CE : 1;
+		bit CC2S : 2;
+		bit OC2FE : 1;
+		bit OC2PE : 1;
+		bit OC2M : 3;
+		bit OC2CE : 1;
+		bit ____ : 16;
+	};
+	uint32_t ALLBITS;
+
+	} TIM_CCMR1_OCM, *TIM_CCMR1_OCM_ptr;
+typedef union
 {
 	// CCMR1 register when in input compare mode
-	bit CC1S : 2;
-	bit IC1PSC : 2;
-	bit IC1F : 4;
-	bit CC2S : 2;
-	bit IC2PSC : 2;
-	bit IC2F : 4;
-	bit ____ : 16;
-} TIM_CCMR1_ICM, *TIM_CCMR1_ICM_ptr;
-typedef struct
+	struct
+	{
+		
+		bit CC1S : 2;
+		bit IC1PSC : 2;
+		bit IC1F : 4;
+		bit CC2S : 2;
+		bit IC2PSC : 2;
+		bit IC2F : 4;
+		bit ____ : 16;
+	};
+	uint32_t ALLBITS;
+
+	} TIM_CCMR1_ICM, *TIM_CCMR1_ICM_ptr;
+typedef union
 {
 	// CCMR2 register when in output capture mode
-	bit CC3S : 2;
-	bit OC3FE : 1;
-	bit OC3PE : 1;
-	bit OC3M : 3;
-	bit OC3CE : 1;
-	bit CC4S : 2;
-	bit OC4FE : 1;
-	bit OC4PE : 1;
-	bit OC4M : 3;
-	bit OC4CE : 1;
-	bit ____ : 16;
+	struct
+	{
+		
+		bit CC3S : 2;
+		bit OC3FE : 1;
+		bit OC3PE : 1;
+		bit OC3M : 3;
+		bit OC3CE : 1;
+		bit CC4S : 2;
+		bit OC4FE : 1;
+		bit OC4PE : 1;
+		bit OC4M : 3;
+		bit OC4CE : 1;
+		bit ____ : 16;
+	};
+	uint32_t ALLBITS;
+
 	
-} TIM_CCMR2_OCM, *TIM_CCMR2_OCM_ptr;
-typedef struct
+	} TIM_CCMR2_OCM, *TIM_CCMR2_OCM_ptr;
+typedef union
 {
 	// CCMR2 register when in input compare mode
-	bit CC3S : 2;
-	bit IC3PSC : 2;
-	bit IC3F : 4;
-	bit CC4S : 2;
-	bit IC4PSC : 2;
-	bit IC4F : 4;
-	bit ____ : 16;
-	
+	struct
+	{
+		
+		bit CC3S : 2;
+		bit IC3PSC : 2;
+		bit IC3F : 4;
+		bit CC4S : 2;
+		bit IC4PSC : 2;
+		bit IC4F : 4;
+		bit ____ : 16;
+	};
+	uint32_t ALLBITS;
+
 } TIM_CCMR2_ICM, *TIM_CCMR2_ICM_ptr;
-typedef struct
+typedef union
 {
-	bit CC1E : 1;
-	bit CC1P : 1;
-	bit ____1 : 1;
-	bit CC1NP : 1;
-	bit CC2E : 1;
-	bit CC2P : 1;
-	bit ____2 : 1;
-	bit CC2NP : 1;
-	bit CC3E : 1;
-	bit CC3P : 1;
-    bit ____3:1;
-	bit CC3NP : 1;
-	bit CC4E : 1;
-	bit CC4P : 1;
-	bit ____4 : 1;
-	bit CC4NP : 1;
-	bit ____5 : 16;
-	
+	struct
+	{
+		
+		bit CC1E : 1;
+		bit CC1P : 1;
+		bit ____1 : 1;
+		bit CC1NP : 1;
+		bit CC2E : 1;
+		bit CC2P : 1;
+		bit ____2 : 1;
+		bit CC2NP : 1;
+		bit CC3E : 1;
+		bit CC3P : 1;
+		bit ____3 : 1;
+		bit CC3NP : 1;
+		bit CC4E : 1;
+		bit CC4P : 1;
+		bit ____4 : 1;
+		bit CC4NP : 1;
+		bit ____5 : 16;
+	};
+	uint32_t ALLBITS;
+
 } TIM_CCER, *TIM_CCER_ptr;
-typedef struct
+typedef union
 {
-	bit CNT : 16;
-	bit ____ : 16;
-	
+	struct
+	{
+		
+		bit CNT : 16;
+		bit ____ : 16;
+	};
+	uint32_t ALLBITS;
+
 } TIM_CNT, *TIM_CNT_ptr;
-typedef struct
+typedef union
 {
-	bit PSC : 16;
-	bit ____ : 16;
-} TIM_PSC, *TIM_PSC_ptr;
-typedef struct
+	struct
+	{
+		
+		bit PSC : 16;
+		bit ____ : 16;
+	};
+	uint32_t ALLBITS;
+
+	} TIM_PSC, *TIM_PSC_ptr;
+typedef union
 {
-	
-} TIM_ARR, *TIM_ARR_ptr;
-typedef struct
+	struct
+	{
+		bit ARRL : 16; // Only used by TIM2 and TIM5
+		bit ARRH : 16;
+	};
+	uint32_t ALLBITS;
+	} TIM_ARR, *TIM_ARR_ptr;
+typedef union
 {
-	
-} TIM_CCR1, *TIM_CCR1_ptr;
-typedef struct
+	struct
+	{
+		bit CCR1H : 16; // Only used by TIM2 and TIM5
+		bit CCR1L : 16;
+	};
+	uint32_t ALLBITS;
+	} TIM_CCR1, *TIM_CCR1_ptr;
+typedef union
 {
-	
+	struct
+	{
+		bit CCR2H : 16; // Only used by TIM2 and TIM5
+		bit CCR2L : 16;
+	};
+	uint32_t ALLBITS;
 } TIM_CCR2, *TIM_CCR2_ptr;
-typedef struct
+typedef union
 {
-	
+	struct
+	{
+		bit CCR3H : 16; // Only used by TIM2 and TIM5
+		bit CCR3L : 16;
+	};
+	uint32_t ALLBITS;
 } TIM_CCR3, *TIM_CCR3_ptr;
-typedef struct
+typedef union
 {
-	
+	struct
+	{
+		bit CCR4H : 16; // Only used by TIM2 and TIM5
+		bit CCR4L : 16;
+	};
+	uint32_t ALLBITS;
 } TIM_CCR4, *TIM_CCR4_ptr;
-typedef struct
+typedef union
 {
-	
+	struct
+	{
+		bit DBA : 5;
+		bit ____1 : 3;
+		bit DBL : 5;
+		bit ____2 : 3;
+	};
+	uint16_t ALLBITS;
 } TIM_DCR, *TIM_DCR_ptr;
-typedef struct
+typedef union
 {
-	
+	struct
+	{
+		bit DMAB : 16;
+	};
+	uint16_t ALLBITS;
 } TIM_DMAR, *TIM_DMAR_ptr;
-typedef struct
+typedef union
 {
-	
+	struct
+	{
+		bit ____1 : 10;
+		bit ITR1_RMP : 2;
+		bit ____2 : 4;
+	};
+	uint16_t ALLBITS;
 } TIM2_OR, *TIM2_OR_ptr;
-typedef struct
+typedef union
 {
-	
+	struct
+	{
+		bit ____1 : 6;
+		bit TI4_RMP : 2;
+		bit ____2 : 8;
+	};
+	uint16_t ALLBITS;
 } TIM5_OR, *TIM5_OR_ptr;
 
 // CRC Registers
@@ -1001,13 +1113,13 @@ typedef struct
 typedef struct
 {
 	TIM_BASIC_Regset TIM2;
-	PADTO(1024, TIM_BASIC_Regset,a);
+	PADTO(1024, TIM_BASIC_Regset, a);
 	TIM_BASIC_Regset TIM3;
-	PADTO(1024, TIM_BASIC_Regset,b);
+	PADTO(1024, TIM_BASIC_Regset, b);
 	TIM_BASIC_Regset TIM4;
-	PADTO(1024, TIM_BASIC_Regset,c);
+	PADTO(1024, TIM_BASIC_Regset, c);
 	TIM_BASIC_Regset TIM5;
-	PADTO(1024, TIM_BASIC_Regset,d);
+	PADTO(1024, TIM_BASIC_Regset, d);
 
 } APB1_Bus, *APB1_Bus_ptr;
 typedef struct
@@ -1016,31 +1128,31 @@ typedef struct
 	// each one's start address to be at a particular offset 
 	// from the preceding peripherals start address.
 	GPIO_Regset GPIO_A;
-	PADTO(1024, GPIO_Regset,a);
+	PADTO(1024, GPIO_Regset, a);
 	GPIO_Regset GPIO_B;
-	PADTO(1024, GPIO_Regset,b);
+	PADTO(1024, GPIO_Regset, b);
 	GPIO_Regset GPIO_C;
-	PADTO(1024, GPIO_Regset,c);
+	PADTO(1024, GPIO_Regset, c);
 	GPIO_Regset GPIO_D;
-	PADTO(1024, GPIO_Regset,d);
+	PADTO(1024, GPIO_Regset, d);
 	GPIO_Regset GPIO_E;
-	PADTO(1024, GPIO_Regset,e);
+	PADTO(1024, GPIO_Regset, e);
 	GPIO_Regset GPIO_F;
-	PADTO(1024, GPIO_Regset,f);
+	PADTO(1024, GPIO_Regset, f);
 	GPIO_Regset GPIO_G;
-	PADTO(1024, GPIO_Regset,g);
+	PADTO(1024, GPIO_Regset, g);
 	GPIO_Regset GPIO_H;
-	PADTO(1024, GPIO_Regset,h);
+	PADTO(1024, GPIO_Regset, h);
 	GPIO_Regset GPIO_I;
-	PADTO(1024, GPIO_Regset,i);
+	PADTO(1024, GPIO_Regset, i);
 	GPIO_Regset GPIO_J;
-	PADTO(1024, GPIO_Regset,j);
+	PADTO(1024, GPIO_Regset, j);
 	GPIO_Regset GPIO_K;
-	PADTO(2048, GPIO_Regset,k);
+	PADTO(2048, GPIO_Regset, k);
 	CRC_Regset CRC; 
-	PADTO(2048, CRC_Regset,l);
+	PADTO(2048, CRC_Regset, l);
 	RCC_Regset RCC;
-	PADTO(1024, RCC_Regset,m);
+	PADTO(1024, RCC_Regset, m);
 	FLASH_Regset FLASH;
 
 } AHB1_Bus, *AHB1_Bus_ptr;
