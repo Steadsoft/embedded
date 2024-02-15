@@ -7,6 +7,13 @@
 
 #include <regtypes.h>
 
+//int lock = 0;
+//int unlocked = 0;
+//int locked = 1;
+//	
+//char flag = __atomic_compare_exchange(&lock, &unlocked, &locked, 0, 0, 0);
+
+
 // Simply runs a loop while or until some condition is true
 #define SPIN_WHILE(X) while((X))
 #define SPIN_UNTIL(X) while(!(X))
@@ -16,6 +23,8 @@
 // a counter which is useful when debugging to see the number of actual iterations.
 #define COUNT_WHILE(X,Y) (*Y)=0;while((X))(*Y)++;
 #define COUNT_UNTIL(X,Y) (*Y)=0;while(!(X))(*Y)++;
+
+#define WAIT_FOR(T) {while (T.SR.UIF == 0); T.SR.UIF = 0;}
 
 
 #define SPEEDR_LOW 0
@@ -149,11 +158,12 @@ void Page_374(void)
 void BitfieldExampleA()
 {
 
-	//SetupSystemClock();
+	SetupSystemClock();
 	
 	ahb1_ptr->RCC.AHB1ENR.GPIOA_EN = 1;
 	ahb1_ptr->RCC.AHB1ENR.GPIOD_EN = 1;
 
+	// Setup the GPIO pins
 	
 	ahb1_ptr->GPIO_D.MODER.MODER_12 = MODER(GENERAL);
 	ahb1_ptr->GPIO_D.OTYPER.OT_12 = 0;
@@ -170,32 +180,39 @@ void BitfieldExampleA()
 	ahb1_ptr->GPIO_D.MODER.MODER_15 = MODER(GENERAL);
 	ahb1_ptr->GPIO_D.OTYPER.OT_15 = 0;
 	ahb1_ptr->GPIO_D.SPEEDR.SPEED_15 = SPEEDR(LOW);
-
 	
-	int lock = 0;
-	int unlocked = 0;
-	int locked = 1;
+	// Setup TIMER2 approx 1 Hz
 	
-	char flag = __atomic_compare_exchange(&lock,&unlocked,&locked,0,0,0);
+	ahb1_ptr->RCC.APB1ENR.TIM2_EN = 1;
+	apb1_ptr->TIM2.PSC.PSC = 1600 - 1;
+	apb1_ptr->TIM2.ARR.ARRH = 0;
+	apb1_ptr->TIM2.ARR.ARRL = 10000 - 1;
+	apb1_ptr->TIM2.CNT.CNT = 0;
+	apb1_ptr->TIM2.CR1.CEN = 1;
+	
+	// Loop forever and toggle the four LEDs
 	
 	while (1)
 	{
-		ahb1_ptr->GPIO_D.BSRR.BS_12 = 1; // The "act" of writing (rather than the value being written) sets the bit 
-		DAWDLE(1000000);
-		ahb1_ptr->GPIO_D.BSRR.BS_13 = 1; // The "act" of writing (rather than the value being written) sets the bit 
-		DAWDLE(1000000);
-		ahb1_ptr->GPIO_D.BSRR.BS_14 = 1; // The "act" of writing (rather than the value being written) sets the bit 
-		DAWDLE(1000000);
-		ahb1_ptr->GPIO_D.BSRR.BS_15 = 1; // The "act" of writing (rather than the value being written) sets the bit 
-		DAWDLE(1000000);
-		ahb1_ptr->GPIO_D.BSRR.BR_15 = 1; // The "act" of writing (rather than the value being written) resets the bit 
-		DAWDLE(1000000);
-		ahb1_ptr->GPIO_D.BSRR.BR_14 = 1; // The "act" of writing (rather than the value being written) resets the bit 
-		DAWDLE(1000000);
-		ahb1_ptr->GPIO_D.BSRR.BR_13 = 1; // The "act" of writing (rather than the value being written) resets the bit 
-		DAWDLE(1000000);
-		ahb1_ptr->GPIO_D.BSRR.BR_12 = 1; // The "act" of writing (rather than the value being written) resets the bit 
-		DAWDLE(1000000);
+		// The "act" of writing (rather than the value being written) 
+		// sets/resets the bit when using the BSSR register.
+		
+		ahb1_ptr->GPIO_D.BSRR.BS_12 = 1; 
+		WAIT_FOR(apb1_ptr->TIM2);
+		ahb1_ptr->GPIO_D.BSRR.BS_13 = 1; 
+		WAIT_FOR(apb1_ptr->TIM2);
+		ahb1_ptr->GPIO_D.BSRR.BS_14 = 1; 
+		WAIT_FOR(apb1_ptr->TIM2);
+		ahb1_ptr->GPIO_D.BSRR.BS_15 = 1; 
+		WAIT_FOR(apb1_ptr->TIM2);
+		ahb1_ptr->GPIO_D.BSRR.BR_15 = 1; 
+		WAIT_FOR(apb1_ptr->TIM2);
+		ahb1_ptr->GPIO_D.BSRR.BR_14 = 1; 
+		WAIT_FOR(apb1_ptr->TIM2);
+		ahb1_ptr->GPIO_D.BSRR.BR_13 = 1; 
+		WAIT_FOR(apb1_ptr->TIM2);
+		ahb1_ptr->GPIO_D.BSRR.BR_12 = 1; 
+		WAIT_FOR(apb1_ptr->TIM2);
 	}
 }
 
