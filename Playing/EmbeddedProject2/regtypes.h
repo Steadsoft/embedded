@@ -2,13 +2,13 @@
 
 #pragma once
 // Undefine stuff defined by STM32 HAL/LL support headers.
-#undef TIM2
-#undef TIM3
-#undef TIM4
-#undef TIM5
-#undef RCC
-#undef CRC
-#undef FLASH
+//#undef TIM2
+//#undef TIM3
+//#undef TIM4
+//#undef TIM5
+//#undef RCC
+//#undef CRC
+//#undef FLASH
 
 #define bit  uint32_t
 
@@ -31,7 +31,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } SCB_CPUID_Reg, *SCB_CPUID_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -52,7 +51,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } SCB_ICSR_Reg, *SCB_ICSR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -63,7 +61,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } SCB_VTOR_Reg, *SCB_VTOR_Reg_ptr;
-
 typedef union
 {
 	// This register must be written to as a single 32 bit write.
@@ -80,7 +77,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } SCB_AIRCR_Reg, *SCB_AIRCR_Reg_ptr;
-
 typedef union 
 {
 	struct
@@ -103,7 +99,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } SCB_SHPR_Reg, *SCB_SHPR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -112,7 +107,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } SCB_SCR_Reg, *SCB_SCR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -121,7 +115,6 @@ typedef union
 	};
 	uint32_t ALLBITS;
 } SCB_CCR_Reg, *SCB_CCR_Reg_ptr;
-
 
 // SysTick Registers
 typedef union
@@ -138,7 +131,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } SYST_CTRL_Reg, *SYST_CTRL_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -149,7 +141,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } SYST_RVR_Reg, *SYST_RVR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -160,7 +151,6 @@ typedef union
 	uint32_t ALLBITS;
 
 } SYST_CVR_Reg, *SYST_CVR_Reg_ptr;
-
 typedef union
 {
 	struct
@@ -873,33 +863,26 @@ typedef struct
 	bit ____2 : 3;
 	bit ____3 : 16;
 } FLASH_ACR, * FLASH_ACR_ptr;
-
 typedef struct
 {
 	
 } FLASH_KEYR, * FLASH_KEYR_ptr;
-
 typedef struct
 {
 	
 } FLASH_OPTKEYR, * FLASH_OPTKEYR_ptr;
-
-
 typedef struct
 {
 	
 } FLASH_SR, * FLASH_SR_ptr;
-
 typedef struct
 {
 	
 } FLASH_CR, * FLASH_CR_ptr;
-
 typedef struct
 {
 	
 } FLASH_OPTCR, * FLASH_OPTCR_ptr;
-
 typedef struct
 {
 	
@@ -917,7 +900,6 @@ typedef struct
 	volatile SCB_CCR_Reg CCR;
 	volatile SCB_SHPR_Reg SHPR;
 } SCB_Regset, *SCB_Regset_ptr;
-
 typedef struct
 {
 	volatile SYST_CTRL_Reg CTRL;
@@ -1062,17 +1044,14 @@ typedef struct
 	FLASH_Regset FLASH;
 
 } AHB1_Bus, *AHB1_Bus_ptr;
-
 typedef struct 
 {
 	
 } APB2_Bus, *APB2_Bus_ptr;
-
 typedef struct 
 {
 	
 } AHB2_Bus, *AHB2_Bus_ptr;
-
 
 typedef struct
 {
