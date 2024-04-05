@@ -34,6 +34,7 @@
     <ToolchainID>com.visualgdb.arm-eabi</ToolchainID>
     <ToolchainVersion>12.3.1/13.2/r1</ToolchainVersion>
     <MCUPropertyListFile>$(ProjectDir)stm32.props</MCUPropertyListFile>
+    <TargetExt>.ELF</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
     <ToolchainID>com.visualgdb.arm-eabi</ToolchainID>

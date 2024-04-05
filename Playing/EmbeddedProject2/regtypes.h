@@ -10,7 +10,9 @@
 //#undef CRC
 //#undef FLASH
 
+#ifndef bit
 #define bit  uint32_t
+#endif
 
 #define PADTO(BYTES,TYPE,ID) const char DEADSPACE_ ## ID [BYTES-sizeof(TYPE)]
 #define PADBY(NAME,BYTES) const char NAME[BYTES]
