@@ -52,9 +52,11 @@
     <ClCompile Include="BitFieldDemo1.c" />
     <ClCompile Include="startup.c" />
     <ClCompile Include="system.c" />
+    <ClInclude Include="regdefs.h" />
+    <ClInclude Include="statics.h" />
+    <ClInclude Include="sysdefs.h" />
     <None Include="stm32.props" />
     <ClInclude Include="regtypes.h" />
-    <ClInclude Include="stm32f4xx_hal_conf.h" />
     <None Include="EmbeddedProject2-Debug.vgdbsettings" />
     <None Include="EmbeddedProject2-Release.vgdbsettings" />
     <None Include="stm32.xml" />

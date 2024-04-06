@@ -27,9 +27,6 @@
     <None Include="stm32.props">
       <Filter>Source files\Device-specific files</Filter>
     </None>
-    <ClInclude Include="stm32f4xx_hal_conf.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
     <None Include="EmbeddedProject2-Debug.vgdbsettings">
       <Filter>VisualGDB settings</Filter>
     </None>
@@ -48,6 +45,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="regtypes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="statics.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="regdefs.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="sysdefs.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>
