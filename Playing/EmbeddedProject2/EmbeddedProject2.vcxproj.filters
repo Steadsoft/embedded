@@ -56,5 +56,23 @@
     <ClInclude Include="sysdefs.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="startup.macros.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="startup.typedefs.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="startup.types.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="startup.externs.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="startup.library.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="startup.docs.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

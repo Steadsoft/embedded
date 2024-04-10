@@ -53,6 +53,12 @@
     <ClCompile Include="startup.c" />
     <ClCompile Include="system.c" />
     <ClInclude Include="regdefs.h" />
+    <ClInclude Include="startup.docs.h" />
+    <ClInclude Include="startup.externs.h" />
+    <ClInclude Include="startup.library.h" />
+    <ClInclude Include="startup.macros.h" />
+    <ClInclude Include="startup.typedefs.h" />
+    <ClInclude Include="startup.types.h" />
     <ClInclude Include="statics.h" />
     <ClInclude Include="sysdefs.h" />
     <None Include="stm32.props" />

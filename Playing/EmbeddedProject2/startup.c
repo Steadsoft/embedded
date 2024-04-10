@@ -5,10 +5,26 @@
 */
 
 #include <stddef.h>
-extern void *_estack;
+#include <stdint.h>
+#include <stdlib.h>
+#include <regtypes.h>
+#include <startup.library.h>
 
+#define startup_implementer
 void Reset_Handler();
 void Default_Handler();
+
+Bus_type bus =
+{ 
+	.ahb1_ptr = (AHB1_Bus_ptr)(0x40020000),	
+	.apb1_ptr = (APB1_Bus_ptr)(0x40000000),
+	.syst_ptr = (SYST_Regset_ptr)(0xE000E010),
+	.scb_ptr = (SCB_Regset_ptr)(0xE000ED00)
+};
+
+
+extern void *_estack;
+
 
 #ifndef DEBUG_DEFAULT_INTERRUPT_HANDLERS
 
@@ -835,7 +851,7 @@ void HASH_RNG_IRQHandler()            __attribute__((weak, alias("Default_Handle
 void FPU_IRQHandler()                 __attribute__((weak, alias("Default_Handler")));
 #endif
 
-void * g_pfnVectors[0x62] __attribute__((section(".isr_vector"), used)) = 
+void * system_vectors[0x62] __attribute__((section(".isr_vector"), used)) = 
 {
 	&_estack,
 	&Reset_Handler,
@@ -958,6 +974,13 @@ void __attribute__((naked, noreturn)) Reset_Handler()
 
 	for (pDest = &_sbss; pDest < &_ebss; pDest++)
 		*pDest = 0;
+	
+	// Stack pointer decreases when data is pushed onto stack.
+	
+	// Reserve first 1K for system, then 1K each for each 'task'
+	
+	
+	
 
 	SystemInit();
 	__libc_init_array();

@@ -1,10 +1,12 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <regtypes.h>
-#include <statics.h>
+//#include <statics.h>
 #include <regdefs.h>
 #include <sysdefs.h>
+#include <startup.library.h>
 
 //int lock = 0;
 //int unlocked = 0;
@@ -12,8 +14,11 @@
 //	
 //char flag = __atomic_compare_exchange(&lock, &unlocked, &locked, 0, 0, 0);
 
-
-
+#define RAM_START         (0x20000000u)
+#define RAM_SIZE          (112 * 1024) // 112 KB
+#define MAIN_STACK        (RAM_START + RAM_SIZE)
+#define TASK_STACK_SIZE   (1024u)
+#define TASK_NUMBER_MAX   (16)
 
 
 static int count = 0;
@@ -23,20 +28,18 @@ void Page_374(void);
 void BitfieldExampleA(void);
 void SetupSystemClock(void);
 
-int main(void)
-{
-
-	SetupSysTick();
-	
-	BitfieldExampleA();
-}
+//int main(void)
+//{
+//	//SetupSysTick();
+//	BitfieldExampleA();
+//}
 
 
-void SysTick_Handler(void)
-{
-	count++;
-}
-
+//void SysTick_Handler(void)
+//{
+//	count++;
+//}
+//
 
 // STM32F407VG
 
@@ -219,14 +222,260 @@ void SetupSysTick()
 	aircr.VECTKEY = SCB_AIRCR_VECTKEY;
 	aircr.PRIGROUP = 3;
 	bus.scb_ptr->AIRCR = aircr;
-	
-	bus.syst_ptr->LOAD.ALLBITS = 16000;
-	
 	bus.scb_ptr->SHPR.PRI_15 = 15; // NVIC_SetPriority
 	
+	bus.syst_ptr->LOAD.ALLBITS = 16000;
 	bus.syst_ptr->VAL.ALLBITS = 0;
-	
 	bus.syst_ptr->CTRL.TICKINT = 1;
 	bus.syst_ptr->CTRL.CLKSOURCE = 1;
 	bus.syst_ptr->CTRL.ENABLE = 1;
+}
+
+/* Debug Exception and Monitor Control Register base address */
+#define DEMCR                 *((volatile uint32_t*) 0xE000EDFCu)
+/* ITM register addresses */
+#define ITM_STIMULUS_PORT0    *((volatile uint32_t*) 0xE0000000u)
+#define ITM_TRACE_EN          *((volatile uint32_t*) 0xE0000E00u)
+/* System Handler control and state register */
+#define SHCSR                 *((volatile uint32_t*) 0xE000ED24u)
+/* SysTick register address */
+#define SCSR                  *((volatile uint32_t*) 0xE000E010u)
+#define SRVR                  *((volatile uint32_t*) 0xE000E014u)
+
+/* Send a char through ITM */
+void ITM_SendChar(uint8_t ch) {
+	// read FIFO status in bit [0]:
+	while (!(ITM_STIMULUS_PORT0 & 1)) ;
+	// write to ITM stimulus port0
+	ITM_STIMULUS_PORT0 = ch;
+}
+
+/* Override low-level _write system call */
+int _write(int file, char *ptr, int len) {
+	int DataIdx;
+	for (DataIdx = 0; DataIdx < len; DataIdx++) {
+		ITM_SendChar(*ptr++);
+	}
+	return len;
+}
+
+/* RAM */
+//#define RAM_START         (0x20000000u)
+//#define RAM_SIZE          (128 * 1024) // 128 KB
+//
+///* Stacks */
+//#define MAIN_STACK        (RAM_START + RAM_SIZE)
+//#define TASK_NUMBER_MAX   (16)
+//#define TASK_STACK_SIZE   (1024u)
+
+uint32_t __uCurrentTaskIdx = 0;
+uint32_t __puTasksPSP[TASK_NUMBER_MAX] = { 0 };
+
+/* Scheduler */
+uint32_t get_current_psp() {
+	return __puTasksPSP[__uCurrentTaskIdx];
+}
+
+void save_current_psp(uint32_t psp) {
+	__puTasksPSP[__uCurrentTaskIdx] = psp;
+}
+
+void select_next_task() {
+	/* Round-Robin scheduler */
+	__uCurrentTaskIdx++;
+	// check if a task is register at current slot
+	if (__uCurrentTaskIdx >= TASK_NUMBER_MAX || __puTasksPSP[__uCurrentTaskIdx] == 0) {
+		__uCurrentTaskIdx = 0;
+	}
+}
+
+void start_scheduler() {
+	printf("Start Scheduler!\n");
+
+	// start with the first task
+	__uCurrentTaskIdx = 0;
+
+	// prepare PSP of the first task
+	__asm volatile("BL get_current_psp"); // return PSP in R0
+	__asm volatile("MSR PSP, R0"); // set PSP
+
+	// change to use PSP
+	__asm volatile("MRS R0, CONTROL");
+	__asm volatile("ORR R0, R0, #2"); // set bit[1] SPSEL
+	__asm volatile("MSR CONTROL, R0");
+
+	// start SysTick
+	// clear and set the period
+	SRVR &= ~0xFFFFFFFF;
+	SRVR |= 16000 - 1; // 1000 Hz ~ 1 ms
+	// enable SysTick
+	SCSR |= (1 << 1); // enable SysTick Exception request
+	SCSR |= (1 << 2); // select system clock
+	SCSR |= (1 << 0); // start
+
+	// Move to Unprivileged level
+	__asm volatile("MRS R0, CONTROL");
+	__asm volatile("ORR R0, R0, #1"); // Set bit[0] nPRIV
+	__asm volatile("MSR CONTROL, R0");
+	// right after here, access is limited
+
+	// get the handler of the first task by tracing back from PSP which is at R4 slot
+	void(*handler)() = (void(*))((uint32_t*)__puTasksPSP[__uCurrentTaskIdx])[14];
+
+	// execute the handler
+	handler();
+}
+
+void init_task(void(*handler)) {
+	int i = 0;
+
+	// find an empty slot
+	for (; i < TASK_NUMBER_MAX; i++) {
+		if (__puTasksPSP[i] == 0) break;
+	}
+
+	if (i >= TASK_NUMBER_MAX) {
+		printf("Can not register a new task anymore!\n");
+		return;
+	}
+	else {
+		printf("Register a task %p at slot %i\n", handler, i);
+	}
+
+	// calculate new PSP
+	uint32_t* psp = (uint32_t*)(MAIN_STACK - (i + 1)*TASK_STACK_SIZE);
+
+	// fill dummy stack frame
+	*(--psp) = 0x01000000u; // Dummy xPSR, just enable Thumb State bit;
+	*(--psp) = (uint32_t) handler; // PC
+	*(--psp) = 0xFFFFFFFDu; // LR with EXC_RETURN to return to Thread using PSP
+	*(--psp) = 0x12121212u; // Dummy R12
+	*(--psp) = 0x03030303u; // Dummy R3
+	*(--psp) = 0x02020202u; // Dummy R2
+	*(--psp) = 0x01010101u; // Dummy R1
+	*(--psp) = 0x00000000u; // Dummy R0
+	*(--psp) = 0x11111111u; // Dummy R11
+	*(--psp) = 0x10101010u; // Dummy R10
+	*(--psp) = 0x09090909u; // Dummy R9
+	*(--psp) = 0x08080808u; // Dummy R8
+	*(--psp) = 0x07070707u; // Dummy R7
+	*(--psp) = 0x06060606u; // Dummy R6
+	*(--psp) = 0x05050505u; // Dummy R5
+	*(--psp) = 0x04040404u; // Dummy R4
+
+	// save PSP
+	__puTasksPSP[i] = (uint32_t)psp;
+}
+
+/* Context Switching run here */
+//__attribute__((naked)) 
+	void SysTick_Handler() {
+	// save LR back to main, must do this firstly
+	__asm volatile("PUSH {LR}");
+
+	printf("****\n");
+
+	/* Save the context of current task */
+
+	// get current PSP
+	__asm volatile("MRS R0, PSP");
+	// save R4 to R11 to PSP Frame Stack
+	__asm volatile("STMDB R0!, {R4-R11}"); // R0 is updated after decrement
+	// save current value of PSP
+	__asm volatile("BL save_current_psp"); // R0 is first argument
+
+	/* Do scheduling */
+
+	// select next task
+	__asm volatile("BL select_next_task");
+
+	/* Retrieve the context of next task */
+
+	// get its past PSP value
+	__asm volatile("BL get_current_psp"); // return PSP is in R0
+	// retrieve R4-R11 from PSP Fram Stack
+	__asm volatile("LDMIA R0!, {R4-R11}"); // R0 is updated after increment
+	// update PSP
+	__asm volatile("MSR PSP, R0");
+
+	// exit
+	__asm volatile("POP {LR}");
+	__asm volatile("BX LR");
+}
+
+/* Fault Handlers */
+void HardFault_Handler() {
+	printf("Exception: HardFault_Handler\n");
+	while (1) ;
+}
+
+void MemManage_Handler() {
+	printf("Exception: MemManage_Handler\n");
+	while (1) ;
+}
+
+void BusFault_Handler() {
+	printf("Exception: BusFault_Handler\n");
+	while (1) ;
+}
+
+void UsageFault_Handler() {
+	printf("Exception: Usage Fault\n");
+	while (1) ;
+}
+
+/* Tasks */
+void task1_main(void) {
+	while (1) {
+		printf("1111\n");
+	}
+}
+
+void task2_main(void) {
+	while (1) {
+		printf("2222\n");
+	}
+}
+
+void task3_main(void) {
+	while (1) {
+		printf("3333\n");
+	}
+}
+
+void task4_main(void) {
+	while (1) {
+		printf("4444\n");
+	}
+}
+
+int main(void)
+{
+	// Enable TRCENA
+	DEMCR |= (1 << 24);
+	// Enable stimulus port 0
+	ITM_TRACE_EN |= (1 << 0);
+
+	/***************
+	 * Fault traps *
+	 ***************/
+	// Enable Fault Handlers
+	SHCSR |= (1 << 16); // Memory Fault
+	SHCSR |= (1 << 17); // Bus Fault
+	SHCSR |= (1 << 18); // Usage Fault
+
+	/*************
+	 * SCHEDULER *
+	 *************/
+	init_task(task1_main);
+	init_task(task2_main);
+	init_task(task3_main);
+	init_task(task4_main);
+
+	SetupSysTick();
+	
+	start_scheduler();
+
+	// should never go here
+	for (;;) ;
 }

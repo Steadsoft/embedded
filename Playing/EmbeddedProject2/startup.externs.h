@@ -1,0 +1,1 @@
+extern Bus_type bus;
