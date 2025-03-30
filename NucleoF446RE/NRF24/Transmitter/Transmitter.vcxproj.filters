@@ -712,4 +712,7 @@
       <Filter>Source files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <LinkerScript Include="STM32F446RE_flash.lds" />
+  </ItemGroup>
 </Project>

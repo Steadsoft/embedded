@@ -2,12 +2,12 @@
 <EmbeddedProfile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <ToolchainID>com.visualgdb.arm-eabi</ToolchainID>
   <ToolchainVersion>
-    <GCC>10.3.1</GCC>
-    <GDB>10.2.90</GDB>
-    <Revision>1</Revision>
+    <GCC>14.2.1</GCC>
+    <GDB>15.2</GDB>
+    <Revision>2</Revision>
   </ToolchainVersion>
   <BspID>com.sysprogs.arm.stm32</BspID>
-  <BspVersion>2022.08</BspVersion>
+  <BspVersion>2025.01</BspVersion>
   <McuID>STM32F446RE</McuID>
   <MCUDefinitionFile>STM32F4xxxx/DeviceDefinitions/stm32f446xx.xml</MCUDefinitionFile>
   <MCUProperties>
@@ -38,6 +38,7 @@
   <ReferencedFrameworks>
     <string>com.sysprogs.arm.stm32.hal</string>
     <string>com.sysprogs.arm.stm32.ll</string>
+    <string>com.sysprogs.arm.stm32.STM32F4_ll</string>
   </ReferencedFrameworks>
   <FrameworkProperties>
     <Entries>
