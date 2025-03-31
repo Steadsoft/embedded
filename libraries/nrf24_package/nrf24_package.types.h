@@ -299,8 +299,7 @@ struct NrfReg_ALL_REGISTERS_struct
 	NrfReg_RX_ADDR_SHORT RxAddrP3;
 	NrfReg_RX_ADDR_SHORT RxAddrP4;
 	NrfReg_RX_ADDR_SHORT RxAddrP5;
-
-
+	NrfReg_TX_ADDR_LONG  TxAddr;
 	
 };
 struct nrf_set_register_interface
@@ -373,6 +372,8 @@ struct nrf_device_interface
 	void(* FlushRxFifo)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
 	void(* WriteTxPayload)(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 	void(* ReadRxPayload)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+	void(* Initialize)(NrfSpiDevice_ptr);
+	void(* PowerUpTx)(NrfSpiDevice_ptr);
 };
 
 struct nrf_empty

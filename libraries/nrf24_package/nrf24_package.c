@@ -1,8 +1,9 @@
 #define nrf24_package_implementer
 
 #include <stdint.h>
-#include <nrf24_package.macros.h>
+#include <stm32f4xx_hal.h>
 #include <nrf24_package.library.h>
+#include <nrf24_hal_support.library.h>
 
 // Declare all static functions
 
@@ -58,10 +59,14 @@ static void _WriteSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, uint8
 static void _ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
 static void _WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
 static void _SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr);
+static void _PowerUpTx(NrfSpiDevice_ptr device_ptr);
+
 static void _FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 static void _FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 
 static void _ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+static void _Initialize(NrfSpiDevice_ptr device_ptr);
+
 static void _WriteTxPayload(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 
 
@@ -131,7 +136,9 @@ nrf24_package_struct nrf24_package =
 		.PowerOnReset = _SetToPowerOnResetState,
 		.FlushTxFifo = _FlushTxFifo,
 		.FlushRxFifo = _FlushRxFifo,
-		.WriteTxPayload = _WriteTxPayload
+		.WriteTxPayload = _WriteTxPayload,
+		.Initialize = _Initialize,
+		.PowerUpTx = _PowerUpTx, // This is a misnomer, but we will use this to power up the device in RX mode.
 	},
 	.EmptyRegister =
 	{ 
@@ -361,7 +368,8 @@ static void _WriteShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADD
 
 static void _ReadTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_ADDRESS(Value), NrfStatus);
+	uint8_t bytes_read;
+	_ReadMultiBytesRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_ADDRESS(Value), &bytes_read, NrfStatus);
 }
 static void _WriteTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus)
 {
@@ -600,6 +608,127 @@ static void _ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_
 	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP3), 3, NrfStatus);
 	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP4), 4, NrfStatus);
 	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP5), 5, NrfStatus);
+	_ReadTxAddrRegister(device_ptr, &(Value->TxAddr), NrfStatus);
+}
+
+static void _Initialize(NrfSpiDevice_ptr device_ptr)
+{
+	NrfReg_STATUS status = { 0 };
+	NrfReg_RX_PW rx_pw = { 0 };
+	NrfReg_RF_SETUP rf_setup = { 0 };
+	NrfReg_EN_AA en_aa = { 0 };
+	NrfReg_EN_RXADDR en_rxaddr = { 0 };
+	NrfReg_SETUP_RETR setup_retr = { 0 };
+	NrfReg_DYNPD dynpd = { 0 };
+	
+	// Set channel
+	
+	/* Set pipeline to max possible 32 bytes */
+	
+	rx_pw.RX_PW_LEN = 32;
+	
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 0, &status);
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 1, &status);
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 2, &status);
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 3, &status);
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 4, &status);
+	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 5, &status);
+
+	/* Set RF settings (2mbps, output power) */
+	
+	// 0 and 1 here sets speed to 2 Mbps
+	rf_setup.RF_DR_LOW = 0; 
+	rf_setup.RF_DR_HIGH = 1; 
+	
+	// 3 = 0 dBm
+	rf_setup.RF_PWR = 3; 
+	
+	nrf24_package.SetRegister.RF_SETUP(device_ptr, rf_setup, &status);
+	
+	/* Enable auto-acknowledgment for all pipes */
+	
+//	en_aa.ENAA_P0 = 1;
+//	en_aa.ENAA_P1 = 1;
+//	en_aa.ENAA_P2 = 1;
+//	en_aa.ENAA_P3 = 1;
+//	en_aa.ENAA_P4 = 1;
+//	en_aa.ENAA_P5 = 1;
+	
+	nrf24_package.SetRegister.EN_AA(device_ptr, en_aa, &status);
+	
+	/* Enable RX addresses */
+	
+	en_rxaddr.ERX_P0 = 1;
+	en_rxaddr.ERX_P0 = 1;
+	en_rxaddr.ERX_P0 = 1;
+	en_rxaddr.ERX_P0 = 1;
+	en_rxaddr.ERX_P0 = 1;
+	en_rxaddr.ERX_P0 = 1;
+
+	nrf24_package.SetRegister.EN_RXADDR(device_ptr, en_rxaddr, &status);
+	
+	/* Auto retransmit delay: 1000 (4x250) us and Up to 15 retransmit trials */
+	
+	setup_retr.ARC = 15;
+	setup_retr.ARD = 3;
+	
+	nrf24_package.SetRegister.SETUP_RETR(device_ptr, setup_retr, &status);
+	
+	/* Dynamic length configurations: No dynamic length */
+	
+	nrf24_package.SetRegister.DYNPD(device_ptr, dynpd, &status);
+	
+	// Clear FIFOs
+	
+	nrf24_package.DeviceControl.FlushRxFifo(device_ptr, &status);
+	nrf24_package.DeviceControl.FlushTxFifo(device_ptr, &status);
+	
+	// Clear interrupts
+	
+	status.RX_DR = 1;
+	status.TX_DS = 1;
+	status.MAX_RT = 1;
+	
+	// Since the mask would be the same as the status itself, we can just pass 
+	// it in for both args.
+
+	nrf24_package.UpdateRegister.STATUS(device_ptr, status, status);
+	
+	_PowerUpTx(device_ptr);
+
+}
+
+static void _PowerUpTx(NrfSpiDevice_ptr device_ptr)
+{
+	NrfReg_STATUS status;
+	NrfReg_CONFIG config = { 0 };
+	NrfReg_CONFIG config_mask = { 0 };
+	NrfReg_RF_CH rf_ch = { 0 };
+	
+	// Clear interrupts
+	
+	status.RX_DR = 1;
+	status.TX_DS = 1;
+	status.MAX_RT = 1;
+	
+	// Since the mask would be the same as the status itself, we can just pass 
+	// it in for both args.
+	
+	nrf24_package.UpdateRegister.STATUS(device_ptr, status, status);
+	
+	// Set mode to TX
+
+	config_mask.PWR_UP = 1;
+	config_mask.PRIM_RX = 1;
+	
+	config.PWR_UP = 1;
+	config.PRIM_RX = 0;
+	
+	nrf24_package.UpdateRegister.CONFIG(device_ptr, config, config_mask, &status);
+	
+	rf_ch.RF_CH = 4; // 2404 MHz
+	
+	nrf24_package.SetRegister.RF_CH(device_ptr, rf_ch, &status);
 
 }
 
