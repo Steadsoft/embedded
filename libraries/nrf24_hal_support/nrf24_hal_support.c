@@ -7,8 +7,8 @@
 // Declare all static functions
 static void spi_ce_lo(void *);
 static void spi_ce_hi(void *);
-static void spi_cs_lo(void *);
-static void spi_cs_hi(void *);
+static void spi_csn_lo(void *);
+static void spi_csn_hi(void *);
 static void exchange_bytes(void *, uint8_t[], uint8_t[], uint8_t);
 static void read_bytes(void *, uint8_t bytes_in_ptr[], uint8_t count);
 static void write_bytes(void *, uint8_t bytes_out_ptr[], uint8_t count);
@@ -24,8 +24,8 @@ nrf24_hal_support_struct nrf24_hal_support =
 	.init_control_pins = init_control_pins,
 	.spi_ce_lo = spi_ce_lo,
 	.spi_ce_hi = spi_ce_hi,
-	.spi_cs_lo = spi_cs_lo,
-	.spi_cs_hi = spi_cs_hi,
+	.spi_csn_lo = spi_csn_lo,
+	.spi_csn_hi = spi_csn_hi,
 	.exchange_bytes = exchange_bytes,
 	.read_bytes = read_bytes,
 	.write_bytes = write_bytes,
@@ -63,8 +63,8 @@ static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr
 	descriptor_ptr->cs_pin = SPI_CS;
 	
 	device_ptr->io_ptr = descriptor_ptr;
-	device_ptr->SelectDevice = nrf24_hal_support.spi_cs_lo;
-	device_ptr->DeselectDevice = nrf24_hal_support.spi_cs_hi;
+	device_ptr->SelectDevice = nrf24_hal_support.spi_csn_lo;
+	device_ptr->DeselectDevice = nrf24_hal_support.spi_csn_hi;
 	device_ptr->ExchangeBytes = nrf24_hal_support.exchange_bytes;
 	device_ptr->ReadBytes = nrf24_hal_support.read_bytes;
 	device_ptr->WriteBytes = nrf24_hal_support.write_bytes;
@@ -142,11 +142,11 @@ static void spi_ce_hi(void * ptr)
 {
 	HAL_GPIO_WritePin(((NrfIoDescriptor_ptr)ptr)->gpio_ptr, ((NrfIoDescriptor_ptr)ptr)->ce_pin, GPIO_PIN_SET);
 }
-static void spi_cs_lo(void * ptr)
+static void spi_csn_lo(void * ptr)
 {
 	HAL_GPIO_WritePin(((NrfIoDescriptor_ptr)ptr)->gpio_ptr, ((NrfIoDescriptor_ptr)ptr)->cs_pin, GPIO_PIN_RESET);
 }
-static void spi_cs_hi(void * ptr)
+static void spi_csn_hi(void * ptr)
 {
 	HAL_GPIO_WritePin(((NrfIoDescriptor_ptr)ptr)->gpio_ptr, ((NrfIoDescriptor_ptr)ptr)->cs_pin, GPIO_PIN_SET);
 }
