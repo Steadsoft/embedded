@@ -436,16 +436,18 @@ static void _ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 	uint8_t command = NrfCommand.R_REGISTER | Register;
 	
 	device_ptr->SelectDevice(device_ptr->io_ptr);
-	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
+	//device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
+	device_ptr->WriteBytes(device_ptr->io_ptr, &command, 1);
 	device_ptr->ReadBytes(device_ptr->io_ptr, Value, 1);
 	device_ptr->DeselectDevice(device_ptr->io_ptr);
 }
 static void _WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	uint8_t command = NrfCommand.W_REGISTER | Register;
+	uint8_t command[2] = { NrfCommand.W_REGISTER | Register, Value };
+	
 	device_ptr->SelectDevice(device_ptr->io_ptr);
-	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
-	device_ptr->WriteBytes(device_ptr->io_ptr, &Value, 1);
+	//device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
+	device_ptr->WriteBytes(device_ptr->io_ptr, command, 2);
 	device_ptr->DeselectDevice(device_ptr->io_ptr);
 }
 static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus)

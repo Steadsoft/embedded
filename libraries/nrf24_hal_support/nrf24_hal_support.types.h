@@ -12,10 +12,10 @@ struct nrf24_hal_support_interface
 {
 	void (*init_spi)(SPI_HandleTypeDef * spi_ptr);
 	void (*init_control_pins)();
-	void (*spi_ce_lo)(void *);
-	void (*spi_ce_hi)(void *);
-	void (*spi_csn_lo)(void *);
-	void (*spi_csn_hi)(void *);
+	void (*spi_set_ce_lo)(void *);
+	void (*spi_set_ce_hi)(void *);
+	void (*spi_set_csn_lo)(void *);
+	void (*spi_set_csn_hi)(void *);
 	void (*exchange_bytes)(void *, uint8_t[], uint8_t[], uint8_t);
 	void (*read_bytes)(void *, uint8_t bytes_in_ptr[], uint8_t count);
 	void (*write_bytes)(void *, uint8_t bytes_out_ptr[], uint8_t count);

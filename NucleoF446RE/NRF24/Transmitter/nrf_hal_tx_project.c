@@ -90,9 +90,12 @@ int main(void)
 	
 	tx_ds_irq_clear_pending = 0;
 	
+	short Y = 0;
+	
 	for (int X = 0; X < 32; X++)
 	{
-		buffer[X] = 0xAA;
+		buffer[X] = 0xAA + Y;
+		Y++;
 	}
 	
 	HAL_Delay(1000);
@@ -105,6 +108,14 @@ int main(void)
 	nrf24_hal_support.init_control_pins(); /// currently hard coded to use GPIOA
 	nrf24_hal_support.init_device(&spi, &device, &descriptor); //// currently hard coded to use GPIOA
 	
+//	while (1)
+//	{
+//		NrfReg_CONFIG configuration = { 0 };
+//		nrf24_package.SetRegister.CONFIG(&device, configuration, &status);
+//		HAL_Delay(10);
+//
+//	}
+
 
 	/// Snapshot all regsiters
 	
@@ -156,13 +167,15 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 	
 	nrf24_package.DeviceControl.FlushTxFifo(device_ptr, &status);
 	
+	HAL_Delay(10);
+	
 	nrf24_package.DeviceControl.WriteTxPayload(device_ptr, data, len, &status);
 	
-	// We must now pulse CE high for > 10 uS for RF transmision to begin.
+	// We must now pulse CE high for > 10 uS for RF transmision to begin. See Page 23 of chip manual.
 	
-	nrf24_hal_support.spi_ce_hi(device_ptr->io_ptr);
-	spin_20_uS(); 
-	nrf24_hal_support.spi_ce_lo(device_ptr->io_ptr);
+	nrf24_hal_support.spi_set_ce_hi(device_ptr->io_ptr);
+	spin_100_uS(); 
+	nrf24_hal_support.spi_set_ce_lo(device_ptr->io_ptr);
 	sent_messages_count++;
 }
 
@@ -172,7 +185,7 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	NrfReg_CONFIG config = { 0 };
 	NrfReg_CONFIG config_mask = { 0 };
 	
-	nrf24_hal_support.spi_ce_lo(device_ptr->io_ptr);
+	nrf24_hal_support.spi_set_ce_lo(device_ptr->io_ptr);
 	
 	nrf24_package.DeviceControl.FlushRxFifo(device_ptr, &status);
 	
@@ -197,7 +210,7 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	
 	nrf24_package.UpdateRegister.CONFIG(device_ptr, config, config_mask, &status);
 
-	nrf24_hal_support.spi_ce_hi(device_ptr->io_ptr);
+	nrf24_hal_support.spi_set_ce_hi(device_ptr->io_ptr);
 }
 
 
