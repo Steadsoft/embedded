@@ -609,6 +609,17 @@ static void _ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_
 	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP4), 4, NrfStatus);
 	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP5), 5, NrfStatus);
 	_ReadTxAddrRegister(device_ptr, &(Value->TxAddr), NrfStatus);
+	_ReadRxPwRegister(device_ptr, &(Value->RxPwP0), 0, NrfStatus);
+	_ReadRxPwRegister(device_ptr, &(Value->RxPwP1), 0, NrfStatus);
+	_ReadRxPwRegister(device_ptr, &(Value->RxPwP2), 0, NrfStatus);
+	_ReadRxPwRegister(device_ptr, &(Value->RxPwP3), 0, NrfStatus);
+	_ReadRxPwRegister(device_ptr, &(Value->RxPwP4), 0, NrfStatus);
+	_ReadRxPwRegister(device_ptr, &(Value->RxPwP5), 0, NrfStatus);
+	_ReadFifoStatusRegister(device_ptr, &(Value->FifoStatus), NrfStatus);
+	_ReadDynpdRegister(device_ptr, &(Value->Dynpd), NrfStatus);
+	_ReadFeatureRegister(device_ptr, &(Value->Feature), NrfStatus);
+	
+
 }
 
 static void _Initialize(NrfSpiDevice_ptr device_ptr)

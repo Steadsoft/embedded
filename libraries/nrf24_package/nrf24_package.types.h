@@ -300,6 +300,15 @@ struct NrfReg_ALL_REGISTERS_struct
 	NrfReg_RX_ADDR_SHORT RxAddrP4;
 	NrfReg_RX_ADDR_SHORT RxAddrP5;
 	NrfReg_TX_ADDR_LONG  TxAddr;
+	NrfReg_RX_PW RxPwP0;
+	NrfReg_RX_PW RxPwP1;
+	NrfReg_RX_PW RxPwP2;
+	NrfReg_RX_PW RxPwP3;
+	NrfReg_RX_PW RxPwP4;
+	NrfReg_RX_PW RxPwP5;
+	NrfReg_FIFO_STATUS FifoStatus;
+	NrfReg_DYNPD Dynpd;
+	NrfReg_FEATURE Feature;
 	
 };
 struct nrf_set_register_interface
