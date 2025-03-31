@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include <malloc.h>
 #include <stm32f4xx_hal.h>
-#include <nrf24_package.macros.h>
 #include <nrf24_package.library.h>
 #include <nrf24_hal_support.library.h>
 
@@ -87,10 +86,6 @@ int main(void)
 	uint8_t buffer[32] = { 0 };
 	//uint8_t[4] send_polls = 0;
 	
-//	CreateMemoryPool(17, 64, 8, &pool_ptr);
-//	CreateMemoryPool(23, 64, 8, &pool_ptr);
-//	CreateMemoryPool(24, 64, 8, &pool_ptr);
-
 	HAL_Init();
 	
 	tx_ds_irq_clear_pending = 0;
@@ -104,21 +99,22 @@ int main(void)
 	
 	int board = get_board_id();
 	
-	// Perform all IO related initialization
+	/// Perform all IO related initialization
 	
-	nrf24_hal_support.init_spi(&spi);
-	nrf24_hal_support.init_control_pins();
-	nrf24_hal_support.init_device(&spi, &device, &descriptor);
+	nrf24_hal_support.init_spi(&spi); /// currently hard coded to use SPI1
+	nrf24_hal_support.init_control_pins(); /// currently hard coded to use GPIOA
+	nrf24_hal_support.init_device(&spi, &device, &descriptor); //// currently hard coded to use GPIOA
 	
-	// Snapshot all regsiters
+
+	/// Snapshot all regsiters
 	
 	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_before, &status);
 	
-	// Force all register into their hardware reset state.
+	/// Force all register into their hardware reset state.
 	
 	nrf24_package.DeviceControl.PowerOnReset(&device);
 	
-	// Snapshot all regsiters
+	/// Snapshot all regsiters
 	
 	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_after, &status);
 		
