@@ -313,7 +313,7 @@ struct NrfReg_ALL_REGISTERS_struct
 	NrfReg_FEATURE Feature;
 	
 };
-struct nrf_set_register_interface
+struct nrf_write_interface
 {
 	void(* CONFIG)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* EN_AA)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_STATUS_ptr NrfStatus);
@@ -336,7 +336,7 @@ struct nrf_set_register_interface
 //	void(* MultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
 
 };
-struct nrf_get_register_interface
+struct nrf_read_interface
 {
 	void(* CONFIG)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 	void(* EN_AA)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA_ptr Value, NrfReg_STATUS_ptr NrfStatus);
@@ -358,7 +358,7 @@ struct nrf_get_register_interface
 	void(* ALL_REGISTERS)(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 };
 
-struct nrf_upd_register_interface
+struct nrf_update_interface
 {
 	void (* CONFIG)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_CONFIG Mask, NrfReg_STATUS_ptr NrfStatus);
 	void (* EN_AA)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_EN_AA Mask, NrfReg_STATUS_ptr NrfStatus);
@@ -375,18 +375,23 @@ struct nrf_upd_register_interface
 	void (* FEATURE)(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_FEATURE Mask, NrfReg_STATUS_ptr NrfStatus);
 };
 
-struct nrf_device_interface
+struct nrf_action_interface
 {
-	
 	void(* PowerOnReset)(NrfSpiDevice_ptr); // Sets all device registers to the same values they have after powering off/on.
-	void(* FlushTxFifo)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
-	void(* FlushRxFifo)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
-	void(* WriteTxPayload)(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-	void(* ReadRxPayload)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
 	void(* Initialize)(NrfSpiDevice_ptr);
 	void(* PowerUpTx)(NrfSpiDevice_ptr);
 	void(* PowerDown)(NrfSpiDevice_ptr);
 };
+
+struct nrf_command_interface
+{
+	void(* FlushTxFifo)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+	void(* FlushRxFifo)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+	void(* WriteTxPayload)(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
+	void(* ReadRxPayload)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+};
+
+//struct nrf_
 
 struct nrf_empty
 {
@@ -396,10 +401,11 @@ struct nrf_empty
 struct nrf24_package_interface
 {
 	NrfIoCallbacks_ptr ptr;
-	struct nrf_set_register_interface SetRegister;
-	struct nrf_get_register_interface GetRegister;
-	struct nrf_upd_register_interface UpdateRegister;
-	struct nrf_device_interface DeviceControl;
+	struct nrf_write_interface Write;
+	struct nrf_read_interface Read;
+	struct nrf_update_interface Update;
+	struct nrf_action_interface Action;
+	struct nrf_command_interface Command;
 	struct nrf_empty EmptyRegister;
 };
 struct nrf_io_callbacks

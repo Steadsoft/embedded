@@ -92,15 +92,15 @@ int maintest(void)
 	
 	// Snapshot all regsiters
 	
-	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_before, &status);
+	nrf24_package.Read.ALL_REGISTERS(&device, &everything_before, &status);
 	
 	// Force all register into their hardware reset state.
 	
-	nrf24_package.DeviceControl.PowerOnReset(&device);
+	nrf24_package.Action.PowerOnReset(&device);
 	
 	// Snapshot all regsiters
 	
-	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_after, &status);
+	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
 		
 	initialize_nrf(&device);
 	
@@ -130,65 +130,65 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 	NrfReg_FEATURE device_features;
 	NrfReg_SETUP_AW saw;
 	
-	nrf24_package.GetRegister.FEATURE(device_ptr, &device_features, &status);
+	nrf24_package.Read.FEATURE(device_ptr, &device_features, &status);
 
-	nrf24_package.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
+	nrf24_package.Read.RF_SETUP(device_ptr, &rf_setup, &status);
 	
-	nrf24_package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
+	nrf24_package.Read.RF_CH(device_ptr, &rf_channel, &status);
 
 	// Just a bunch of test calls into the various register read/write functions.
 	
-	nrf24_package.GetRegister.CONFIG(device_ptr, &configuration, &status);
+	nrf24_package.Read.CONFIG(device_ptr, &configuration, &status);
 	
 	for (int X = 0; X < count; X++)
 	{
 		rf_setup.PLL_LOCK = 1;
 		rf_setup.RF_PWR = 2;
 	
-		nrf24_package.GetRegister.RF_SETUP(device_ptr, &rf_setup, &status);
+		nrf24_package.Read.RF_SETUP(device_ptr, &rf_setup, &status);
 		
 		//trapif(rf_setup.LNA_HCURR != 1 || rf_setup.RF_PWR != 3 || rf_setup.RF_DR != 1);
 		
-		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 2, &status);
+		nrf24_package.Read.RX_ADDR_SHORT(device_ptr, &rx_address, 2, &status);
 	
 		trapif(rx_address.value != 0xC3, device_ptr);
 		
-		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 3, &status);
+		nrf24_package.Read.RX_ADDR_SHORT(device_ptr, &rx_address, 3, &status);
 		
 		trapif(rx_address.value != 0xC4, device_ptr);
 		
-		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 4, &status);
+		nrf24_package.Read.RX_ADDR_SHORT(device_ptr, &rx_address, 4, &status);
 		
 		trapif(rx_address.value != 0xC5, device_ptr);
 		
-		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &rx_address, 5, &status);
+		nrf24_package.Read.RX_ADDR_SHORT(device_ptr, &rx_address, 5, &status);
 		
 		trapif(rx_address.value != 0xC6, device_ptr);
 		
-		nrf24_package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
+		nrf24_package.Read.RF_CH(device_ptr, &rf_channel, &status);
 		
 		trapif(rf_channel.RF_CH != 0x02, device_ptr);
 
 		rf_channel.RF_CH = 23;
 		
-		nrf24_package.SetRegister.RF_CH(device_ptr, rf_channel, &status);
+		nrf24_package.Write.RF_CH(device_ptr, rf_channel, &status);
 
-		nrf24_package.GetRegister.RF_CH(device_ptr, &rf_channel, &status);
+		nrf24_package.Read.RF_CH(device_ptr, &rf_channel, &status);
 		
 		trapif(rf_channel.RF_CH != 23, device_ptr);
 		
 		rf_channel.RF_CH = 2;
 
-		nrf24_package.SetRegister.RF_CH(device_ptr, rf_channel, &status);
+		nrf24_package.Write.RF_CH(device_ptr, rf_channel, &status);
 
-		nrf24_package.GetRegister.CONFIG(device_ptr, &(configuration), &status);
-		nrf24_package.GetRegister.EN_AA(device_ptr, &(auto_acknowledge_flags), &status);
-		nrf24_package.GetRegister.RX_ADDR_SHORT(device_ptr, &(rx_address), 3, &status);
-		nrf24_package.GetRegister.SETUP_AW(device_ptr, &saw, &status);
+		nrf24_package.Read.CONFIG(device_ptr, &(configuration), &status);
+		nrf24_package.Read.EN_AA(device_ptr, &(auto_acknowledge_flags), &status);
+		nrf24_package.Read.RX_ADDR_SHORT(device_ptr, &(rx_address), 3, &status);
+		nrf24_package.Read.SETUP_AW(device_ptr, &saw, &status);
 		
 		trapif(saw.AW != 0x03, device_ptr);
 		
-		nrf24_package.GetRegister.STATUS(device_ptr, &status);
+		nrf24_package.Read.STATUS(device_ptr, &status);
 
 		spin_100_uS();
 	}
@@ -204,7 +204,7 @@ void trapif(int value, NrfSpiDevice_ptr device_ptr)
 
 	while (1)
 	{
-		nrf24_package.GetRegister.SETUP_AW(device_ptr, &saw, &status);
+		nrf24_package.Read.SETUP_AW(device_ptr, &saw, &status);
 		spin_100_uS();
 	}
 	

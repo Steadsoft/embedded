@@ -75,7 +75,7 @@ static void _WriteTxPayload(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_l
 
 nrf24_package_struct nrf24_package =
 { 
-	.GetRegister = 
+	.Read = 
 	{     
 		.CONFIG = _ReadConfigRegister,
 		.EN_AA = _ReadEnAaRegister,
@@ -96,7 +96,7 @@ nrf24_package_struct nrf24_package =
 		.FEATURE = _ReadFeatureRegister,
 		.ALL_REGISTERS = _ReadAllRegisters,
 	},
-	.SetRegister = 
+	.Write = 
 	{ 
 		.CONFIG = _WriteConfigRegister,
 		.EN_AA = _WriteEnAaRegister,
@@ -116,7 +116,7 @@ nrf24_package_struct nrf24_package =
 		.DYNPD = _WriteDynpdRegister,
 		.FEATURE = _WriteFeatureRegister,
 	},
-	.UpdateRegister =
+	.Update =
 	{ 
 		.CONFIG = _UpdateConfigRegister,
 		.EN_AA = _UpdateEnAaRegister,
@@ -132,15 +132,20 @@ nrf24_package_struct nrf24_package =
 		.DYNPD = _UpdateDynpdRegister,
 		.FEATURE = _UpdateFeatureRegister,
 	},
-	.DeviceControl =
+	.Action =
 	{ 
 		.PowerOnReset = _SetToPowerOnResetState,
+		.Initialize = _Initialize,
+		.PowerUpTx = _PowerUpTx,
+		// This is a misnomer, but we will use this to power up the device in RX mode.
+		.PowerDown = _PowerDown
+	},
+	.Command =
+	{ 
 		.FlushTxFifo = _FlushTxFifo,
 		.FlushRxFifo = _FlushRxFifo,
+		 // TODO add support for REUSE_TX_PL as well.
 		.WriteTxPayload = _WriteTxPayload,
-		.Initialize = _Initialize,
-		.PowerUpTx = _PowerUpTx, // This is a misnomer, but we will use this to power up the device in RX mode.
-		.PowerDown = _PowerDown
 	},
 	.EmptyRegister =
 	{ 
@@ -373,6 +378,9 @@ static void _ReadTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG
 	uint8_t bytes_read;
 	_ReadMultiBytesRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_ADDRESS(Value), &bytes_read, NrfStatus);
 }
+
+// TODO This register is actually 5 bytes and so are several others,  so we need to fix this
+
 static void _WriteTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	_WriteSingleByteRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_VALUE(Value), NrfStatus);
@@ -569,31 +577,31 @@ static void _SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr)
 	rx_addr_short_p4.value = C5;
 	rx_addr_short_p5.value = C6;
 	
-	nrf24_package.DeviceControl.PowerDown(device_ptr);
+	nrf24_package.Action.PowerDown(device_ptr);
 	
-	nrf24_package.SetRegister.CONFIG(device_ptr, configuration, &status);
-	nrf24_package.SetRegister.EN_AA(device_ptr, en_aa, &status);
-	nrf24_package.SetRegister.EN_RXADDR(device_ptr, en_rxaddr, &status);
-	nrf24_package.SetRegister.SETUP_AW(device_ptr, setup_aw, &status);
-	nrf24_package.SetRegister.SETUP_RETR(device_ptr, setup_retr, &status);
-	nrf24_package.SetRegister.RF_CH(device_ptr, rf_ch, &status);
-	nrf24_package.SetRegister.OBSERVE_TX(device_ptr, observe_tx, &status);
-	nrf24_package.SetRegister.RPD(device_ptr, rpd, &status);
-	nrf24_package.SetRegister.RX_ADDR_LONG(device_ptr, rx_addr_long_p0, 0, &status);
-	nrf24_package.SetRegister.RX_ADDR_LONG(device_ptr, rx_addr_long_p1, 1, &status);
-	nrf24_package.SetRegister.RX_ADDR_SHORT(device_ptr, rx_addr_short_p2, 2, &status);
-	nrf24_package.SetRegister.RX_ADDR_SHORT(device_ptr, rx_addr_short_p3, 3, &status);
-	nrf24_package.SetRegister.RX_ADDR_SHORT(device_ptr, rx_addr_short_p4, 4, &status);
-	nrf24_package.SetRegister.RX_ADDR_SHORT(device_ptr, rx_addr_short_p5, 5, &status);
-	nrf24_package.SetRegister.TX_ADDR_LONG(device_ptr, tx_addr_long, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 0, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 1, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 2, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 3, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 4, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 5, &status);
-	nrf24_package.SetRegister.DYNPD(device_ptr, dynpd, &status);
-	nrf24_package.SetRegister.FEATURE(device_ptr, feature, &status);
+	nrf24_package.Write.CONFIG(device_ptr, configuration, &status);
+	nrf24_package.Write.EN_AA(device_ptr, en_aa, &status);
+	nrf24_package.Write.EN_RXADDR(device_ptr, en_rxaddr, &status);
+	nrf24_package.Write.SETUP_AW(device_ptr, setup_aw, &status);
+	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status);
+	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status);
+	nrf24_package.Write.OBSERVE_TX(device_ptr, observe_tx, &status);
+	nrf24_package.Write.RPD(device_ptr, rpd, &status);
+	nrf24_package.Write.RX_ADDR_LONG(device_ptr, rx_addr_long_p0, 0, &status);
+	nrf24_package.Write.RX_ADDR_LONG(device_ptr, rx_addr_long_p1, 1, &status);
+	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, rx_addr_short_p2, 2, &status);
+	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, rx_addr_short_p3, 3, &status);
+	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, rx_addr_short_p4, 4, &status);
+	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, rx_addr_short_p5, 5, &status);
+	nrf24_package.Write.TX_ADDR_LONG(device_ptr, tx_addr_long, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 0, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 1, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 2, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 3, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 4, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 5, &status);
+	nrf24_package.Write.DYNPD(device_ptr, dynpd, &status);
+	nrf24_package.Write.FEATURE(device_ptr, feature, &status);
 }
 
 static void _ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus)
@@ -644,12 +652,12 @@ static void _Initialize(NrfSpiDevice_ptr device_ptr)
 	
 	rx_pw.RX_PW_LEN = 32;
 	
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 0, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 1, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 2, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 3, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 4, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 5, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 0, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 1, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 2, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 3, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 4, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 5, &status);
 
 	/* Set RF settings (2mbps, output power) */
 	
@@ -660,7 +668,7 @@ static void _Initialize(NrfSpiDevice_ptr device_ptr)
 	// 3 = 0 dBm
 	rf_setup.RF_PWR = 3; 
 	
-	nrf24_package.SetRegister.RF_SETUP(device_ptr, rf_setup, &status);
+	nrf24_package.Write.RF_SETUP(device_ptr, rf_setup, &status);
 	
 	/* Enable auto-acknowledgment for all pipes */
 	
@@ -671,7 +679,7 @@ static void _Initialize(NrfSpiDevice_ptr device_ptr)
 //	en_aa.ENAA_P4 = 1;
 //	en_aa.ENAA_P5 = 1;
 	
-	nrf24_package.SetRegister.EN_AA(device_ptr, en_aa, &status);
+	nrf24_package.Write.EN_AA(device_ptr, en_aa, &status);
 	
 	/* Enable RX addresses */
 	
@@ -682,23 +690,23 @@ static void _Initialize(NrfSpiDevice_ptr device_ptr)
 	en_rxaddr.ERX_P0 = 1;
 	en_rxaddr.ERX_P0 = 1;
 
-	nrf24_package.SetRegister.EN_RXADDR(device_ptr, en_rxaddr, &status);
+	nrf24_package.Write.EN_RXADDR(device_ptr, en_rxaddr, &status);
 	
 	/* Auto retransmit delay: 1000 (4x250) us and Up to 15 retransmit trials */
 	
 	setup_retr.ARC = 15;
 	setup_retr.ARD = 3;
 	
-	nrf24_package.SetRegister.SETUP_RETR(device_ptr, setup_retr, &status);
+	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status);
 	
 	/* Dynamic length configurations: No dynamic length */
 	
-	nrf24_package.SetRegister.DYNPD(device_ptr, dynpd, &status);
+	nrf24_package.Write.DYNPD(device_ptr, dynpd, &status);
 	
 	// Clear FIFOs
 	
-	nrf24_package.DeviceControl.FlushRxFifo(device_ptr, &status);
-	nrf24_package.DeviceControl.FlushTxFifo(device_ptr, &status);
+	nrf24_package.Command.FlushRxFifo(device_ptr, &status);
+	nrf24_package.Command.FlushTxFifo(device_ptr, &status);
 	
 	// Clear interrupts
 	
@@ -709,7 +717,7 @@ static void _Initialize(NrfSpiDevice_ptr device_ptr)
 	// Since the mask would be the same as the status itself, we can just pass 
 	// it in for both args.
 
-	nrf24_package.UpdateRegister.STATUS(device_ptr, status, status);
+	nrf24_package.Update.STATUS(device_ptr, status, status);
 	
 	_PowerUpTx(device_ptr);
 
@@ -722,11 +730,11 @@ static void _PowerDown(NrfSpiDevice_ptr device_ptr)
 	
 	device_ptr->DeactivateChipEnable(device_ptr->io_ptr);
 
-	nrf24_package.GetRegister.CONFIG(device_ptr, &config, &status);
+	nrf24_package.Read.CONFIG(device_ptr, &config, &status);
 	
 	config.PWR_UP = 0;
 	
-	nrf24_package.SetRegister.CONFIG(device_ptr, config, &status);
+	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
 
 static void _PowerUpTx(NrfSpiDevice_ptr device_ptr)
@@ -745,7 +753,7 @@ static void _PowerUpTx(NrfSpiDevice_ptr device_ptr)
 	// Since the mask would be the same as the status itself, we can just pass 
 	// it in for both args.
 	
-	nrf24_package.UpdateRegister.STATUS(device_ptr, status, status);
+	nrf24_package.Update.STATUS(device_ptr, status, status);
 	
 	// Set mode to TX
 
@@ -755,11 +763,11 @@ static void _PowerUpTx(NrfSpiDevice_ptr device_ptr)
 	config.PWR_UP = 1;
 	config.PRIM_RX = 0;
 	
-	nrf24_package.UpdateRegister.CONFIG(device_ptr, config, config_mask, &status);
+	nrf24_package.Update.CONFIG(device_ptr, config, config_mask, &status);
 	
 	rf_ch.RF_CH = 4; // 2404 MHz
 	
-	nrf24_package.SetRegister.RF_CH(device_ptr, rf_ch, &status);
+	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status);
 
 }
 
