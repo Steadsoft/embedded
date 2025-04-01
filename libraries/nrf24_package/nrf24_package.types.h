@@ -53,8 +53,10 @@ struct nrf_spi_device
 	void(* ReadBytes)(void * io_ptr, uint8_t BytesIn[], uint8_t BytesToRead);
 	void(* WriteBytes)(void * io_ptr, uint8_t BytesOut[], uint8_t BytesToWrite);
 	void(* ExchangeBytes)(void * io_ptr, uint8_t BytesOut[], uint8_t BytesIn[], uint8_t Count);
-	void(* SelectDevice)(void * io_ptr);
-	void(* DeselectDevice)(void * io_ptr);
+	void(* ActivateChipSelect)(void * io_ptr);
+	void(* DeactivateChipSelect)(void * io_ptr);
+	void(* ActivateChipEnable)(void * io_ptr);
+	void(* DeactivateChipEnable)(void * io_ptr);
 	void * io_ptr;
 };
 
@@ -383,6 +385,7 @@ struct nrf_device_interface
 	void(* ReadRxPayload)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
 	void(* Initialize)(NrfSpiDevice_ptr);
 	void(* PowerUpTx)(NrfSpiDevice_ptr);
+	void(* PowerDown)(NrfSpiDevice_ptr);
 };
 
 struct nrf_empty

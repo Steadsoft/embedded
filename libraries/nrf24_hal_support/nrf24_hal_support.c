@@ -63,8 +63,10 @@ static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr
 	descriptor_ptr->cs_pin = SPI_CS;
 	
 	device_ptr->io_ptr = descriptor_ptr;
-	device_ptr->SelectDevice = nrf24_hal_support.spi_set_csn_lo;
-	device_ptr->DeselectDevice = nrf24_hal_support.spi_set_csn_hi;
+	device_ptr->ActivateChipSelect = nrf24_hal_support.spi_set_csn_lo;
+	device_ptr->DeactivateChipSelect = nrf24_hal_support.spi_set_csn_hi;
+	device_ptr->ActivateChipEnable = nrf24_hal_support.spi_set_ce_hi;
+	device_ptr->DeactivateChipEnable = nrf24_hal_support.spi_set_ce_lo;
 	device_ptr->ExchangeBytes = nrf24_hal_support.exchange_bytes;
 	device_ptr->ReadBytes = nrf24_hal_support.read_bytes;
 	device_ptr->WriteBytes = nrf24_hal_support.write_bytes;

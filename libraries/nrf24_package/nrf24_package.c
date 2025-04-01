@@ -60,6 +60,7 @@ static void _ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_
 static void _WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
 static void _SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr);
 static void _PowerUpTx(NrfSpiDevice_ptr device_ptr);
+static void _PowerDown(NrfSpiDevice_ptr device_ptr);
 
 static void _FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 static void _FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
@@ -139,6 +140,7 @@ nrf24_package_struct nrf24_package =
 		.WriteTxPayload = _WriteTxPayload,
 		.Initialize = _Initialize,
 		.PowerUpTx = _PowerUpTx, // This is a misnomer, but we will use this to power up the device in RX mode.
+		.PowerDown = _PowerDown
 	},
 	.EmptyRegister =
 	{ 
@@ -303,9 +305,9 @@ static void _UpdateRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP 
 static void _ReadStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr Value)
 {
 	uint8_t command = NrfCommand.NOP | Nrf24Register.STATUS;
-	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ActivateChipSelect(device_ptr->io_ptr);
 	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)Value, 1);
-	device_ptr->DeselectDevice(device_ptr->io_ptr);
+	device_ptr->DeactivateChipSelect(device_ptr->io_ptr);
 }
 static void _WriteStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS_ptr NrfStatus)
 {
@@ -435,20 +437,20 @@ static void _ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 {
 	uint8_t command = NrfCommand.R_REGISTER | Register;
 	
-	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ActivateChipSelect(device_ptr->io_ptr);
 	//device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
 	device_ptr->WriteBytes(device_ptr->io_ptr, &command, 1);
 	device_ptr->ReadBytes(device_ptr->io_ptr, Value, 1);
-	device_ptr->DeselectDevice(device_ptr->io_ptr);
+	device_ptr->DeactivateChipSelect(device_ptr->io_ptr);
 }
 static void _WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command[2] = { NrfCommand.W_REGISTER | Register, Value };
 	
-	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ActivateChipSelect(device_ptr->io_ptr);
 	//device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
 	device_ptr->WriteBytes(device_ptr->io_ptr, command, 2);
-	device_ptr->DeselectDevice(device_ptr->io_ptr);
+	device_ptr->DeactivateChipSelect(device_ptr->io_ptr);
 }
 static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus)
 {
@@ -479,10 +481,10 @@ static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 	
 	*BytesRead = bytes;
 	
-	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ActivateChipSelect(device_ptr->io_ptr);
 	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus,1);
 	device_ptr->ReadBytes(device_ptr->io_ptr, Value, bytes);
-	device_ptr->DeselectDevice(device_ptr->io_ptr);
+	device_ptr->DeactivateChipSelect(device_ptr->io_ptr);
 }
 static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus)
 {
@@ -509,10 +511,10 @@ static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Regist
 	
 	*BytesWritten = bytes;
 	
-	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ActivateChipSelect(device_ptr->io_ptr);
 	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
 	device_ptr->WriteBytes(device_ptr->io_ptr, Value, bytes);
-	device_ptr->DeselectDevice(device_ptr->io_ptr);
+	device_ptr->DeactivateChipSelect(device_ptr->io_ptr);
 }
 
 // Set all regsiters to the same values they get set to, when the device is powered off/on
@@ -566,6 +568,8 @@ static void _SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr)
 	rx_addr_short_p3.value = C4;
 	rx_addr_short_p4.value = C5;
 	rx_addr_short_p5.value = C6;
+	
+	nrf24_package.DeviceControl.PowerDown(device_ptr);
 	
 	nrf24_package.SetRegister.CONFIG(device_ptr, configuration, &status);
 	nrf24_package.SetRegister.EN_AA(device_ptr, en_aa, &status);
@@ -711,6 +715,20 @@ static void _Initialize(NrfSpiDevice_ptr device_ptr)
 
 }
 
+static void _PowerDown(NrfSpiDevice_ptr device_ptr)
+{
+	NrfReg_CONFIG config = { 0 };
+	NrfReg_STATUS status;
+	
+	device_ptr->DeactivateChipEnable(device_ptr->io_ptr);
+
+	nrf24_package.GetRegister.CONFIG(device_ptr, &config, &status);
+	
+	config.PWR_UP = 0;
+	
+	nrf24_package.SetRegister.CONFIG(device_ptr, config, &status);
+}
+
 static void _PowerUpTx(NrfSpiDevice_ptr device_ptr)
 {
 	NrfReg_STATUS status;
@@ -749,18 +767,18 @@ static void _FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatu
 {
 	uint8_t command = NrfCommand.FLUSH_TX;
 	
-	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ActivateChipSelect(device_ptr->io_ptr);
 	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
-	device_ptr->DeselectDevice(device_ptr->io_ptr);
+	device_ptr->DeactivateChipSelect(device_ptr->io_ptr);
 }
 
 static void _FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = NrfCommand.FLUSH_RX;
 
-	device_ptr->SelectDevice(device_ptr->io_ptr);
+	device_ptr->ActivateChipSelect(device_ptr->io_ptr);
 	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
-	device_ptr->DeselectDevice(device_ptr->io_ptr);
+	device_ptr->DeactivateChipSelect(device_ptr->io_ptr);
 }
 
 static void _WriteTxPayload(NrfSpiDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus)
@@ -774,11 +792,8 @@ static void _WriteTxPayload(NrfSpiDevice_ptr device_ptr, uint8_t * data_ptr, uin
 		if (X < data_len)
 			buffer[X + 1] = data_ptr[X];
 	}
-	
 
-	device_ptr->SelectDevice(device_ptr->io_ptr);
-	//device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
+	device_ptr->ActivateChipSelect(device_ptr->io_ptr);
 	device_ptr->WriteBytes(device_ptr->io_ptr, buffer, data_len + 1);
-	//device_ptr->WriteBytes(device_ptr->io_ptr, data_ptr, data_len);
-	device_ptr->DeselectDevice(device_ptr->io_ptr);
+	device_ptr->DeactivateChipSelect(device_ptr->io_ptr);
 }
