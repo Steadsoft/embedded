@@ -765,10 +765,20 @@ static void _FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatu
 
 static void _WriteTxPayload(NrfSpiDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus)
 {
-	uint8_t command = NrfCommand.W_TX_PAYLOAD;
+	uint8_t buffer[33];
+	
+	buffer[0] = NrfCommand.W_TX_PAYLOAD;
+	
+	for (int X = 0; X < 32; X++)
+	{
+		if (X < data_len)
+			buffer[X + 1] = data_ptr[X];
+	}
+	
 
 	device_ptr->SelectDevice(device_ptr->io_ptr);
-	device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
-	device_ptr->WriteBytes(device_ptr->io_ptr, data_ptr, data_len);
+	//device_ptr->ExchangeBytes(device_ptr->io_ptr, &command, (uint8_t*)NrfStatus, 1);
+	device_ptr->WriteBytes(device_ptr->io_ptr, buffer, data_len + 1);
+	//device_ptr->WriteBytes(device_ptr->io_ptr, data_ptr, data_len);
 	device_ptr->DeselectDevice(device_ptr->io_ptr);
 }
