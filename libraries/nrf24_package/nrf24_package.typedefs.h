@@ -3,10 +3,6 @@ typedef const struct nrf_registers nrf24_register_names;
 typedef const struct nrf_commands nrf24_command_names;
 
 
-typedef struct nrf_register_calls NrfRegisterCalls, * NrfRegisterCalls_ptr;
-typedef struct nrf_io_interface NrfIoInterface, * NrfIoInterface_ptr;
-typedef struct nrf_io_callbacks NrfIoCallbacks, * NrfIoCallbacks_ptr;
-typedef struct nrf_spi_device NrfSpiDevice, * NrfSpiDevice_ptr;
 
 /*---------------------------------------------------------------------*/
 /* Registers are all defined as unions to faciliate access to their    */
