@@ -5,13 +5,13 @@
 #include <nrf24_package.library.h>
 
 // Declare all static functions
-static void spi_set_ce_lo(void *);
-static void spi_set_ce_hi(void *);
-static void spi_set_csn_lo(void *);
-static void spi_set_csn_hi(void *);
-static void exchange_bytes(void *, uint8_t[], uint8_t[], uint8_t);
-static void read_bytes(void *, uint8_t bytes_in_ptr[], uint8_t count);
-static void write_bytes(void *, uint8_t bytes_out_ptr[], uint8_t count);
+static void spi_set_ce_lo(NrfIoDescriptor_ptr);
+static void spi_set_ce_hi(NrfIoDescriptor_ptr);
+static void spi_set_csn_lo(NrfIoDescriptor_ptr);
+static void spi_set_csn_hi(NrfIoDescriptor_ptr);
+static void exchange_bytes(NrfIoDescriptor_ptr, uint8_t[], uint8_t[], uint8_t);
+static void read_bytes(NrfIoDescriptor_ptr, uint8_t bytes_in_ptr[], uint8_t count);
+static void write_bytes(NrfIoDescriptor_ptr, uint8_t bytes_out_ptr[], uint8_t count);
 static void init_spi(SPI_HandleTypeDef * spi_ptr);
 static void init_control_pins();
 static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr);
@@ -136,42 +136,42 @@ static void init_control_pins()
 	HAL_GPIO_WritePin(GPIOA, NRF_CE, GPIO_PIN_RESET);
 }
 
-static void spi_set_ce_lo(void * ptr)
+static void spi_set_ce_lo(NrfIoDescriptor_ptr ptr)
 {
-	HAL_GPIO_WritePin(((NrfIoDescriptor_ptr)ptr)->gpio_ptr, ((NrfIoDescriptor_ptr)ptr)->ce_pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->ce_pin, GPIO_PIN_RESET);
 }
-static void spi_set_ce_hi(void * ptr)
+static void spi_set_ce_hi(NrfIoDescriptor_ptr ptr)
 {
-	HAL_GPIO_WritePin(((NrfIoDescriptor_ptr)ptr)->gpio_ptr, ((NrfIoDescriptor_ptr)ptr)->ce_pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->ce_pin, GPIO_PIN_SET);
 }
-static void spi_set_csn_lo(void * ptr)
+static void spi_set_csn_lo(NrfIoDescriptor_ptr ptr)
 {
-	HAL_GPIO_WritePin(((NrfIoDescriptor_ptr)ptr)->gpio_ptr, ((NrfIoDescriptor_ptr)ptr)->cs_pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_RESET);
 }
-static void spi_set_csn_hi(void * ptr)
+static void spi_set_csn_hi(NrfIoDescriptor_ptr ptr)
 {
-	HAL_GPIO_WritePin(((NrfIoDescriptor_ptr)ptr)->gpio_ptr, ((NrfIoDescriptor_ptr)ptr)->cs_pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_SET);
 }
-static void exchange_bytes(void * ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
+static void exchange_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
 {
-	((NrfIoDescriptor_ptr)ptr)->status = HAL_SPI_TransmitReceive(((NrfIoDescriptor_ptr)ptr)->spi_ptr, bytes_out_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
+	ptr->status = HAL_SPI_TransmitReceive(ptr->spi_ptr, bytes_out_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
 	
-	if (((NrfIoDescriptor_ptr)ptr)->status != HAL_OK)
+	if (ptr->status != HAL_OK)
 		pulse_led_forever(100);
 }
 
-static void read_bytes(void * ptr, uint8_t bytes_in_ptr[], uint8_t count)
+static void read_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count)
 {
-	((NrfIoDescriptor_ptr)ptr)->status = HAL_SPI_Receive(((NrfIoDescriptor_ptr)ptr)->spi_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
+	ptr->status = HAL_SPI_Receive(ptr->spi_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
 	
-	if (((NrfIoDescriptor_ptr)ptr)->status != HAL_OK)
+	if (ptr->status != HAL_OK)
 		pulse_led_forever(100);
 }
 
-static void write_bytes(void * ptr, uint8_t bytes_out_ptr[], uint8_t count)
+static void write_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count)
 {
-	((NrfIoDescriptor_ptr)ptr)->status = HAL_SPI_Transmit(((NrfIoDescriptor_ptr)ptr)->spi_ptr, bytes_out_ptr, count, HAL_MAX_DELAY);
+	ptr->status = HAL_SPI_Transmit(ptr->spi_ptr, bytes_out_ptr, count, HAL_MAX_DELAY);
 	
-	if (((NrfIoDescriptor_ptr)ptr)->status != HAL_OK)
+	if (ptr->status != HAL_OK)
 		pulse_led_forever(100);
 }

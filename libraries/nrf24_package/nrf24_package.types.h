@@ -50,14 +50,14 @@ struct nrf_commands
 
 struct nrf_spi_device
 {
-	void(* ReadBytes)(void * io_ptr, uint8_t BytesIn[], uint8_t BytesToRead);
-	void(* WriteBytes)(void * io_ptr, uint8_t BytesOut[], uint8_t BytesToWrite);
-	void(* ExchangeBytes)(void * io_ptr, uint8_t BytesOut[], uint8_t BytesIn[], uint8_t Count);
-	void(* ActivateChipSelect)(void * io_ptr);
-	void(* DeactivateChipSelect)(void * io_ptr);
-	void(* ActivateChipEnable)(void * io_ptr);
-	void(* DeactivateChipEnable)(void * io_ptr);
-	void * io_ptr;
+	void(* ReadBytes)(NrfIoDescriptor_ptr io_ptr, uint8_t BytesIn[], uint8_t BytesToRead);
+	void(* WriteBytes)(NrfIoDescriptor_ptr io_ptr, uint8_t BytesOut[], uint8_t BytesToWrite);
+	void(* ExchangeBytes)(NrfIoDescriptor_ptr io_ptr, uint8_t BytesOut[], uint8_t BytesIn[], uint8_t Count);
+	void(* ActivateChipSelect)(NrfIoDescriptor_ptr io_ptr);
+	void(* DeactivateChipSelect)(NrfIoDescriptor_ptr io_ptr);
+	void(* ActivateChipEnable)(NrfIoDescriptor_ptr io_ptr);
+	void(* DeactivateChipEnable)(NrfIoDescriptor_ptr io_ptr);
+	NrfIoDescriptor_ptr io_ptr;
 };
 
 // Register structures
@@ -375,6 +375,7 @@ struct nrf_update_interface
 	void (* FEATURE)(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_FEATURE Mask, NrfReg_STATUS_ptr NrfStatus);
 };
 
+// these are abstract composite operations
 struct nrf_action_interface
 {
 	void(* PowerOnReset)(NrfSpiDevice_ptr); // Sets all device registers to the same values they have after powering off/on.
@@ -383,6 +384,7 @@ struct nrf_action_interface
 	void(* PowerDown)(NrfSpiDevice_ptr);
 };
 
+// These represent the documented commands
 struct nrf_command_interface
 {
 	void(* FlushTxFifo)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
@@ -390,8 +392,6 @@ struct nrf_command_interface
 	void(* WriteTxPayload)(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 	void(* ReadRxPayload)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
 };
-
-//struct nrf_
 
 struct nrf_empty
 {
