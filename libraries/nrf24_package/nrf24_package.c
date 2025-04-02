@@ -638,88 +638,41 @@ static void _ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_
 
 static void _Initialize(NrfSpiDevice_ptr device_ptr)
 {
+	// Do generic configuration that is independent of whether we are 
+	// transmitting or receiving. 
+	
+	// SEE: https://www.youtube.com/watch?v=mB7LsiscM78
+	
 	NrfReg_STATUS status = { 0 };
-	NrfReg_RX_PW rx_pw = { 0 };
 	NrfReg_RF_SETUP rf_setup = { 0 };
 	NrfReg_EN_AA en_aa = { 0 };
 	NrfReg_EN_RXADDR en_rxaddr = { 0 };
 	NrfReg_SETUP_RETR setup_retr = { 0 };
-	NrfReg_DYNPD dynpd = { 0 };
+  	NrfReg_CONFIG config = { 0 };
+	NrfReg_SETUP_AW setup_aw = { 0 };
+	NrfReg_RF_CH rf_ch = { 0 };
 	
-	// Set channel
+	device_ptr->DeactivateChipEnable(device_ptr->io_ptr);
+	device_ptr->DeactivateChipSelect(device_ptr->io_ptr); // Precautionary measure
 	
-	/* Set pipeline to max possible 32 bytes */
-	
-	rx_pw.RX_PW_LEN = 32;
-	
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 0, &status);
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 1, &status);
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 2, &status);
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 3, &status);
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 4, &status);
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 5, &status);
+	nrf24_package.Write.CONFIG(device_ptr, config, &status); // Zeroize the config register
+	nrf24_package.Write.EN_AA(device_ptr, en_aa, &status); // Zeroize the auto-ack register
+	nrf24_package.Write.EN_RXADDR(device_ptr, en_rxaddr, &status); // Zeroize the RX addresses
 
-	/* Set RF settings (2mbps, output power) */
+	setup_aw.AW = 3; // 5 byte address width
 	
-	// 0 and 1 here sets speed to 2 Mbps
+	nrf24_package.Write.SETUP_AW(device_ptr, setup_aw, &status); // Set address width to 5 bytes
+	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status); // Zeroize the auto-retransmit register
+	
+	rf_ch.RF_CH	= 0; // default to 2400 MHz
+	
+	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status); // Set RF channel.
+	
 	rf_setup.RF_DR_LOW = 0; 
-	rf_setup.RF_DR_HIGH = 1; 
+	rf_setup.RF_DR_HIGH = 1;
+	rf_setup.RF_PWR = 3; // 0 dBm
 	
-	// 3 = 0 dBm
-	rf_setup.RF_PWR = 3; 
-	
-	nrf24_package.Write.RF_SETUP(device_ptr, rf_setup, &status);
-	
-	/* Enable auto-acknowledgment for all pipes */
-	
-//	en_aa.ENAA_P0 = 1;
-//	en_aa.ENAA_P1 = 1;
-//	en_aa.ENAA_P2 = 1;
-//	en_aa.ENAA_P3 = 1;
-//	en_aa.ENAA_P4 = 1;
-//	en_aa.ENAA_P5 = 1;
-	
-	nrf24_package.Write.EN_AA(device_ptr, en_aa, &status);
-	
-	/* Enable RX addresses */
-	
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P0 = 1;
-
-	nrf24_package.Write.EN_RXADDR(device_ptr, en_rxaddr, &status);
-	
-	/* Auto retransmit delay: 1000 (4x250) us and Up to 15 retransmit trials */
-	
-	setup_retr.ARC = 15;
-	setup_retr.ARD = 3;
-	
-	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status);
-	
-	/* Dynamic length configurations: No dynamic length */
-	
-	nrf24_package.Write.DYNPD(device_ptr, dynpd, &status);
-	
-	// Clear FIFOs
-	
-	nrf24_package.Command.FlushRxFifo(device_ptr, &status);
-	nrf24_package.Command.FlushTxFifo(device_ptr, &status);
-	
-	// Clear interrupts
-	
-	status.RX_DR = 1;
-	status.TX_DS = 1;
-	status.MAX_RT = 1;
-	
-	// Since the mask would be the same as the status itself, we can just pass 
-	// it in for both args.
-
-	nrf24_package.Update.STATUS(device_ptr, status, status);
-	
-	_PowerUpTx(device_ptr);
+	nrf24_package.Write.RF_SETUP(device_ptr, rf_setup, &status); // Set RF settings
 
 }
 
