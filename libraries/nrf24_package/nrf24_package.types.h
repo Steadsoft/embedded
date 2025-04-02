@@ -50,14 +50,18 @@ struct nrf_commands
 
 struct nrf_spi_device
 {
-	void(* ReadBytes)(NrfIoDescriptor_ptr, uint8_t BytesIn[], uint8_t BytesToRead);
-	void(* WriteBytes)(NrfIoDescriptor_ptr io_ptr, uint8_t BytesOut[], uint8_t BytesToWrite);
-	void(* ExchangeBytes)(NrfIoDescriptor_ptr io_ptr, uint8_t BytesOut[], uint8_t BytesIn[], uint8_t Count);
-	void(* ActivateChipSelect)(NrfIoDescriptor_ptr io_ptr);
-	void(* DeactivateChipSelect)(NrfIoDescriptor_ptr io_ptr);
-	void(* ActivateChipEnable)(NrfIoDescriptor_ptr io_ptr);
-	void(* DeactivateChipEnable)(NrfIoDescriptor_ptr io_ptr);
-	NrfIoDescriptor_ptr io_ptr;
+//	void(* ReadBytes)(NrfIoDescriptor_ptr, uint8_t BytesIn[], uint8_t BytesToRead);
+//	void(* WriteBytes)(NrfIoDescriptor_ptr io_ptr, uint8_t BytesOut[], uint8_t BytesToWrite);
+//	void(* ExchangeBytes)(NrfIoDescriptor_ptr io_ptr, uint8_t BytesOut[], uint8_t BytesIn[], uint8_t Count);
+//	void(* ActivateChipSelect)(NrfIoDescriptor_ptr io_ptr);
+//	void(* DeactivateChipSelect)(NrfIoDescriptor_ptr io_ptr);
+//	void(* ActivateChipEnable)(NrfIoDescriptor_ptr io_ptr);
+//	void(* DeactivateChipEnable)(NrfIoDescriptor_ptr io_ptr);
+	SPI_HandleTypeDef * spi_ptr;
+	GPIO_TypeDef * gpio_ptr;
+	HAL_StatusTypeDef status;
+	uint8_t cs_pin;
+	uint8_t ce_pin;
 };
 
 // Register structures

@@ -11,14 +11,13 @@ struct nrf24_io_descriptor
 struct nrf24_hal_support_interface
 {
 	void(*init_spi)(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr);
-	void(*spi_set_ce_lo)(NrfIoDescriptor_ptr);
-	void(*spi_set_ce_hi)(NrfIoDescriptor_ptr);
-	void(*spi_set_csn_lo)(NrfIoDescriptor_ptr);
-	void(*spi_set_csn_hi)(NrfIoDescriptor_ptr);
-	void(*exchange_bytes)(NrfIoDescriptor_ptr, uint8_t[], uint8_t[], uint8_t);
-	void(*read_bytes)(NrfIoDescriptor_ptr, uint8_t bytes_in_ptr[], uint8_t count);
-	void(*write_bytes)(NrfIoDescriptor_ptr, uint8_t bytes_out_ptr[], uint8_t count);
-	void(*init_device)(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr);
+	void(*spi_set_ce_lo)(NrfSpiDevice_ptr);
+	void(*spi_set_ce_hi)(NrfSpiDevice_ptr);
+	void(*spi_set_csn_lo)(NrfSpiDevice_ptr);
+	void(*spi_set_csn_hi)(NrfSpiDevice_ptr);
+	void(*exchange_bytes)(NrfSpiDevice_ptr, uint8_t[], uint8_t[], uint8_t);
+	void(*read_bytes)(NrfSpiDevice_ptr, uint8_t bytes_in_ptr[], uint8_t count);
+	void(*write_bytes)(NrfSpiDevice_ptr, uint8_t bytes_out_ptr[], uint8_t count);
 	void(*flash_led_forever)(uint32_t interval);
 };
 

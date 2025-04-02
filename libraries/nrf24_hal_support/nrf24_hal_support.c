@@ -5,15 +5,14 @@
 #include <nrf24_package.library.h>
 
 // Declare all static functions
-static void spi_set_ce_lo(NrfIoDescriptor_ptr);
-static void spi_set_ce_hi(NrfIoDescriptor_ptr);
-static void spi_set_csn_lo(NrfIoDescriptor_ptr);
-static void spi_set_csn_hi(NrfIoDescriptor_ptr);
-static void exchange_bytes(NrfIoDescriptor_ptr, uint8_t[], uint8_t[], uint8_t);
-static void read_bytes(NrfIoDescriptor_ptr, uint8_t bytes_in_ptr[], uint8_t count);
-static void write_bytes(NrfIoDescriptor_ptr, uint8_t bytes_out_ptr[], uint8_t count);
+static void spi_set_ce_lo(NrfSpiDevice_ptr);
+static void spi_set_ce_hi(NrfSpiDevice_ptr);
+static void spi_set_csn_lo(NrfSpiDevice_ptr);
+static void spi_set_csn_hi(NrfSpiDevice_ptr);
+static void exchange_bytes(NrfSpiDevice_ptr, uint8_t[], uint8_t[], uint8_t);
+static void read_bytes(NrfSpiDevice_ptr, uint8_t bytes_in_ptr[], uint8_t count);
+static void write_bytes(NrfSpiDevice_ptr, uint8_t bytes_out_ptr[], uint8_t count);
 static void init_spi(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr);
-static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr);
 static void pulse_led_forever(uint32_t interval);
 
 // Declare the global library interface with same name as library
@@ -27,7 +26,6 @@ nrf24_hal_support_struct nrf24_hal_support =
 	.exchange_bytes = exchange_bytes,
 	.read_bytes = read_bytes,
 	.write_bytes = write_bytes,
-	.init_device = init_device,
 	.flash_led_forever = pulse_led_forever
 };
 
@@ -59,7 +57,6 @@ static void pulse_led_forever(uint32_t interval)
 static void Initialize(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin)
 {
 	init_spi(spi_ptr, spi_base, int_pin, ce_pin, cs_pin, device_ptr);
-	init_device(spi_ptr, device_ptr, device_ptr->io_ptr);
 }
 
 static void init_spi(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr)
@@ -131,41 +128,29 @@ static void init_spi(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_
 	HAL_GPIO_WritePin((GPIO_TypeDef *)(gpio_base), cs_pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin((GPIO_TypeDef *)(gpio_base), ce_pin, GPIO_PIN_RESET);
 	
-	device_ptr->io_ptr->spi_ptr = spi_ptr;
-	device_ptr->io_ptr->gpio_ptr = (GPIO_TypeDef *)(gpio_base);
-	device_ptr->io_ptr->ce_pin = ce_pin;
-	device_ptr->io_ptr->cs_pin = cs_pin;
-}
-static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr)
-{
-	device_ptr->io_ptr = descriptor_ptr;
-	device_ptr->ActivateChipSelect = nrf24_hal_support.spi_set_csn_lo;
-	device_ptr->DeactivateChipSelect = nrf24_hal_support.spi_set_csn_hi;
-	device_ptr->ActivateChipEnable = nrf24_hal_support.spi_set_ce_hi;
-	device_ptr->DeactivateChipEnable = nrf24_hal_support.spi_set_ce_lo;
-	device_ptr->ExchangeBytes = nrf24_hal_support.exchange_bytes;
-	device_ptr->ReadBytes = nrf24_hal_support.read_bytes;
-	device_ptr->WriteBytes = nrf24_hal_support.write_bytes;
-
+	device_ptr->spi_ptr = spi_ptr;
+	device_ptr->gpio_ptr = (GPIO_TypeDef *)(gpio_base);
+	device_ptr->ce_pin = ce_pin;
+	device_ptr->cs_pin = cs_pin;
 }
 
-static void spi_set_ce_lo(NrfIoDescriptor_ptr ptr)
+static void spi_set_ce_lo(NrfSpiDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->ce_pin, GPIO_PIN_RESET);
 }
-static void spi_set_ce_hi(NrfIoDescriptor_ptr ptr)
+static void spi_set_ce_hi(NrfSpiDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->ce_pin, GPIO_PIN_SET);
 }
-static void spi_set_csn_lo(NrfIoDescriptor_ptr ptr)
+static void spi_set_csn_lo(NrfSpiDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_RESET);
 }
-static void spi_set_csn_hi(NrfIoDescriptor_ptr ptr)
+static void spi_set_csn_hi(NrfSpiDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_SET);
 }
-static void exchange_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
+static void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
 {
 	ptr->status = HAL_SPI_TransmitReceive(ptr->spi_ptr, bytes_out_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
 	
@@ -173,7 +158,7 @@ static void exchange_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_out_ptr[], uin
 		pulse_led_forever(100);
 }
 
-static void read_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count)
+static void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count)
 {
 	ptr->status = HAL_SPI_Receive(ptr->spi_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
 	
@@ -181,7 +166,7 @@ static void read_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_in_ptr[], uint8_t 
 		pulse_led_forever(100);
 }
 
-static void write_bytes(NrfIoDescriptor_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count)
+static void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count)
 {
 	ptr->status = HAL_SPI_Transmit(ptr->spi_ptr, bytes_out_ptr, count, HAL_MAX_DELAY);
 	

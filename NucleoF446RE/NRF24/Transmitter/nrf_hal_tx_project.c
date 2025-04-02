@@ -110,7 +110,6 @@ int main(void)
 	/// Perform all IO related initialization
 	
 	nrf24_hal_support.init_spi(&spi, SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device); /// currently hard coded to use SPI1
-	nrf24_hal_support.init_device(&spi, &device, &io_descriptor); //// currently hard coded to use GPIOA
 	
 //	while (1)
 //	{
@@ -180,9 +179,9 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 	
 	// We must now pulse CE high for > 10 uS for RF transmision to begin. See Page 23 of chip manual.
 	
-	nrf24_hal_support.spi_set_ce_hi(device_ptr->io_ptr);
+	nrf24_hal_support.spi_set_ce_hi(device_ptr);
 	spin_100_uS(); 
-	nrf24_hal_support.spi_set_ce_lo(device_ptr->io_ptr);
+	nrf24_hal_support.spi_set_ce_lo(device_ptr);
 	sent_messages_count++;
 }
 
@@ -192,7 +191,7 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	NrfReg_CONFIG config = { 0 };
 	NrfReg_CONFIG config_mask = { 0 };
 	
-	nrf24_hal_support.spi_set_ce_lo(device_ptr->io_ptr);
+	nrf24_hal_support.spi_set_ce_lo(device_ptr);
 	
 	nrf24_package.Command.FlushRxFifo(device_ptr, &status);
 	
@@ -217,7 +216,7 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, config_mask, &status);
 
-	nrf24_hal_support.spi_set_ce_hi(device_ptr->io_ptr);
+	nrf24_hal_support.spi_set_ce_hi(device_ptr);
 }
 
 
