@@ -2,9 +2,8 @@
 #include <stdbool.h>
 #include <malloc.h>
 #include <stm32f4xx_hal.h>
-#include <nrf24_package.macros.h>
-#include <nrf24_package.library.h>
 #include <nrf24_hal_support.library.h>
+#include <nrf24_package.library.h>
 
 #define ATOMIC_FLAG_OFF (atomic_flag){0};
 # define ROUNDUP(N,ALIGN)	        (((N) +  ((ALIGN)-1)) & ~((ALIGN)-1))
@@ -123,21 +122,21 @@ int main(void)
 	
 	// Snapshot all regsiters
 	
-	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_before, &status);
+	nrf24_package.Read.ALL_REGISTERS(&device, &everything_before, &status);
 	
 	// Force all register into their hardware reset state.
 	
-	nrf24_package.DeviceControl.PowerOnReset(&device);
+	nrf24_package.Action.PowerOnReset(&device);
 	
 	// Snapshot all regsiters
 	
-	nrf24_package.GetRegister.ALL_REGISTERS(&device, &everything_after, &status);
+	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
 		
 	initialize_nrf24_device(&device);
 	
 	TM_NRF24L01_PowerUpTx(&device);
 	
-	nrf24_package.GetRegister.STATUS(&device, &status);
+	nrf24_package.Read.STATUS(&device, &status);
 	
 	status_irq = nrf24_package.EmptyRegister.STATUS;
 	status_mask_irq = nrf24_package.EmptyRegister.STATUS;
@@ -166,9 +165,9 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 {
 	NrfReg_STATUS status;
 	
-	nrf24_package.DeviceControl.FlushTxFifo(device_ptr, &status);
+	nrf24_package.Command.FlushTxFifo(device_ptr, &status);
 	
-	nrf24_package.DeviceControl.WriteTxPayload(device_ptr, data, len, &status);
+	nrf24_package.Command.WriteTxPayload(device_ptr, data, len, &status);
 	
 	// We must now pulse CE high for > 10 uS for RF transmision to begin.
 	
@@ -194,12 +193,12 @@ void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
 	
 	rx_pw.RX_PW_LEN = 32;
 	
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 0, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 1, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 2, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 3, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 4, &status);
-	nrf24_package.SetRegister.RX_PW(device_ptr, rx_pw, 5, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 0, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 1, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 2, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 3, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 4, &status);
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 5, &status);
 
 	/* Set RF settings (2mbps, output power) */
 	
@@ -210,7 +209,7 @@ void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
 	// 3 = 0 dBm
 	rf_setup.RF_PWR = 3; 
 	
-	nrf24_package.SetRegister.RF_SETUP(device_ptr, rf_setup, &status);
+	nrf24_package.Write.RF_SETUP(device_ptr, rf_setup, &status);
 	
 	/* Enable auto-acknowledgment for all pipes */
 	
@@ -221,7 +220,7 @@ void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
 //	en_aa.ENAA_P4 = 1;
 //	en_aa.ENAA_P5 = 1;
 	
-	nrf24_package.SetRegister.EN_AA(device_ptr, en_aa, &status);
+	nrf24_package.Write.EN_AA(device_ptr, en_aa, &status);
 	
 	/* Enable RX addresses */
 	
@@ -232,23 +231,23 @@ void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
 	en_rxaddr.ERX_P0 = 1;
 	en_rxaddr.ERX_P0 = 1;
 
-	nrf24_package.SetRegister.EN_RXADDR(device_ptr, en_rxaddr, &status);
+	nrf24_package.Write.EN_RXADDR(device_ptr, en_rxaddr, &status);
 	
 	/* Auto retransmit delay: 1000 (4x250) us and Up to 15 retransmit trials */
 	
 	setup_retr.ARC = 15;
 	setup_retr.ARD = 3;
 	
-	nrf24_package.SetRegister.SETUP_RETR(device_ptr, setup_retr, &status);
+	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status);
 	
 	/* Dynamic length configurations: No dynamic length */
 	
-	nrf24_package.SetRegister.DYNPD(device_ptr, dynpd, &status);
+	nrf24_package.Write.DYNPD(device_ptr, dynpd, &status);
 	
 	// Clear FIFOs
 	
-	nrf24_package.DeviceControl.FlushRxFifo(device_ptr, &status);
-	nrf24_package.DeviceControl.FlushTxFifo(device_ptr, &status);
+	nrf24_package.Command.FlushRxFifo(device_ptr, &status);
+	nrf24_package.Command.FlushTxFifo(device_ptr, &status);
 	
 	// Clear interrupts
 	
@@ -259,7 +258,7 @@ void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
 	// Since the mask would be the same as the status itself, we can just pass 
 	// it in for both args.
 
-	nrf24_package.UpdateRegister.STATUS(device_ptr, status, status);
+	nrf24_package.Update.STATUS(device_ptr, status, status);
 	
 	TM_NRF24L01_PowerUpRx(device_ptr);
 	
@@ -273,13 +272,13 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	
 	nrf24_hal_support.spi_set_ce_lo(device_ptr->io_ptr);
 	
-	nrf24_package.DeviceControl.FlushRxFifo(device_ptr, &status);
+	nrf24_package.Command.FlushRxFifo(device_ptr, &status);
 	
 	status.RX_DR = 1;
 	status.TX_DS = 1;
 	status.MAX_RT = 1;
 	
-	nrf24_package.SetRegister.STATUS(device_ptr, status, &status);
+	nrf24_package.Read.STATUS(device_ptr, &status);
 	
 	config_mask.PWR_UP = 1;
 	config_mask.PRIM_RX = 1;
@@ -294,7 +293,7 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	config.MASK_RX_DR = 1;
 	config.MASK_TX_DS = 0; // Data sent interrupt will be generated (not masked, not inhibited)
 	
-	nrf24_package.UpdateRegister.CONFIG(device_ptr, config, config_mask, &status);
+	nrf24_package.Update.CONFIG(device_ptr, config, config_mask, &status);
 
 	nrf24_hal_support.spi_set_ce_hi(device_ptr->io_ptr);
 }
@@ -315,7 +314,7 @@ void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr)
 	// Since the mask would be the same as the status itself, we can just pass 
 	// it in for both args.
 	
-	nrf24_package.UpdateRegister.STATUS(device_ptr, status, status);
+	nrf24_package.Update.STATUS(device_ptr, status, status);
 	
 	// Set mode to TX
 
@@ -325,11 +324,11 @@ void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr)
 	config.PWR_UP = 1;
 	config.PRIM_RX = 0;
 	
-	nrf24_package.UpdateRegister.CONFIG(device_ptr, config, config_mask, &status);
+	nrf24_package.Update.CONFIG(device_ptr, config, config_mask, &status);
 	
 	rf_ch.RF_CH = 4; // 2404 MHz
 	
-	nrf24_package.SetRegister.RF_CH(device_ptr, rf_ch, &status);
+	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status);
 	
 }
 
@@ -345,11 +344,11 @@ void EXTI0_IRQPostHandler(NrfSpiDevice_ptr device_ptr)
 	
 	tx_ds_interrupt_count++;
 	
-	nrf24_package.GetRegister.STATUS(device_ptr, &status_irq);
+	nrf24_package.Read.STATUS(device_ptr, &status_irq);
 
 	if (status_irq.TX_DS)
 	{
-		nrf24_package.SetRegister.STATUS(device_ptr, status_irq, &status_irq);
+		nrf24_package.Write.STATUS(device_ptr, status_irq, &status_irq);
 	}
 	
 	tx_ds_irq_clear_pending = 0;

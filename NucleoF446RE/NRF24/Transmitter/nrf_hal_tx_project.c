@@ -14,6 +14,11 @@
 #ifdef __cplusplus
 extern "C"
 #endif
+	
+	
+#define SPI_CS GPIO_PIN_4
+#define NRF_CE GPIO_PIN_1
+	
 void SysTick_Handler(void)
 {
 	HAL_IncTick();
@@ -81,7 +86,7 @@ int main(void)
 	NrfReg_STATUS status_mask_irq = { 0 };
 	NrfReg_STATUS status_irq = { 0 };
 	SPI_HandleTypeDef spi = { 0 }; 
-	NrfIoDescriptor descriptor = { 0 };
+	NrfIoDescriptor io_descriptor = { 0 };
 	uint32_t state = 0;
 	uint8_t buffer[32] = { 0 };
 	//uint8_t[4] send_polls = 0;
@@ -104,9 +109,8 @@ int main(void)
 	
 	/// Perform all IO related initialization
 	
-	nrf24_hal_support.init_spi(&spi); /// currently hard coded to use SPI1
-	nrf24_hal_support.init_control_pins(); /// currently hard coded to use GPIOA
-	nrf24_hal_support.init_device(&spi, &device, &descriptor); //// currently hard coded to use GPIOA
+	nrf24_hal_support.init_spi(&spi, SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device); /// currently hard coded to use SPI1
+	nrf24_hal_support.init_device(&spi, &device, &io_descriptor); //// currently hard coded to use GPIOA
 	
 //	while (1)
 //	{

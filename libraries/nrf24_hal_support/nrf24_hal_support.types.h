@@ -10,8 +10,7 @@ struct nrf24_io_descriptor
 
 struct nrf24_hal_support_interface
 {
-	void (*init_spi)(SPI_HandleTypeDef * spi_ptr);
-	void (*init_control_pins)();
+	void(*init_spi)(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr);
 	void(*spi_set_ce_lo)(NrfIoDescriptor_ptr);
 	void(*spi_set_ce_hi)(NrfIoDescriptor_ptr);
 	void(*spi_set_csn_lo)(NrfIoDescriptor_ptr);

@@ -10,6 +10,11 @@
 #ifdef __cplusplus
 extern "C"
 #endif
+	
+#define SPI_CS GPIO_PIN_4
+#define NRF_CE GPIO_PIN_1
+	
+	
 typedef struct
 {
 	unsigned long fields[3];
@@ -85,8 +90,7 @@ int maintest(void)
 	
 	// Perform all IO related initialization
 	
-	nrf24_hal_support.init_spi(&spi);
-	nrf24_hal_support.init_control_pins();
+	nrf24_hal_support.init_spi(&spi, SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device);
 	nrf24_hal_support.init_device(&spi, &device, &descriptor);
 	
 	// Snapshot all regsiters

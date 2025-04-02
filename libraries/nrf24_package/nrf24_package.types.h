@@ -50,7 +50,7 @@ struct nrf_commands
 
 struct nrf_spi_device
 {
-	void(* ReadBytes)(NrfIoDescriptor_ptr io_ptr, uint8_t BytesIn[], uint8_t BytesToRead);
+	void(* ReadBytes)(NrfIoDescriptor_ptr, uint8_t BytesIn[], uint8_t BytesToRead);
 	void(* WriteBytes)(NrfIoDescriptor_ptr io_ptr, uint8_t BytesOut[], uint8_t BytesToWrite);
 	void(* ExchangeBytes)(NrfIoDescriptor_ptr io_ptr, uint8_t BytesOut[], uint8_t BytesIn[], uint8_t Count);
 	void(* ActivateChipSelect)(NrfIoDescriptor_ptr io_ptr);

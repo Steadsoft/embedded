@@ -12,8 +12,7 @@ static void spi_set_csn_hi(NrfIoDescriptor_ptr);
 static void exchange_bytes(NrfIoDescriptor_ptr, uint8_t[], uint8_t[], uint8_t);
 static void read_bytes(NrfIoDescriptor_ptr, uint8_t bytes_in_ptr[], uint8_t count);
 static void write_bytes(NrfIoDescriptor_ptr, uint8_t bytes_out_ptr[], uint8_t count);
-static void init_spi(SPI_HandleTypeDef * spi_ptr);
-static void init_control_pins();
+static void init_spi(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr);
 static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr);
 static void pulse_led_forever(uint32_t interval);
 
@@ -21,7 +20,6 @@ static void pulse_led_forever(uint32_t interval);
 nrf24_hal_support_struct nrf24_hal_support =
 {
 	.init_spi = init_spi,
-	.init_control_pins = init_control_pins,
 	.spi_set_ce_lo = spi_set_ce_lo,
 	.spi_set_ce_hi = spi_set_ce_hi,
 	.spi_set_csn_lo = spi_set_csn_lo,
@@ -55,33 +53,41 @@ static void pulse_led_forever(uint32_t interval)
 		HAL_Delay(interval);	
 	}
 }
-static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr)
-{
-	descriptor_ptr->spi_ptr = spi_ptr;
-	descriptor_ptr->gpio_ptr = GPIOA;
-	descriptor_ptr->ce_pin = NRF_CE;
-	descriptor_ptr->cs_pin = SPI_CS;
-	
-	device_ptr->io_ptr = descriptor_ptr;
-	device_ptr->ActivateChipSelect = nrf24_hal_support.spi_set_csn_lo;
-	device_ptr->DeactivateChipSelect = nrf24_hal_support.spi_set_csn_hi;
-	device_ptr->ActivateChipEnable = nrf24_hal_support.spi_set_ce_hi;
-	device_ptr->DeactivateChipEnable = nrf24_hal_support.spi_set_ce_lo;
-	device_ptr->ExchangeBytes = nrf24_hal_support.exchange_bytes;
-	device_ptr->ReadBytes = nrf24_hal_support.read_bytes;
-	device_ptr->WriteBytes = nrf24_hal_support.write_bytes;
 
-}
-static void init_spi(SPI_HandleTypeDef * spi_ptr)
+// Initiaize the SPI and associated GPIO pins based on the supplied SPI base address.
+// The int pin, ce pin nd cs pin are assumed to be on the same IO port as the specified SPI.
+static void Initialize(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin)
 {
+	init_spi(spi_ptr, spi_base, int_pin, ce_pin, cs_pin, device_ptr);
+	init_device(spi_ptr, device_ptr, device_ptr->io_ptr);
+}
+
+static void init_spi(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr)
+{
+	unsigned long gpio_base;
 	HAL_StatusTypeDef status;
-	
+	GPIO_InitTypeDef  GPIO_InitStruct_ctrl = { 0 };
 	GPIO_InitTypeDef  GPIO_InitStruct_spi = { 0 };
 	GPIO_InitTypeDef  GPIO_InitStruct_irq = { 0 };
 
-	__SPI1_CLK_ENABLE();
+	if (spi_base == SPI1_BASE)
+	{
+		gpio_base = GPIOA_BASE;
+		__SPI1_CLK_ENABLE();
+		__GPIOA_CLK_ENABLE();
+		GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
+		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
+	}
+	if (spi_base == SPI4_BASE)
+	{
+		gpio_base = GPIOB_BASE;
+		__SPI4_CLK_ENABLE();
+		__GPIOB_CLK_ENABLE();
+		GPIO_InitStruct_spi.Pin       = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5;
+		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI4;
+	}
 	
-	spi_ptr->Instance = SPI1;
+	spi_ptr->Instance = ((SPI_TypeDef *) spi_base);
 	spi_ptr->Init.Mode = SPI_MODE_MASTER; 
 	spi_ptr->Init.Direction = SPI_DIRECTION_2LINES;
 	spi_ptr->Init.DataSize = SPI_DATASIZE_8BIT;
@@ -96,44 +102,51 @@ static void init_spi(SPI_HandleTypeDef * spi_ptr)
 	
 	status = HAL_SPI_Init(spi_ptr);
 	
-	__GPIOA_CLK_ENABLE();
-
-	GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
 	GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
 	GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
 	GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
-	GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
  
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_spi);
+	HAL_GPIO_Init((GPIO_TypeDef *)(gpio_base), &GPIO_InitStruct_spi);
 	
-	GPIO_InitStruct_irq.Pin = GPIO_PIN_0;
-	GPIO_InitStruct_irq.Mode = GPIO_MODE_IT_FALLING;
-	GPIO_InitStruct_irq.Pull = GPIO_PULLUP;
-	GPIO_InitStruct_spi.Speed = GPIO_SPEED_FAST;
+	if (int_pin < 0)
+	{
+		GPIO_InitStruct_irq.Pin = int_pin;
+		GPIO_InitStruct_irq.Mode = GPIO_MODE_IT_FALLING;
+		GPIO_InitStruct_irq.Pull = GPIO_PULLUP;
+		GPIO_InitStruct_spi.Speed = GPIO_SPEED_FAST;
+		HAL_GPIO_Init((GPIO_TypeDef *)(gpio_base), &GPIO_InitStruct_irq);
+		/* EXTI interrupt init*/
+		HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+		HAL_NVIC_EnableIRQ(EXTI0_IRQn); 
+	}
+	
+	// Init the control pins
+	
+	GPIO_InitStruct_ctrl.Pin   = ce_pin | cs_pin;
+	GPIO_InitStruct_ctrl.Mode  = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct_ctrl.Pull  = GPIO_PULLUP;
+	GPIO_InitStruct_ctrl.Speed = GPIO_SPEED_LOW;
 
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_irq);
+	HAL_GPIO_Init((GPIO_TypeDef *)(gpio_base), &GPIO_InitStruct_ctrl);
+	HAL_GPIO_WritePin((GPIO_TypeDef *)(gpio_base), cs_pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin((GPIO_TypeDef *)(gpio_base), ce_pin, GPIO_PIN_RESET);
 	
-	/* EXTI interrupt init*/
-	HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(EXTI0_IRQn); 
+	device_ptr->io_ptr->spi_ptr = spi_ptr;
+	device_ptr->io_ptr->gpio_ptr = (GPIO_TypeDef *)(gpio_base);
+	device_ptr->io_ptr->ce_pin = ce_pin;
+	device_ptr->io_ptr->cs_pin = cs_pin;
 }
-
-
-
-static void init_control_pins()
+static void init_device(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, NrfIoDescriptor_ptr descriptor_ptr)
 {
-	GPIO_InitTypeDef  GPIO_InitStruct_ctrl = { 0 };
-	
-	GPIO_InitStruct_ctrl.Pin  = NRF_CE | SPI_CS;
-	GPIO_InitStruct_ctrl.Mode = GPIO_MODE_OUTPUT_PP;
+	device_ptr->io_ptr = descriptor_ptr;
+	device_ptr->ActivateChipSelect = nrf24_hal_support.spi_set_csn_lo;
+	device_ptr->DeactivateChipSelect = nrf24_hal_support.spi_set_csn_hi;
+	device_ptr->ActivateChipEnable = nrf24_hal_support.spi_set_ce_hi;
+	device_ptr->DeactivateChipEnable = nrf24_hal_support.spi_set_ce_lo;
+	device_ptr->ExchangeBytes = nrf24_hal_support.exchange_bytes;
+	device_ptr->ReadBytes = nrf24_hal_support.read_bytes;
+	device_ptr->WriteBytes = nrf24_hal_support.write_bytes;
 
-	GPIO_InitStruct_ctrl.Pull      = GPIO_PULLUP;
-	GPIO_InitStruct_ctrl.Speed     = GPIO_SPEED_LOW;
-
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_ctrl);
-
-	HAL_GPIO_WritePin(GPIOA, SPI_CS, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA, NRF_CE, GPIO_PIN_RESET);
 }
 
 static void spi_set_ce_lo(NrfIoDescriptor_ptr ptr)
