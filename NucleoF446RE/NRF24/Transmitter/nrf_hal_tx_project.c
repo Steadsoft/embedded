@@ -36,6 +36,10 @@ volatile uint32_t tx_ds_interrupt_count = 0;
 volatile uint32_t sent_messages_count = 0;
 
 volatile uint8_t tx_ds_irq_clear_pending = 0;
+
+static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code);
+
+
 void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr);
 void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr);
 int get_board_id();
@@ -109,7 +113,7 @@ int main(void)
 	
 	/// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI1_BASE, NRF_IR, NRF_CE, SPI_CS, &device); 
+	nrf24_hal_support.Configure(SPI1_BASE, NRF_IR, NRF_CE, SPI_CS, &device, fault_handler); 
 	
 //	while (1)
 //	{
@@ -240,6 +244,11 @@ void EXTI0_IRQPostHandler(NrfSpiDevice_ptr device_ptr)
 	}
 	
 	tx_ds_irq_clear_pending = 0;
+}
+
+static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)
+{
+	;
 }
 
 

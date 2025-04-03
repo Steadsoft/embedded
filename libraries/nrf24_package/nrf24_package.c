@@ -650,6 +650,8 @@ private void Initialize(NrfSpiDevice_ptr device_ptr)
 	NrfReg_SETUP_AW setup_aw = { 0 };
 	NrfReg_RF_CH rf_ch = { 0 };
 	
+	if (!device_ptr->configured) ; // lets devise an exception callback for any errors like this.
+	
 	nrf24_hal_support.Deactivate(device_ptr);
 	nrf24_hal_support.Deselect(device_ptr);
 	

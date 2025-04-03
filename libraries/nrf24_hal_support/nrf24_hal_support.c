@@ -10,7 +10,7 @@ private void spi_set_ce_hi(NrfSpiDevice_ptr);
 private void spi_set_csn_lo(NrfSpiDevice_ptr);
 private void spi_set_csn_hi(NrfSpiDevice_ptr);
 private void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count);
-private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr);
+private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler);
 private void pulse_led_forever(uint32_t interval);
 private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count);
 private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
@@ -55,13 +55,50 @@ private void pulse_led_forever(uint32_t interval)
 // Initiaize the SPI and associated GPIO pins based on the supplied SPI base address.
 // The int pin, ce pin nd cs pin are assumed to be on the same IO port as the specified SPI.
 
-private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr)
+private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler)
 {
 	unsigned long gpio_base;
 	HAL_StatusTypeDef status;
 	GPIO_InitTypeDef  GPIO_InitStruct_ctrl = { 0 };
 	GPIO_InitTypeDef  GPIO_InitStruct_spi = { 0 };
 	GPIO_InitTypeDef  GPIO_InitStruct_irq = { 0 };
+	
+	if (device_ptr == NULL)
+	{
+		handler(NULL, NULL_ARG_PTR);
+		return;
+	}
+	
+	device_ptr->FaultHandler = handler;
+	
+	if (int_pin < GPIO_PIN_0 || int_pin > GPIO_PIN_15)
+	{
+		// Invalid interrupt pin number
+		device_ptr->FaultHandler(device_ptr, INVALID_INTERRUPT_PIN);
+		return;
+	}
+	
+	if (ce_pin < GPIO_PIN_0 || ce_pin > GPIO_PIN_15)
+	{
+		// Invalid CE pin number
+		device_ptr->FaultHandler(device_ptr, INVALID_CE_PIN);
+		return;
+	}
+	
+	if (cs_pin < GPIO_PIN_0 || cs_pin > GPIO_PIN_15)
+	{
+		// Invalid CS pin number
+		device_ptr->FaultHandler(device_ptr, INVALID_CS_PIN);
+		return;
+	}
+	
+	if (int_pin == ce_pin || int_pin == cs_pin || ce_pin == cs_pin)
+	{
+		// Invalid pin combination
+		device_ptr->FaultHandler(device_ptr, INVALID_PIN_COMBINATION);
+		return;
+	}
+
 
 	if (spi_base == SPI1_BASE)
 	{
@@ -71,13 +108,18 @@ private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint3
 		GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
 		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
 	}
-	if (spi_base == SPI4_BASE)
+	else if (spi_base == SPI4_BASE)
 	{
 		gpio_base = GPIOB_BASE;
 		__SPI4_CLK_ENABLE();
 		__GPIOB_CLK_ENABLE();
 		GPIO_InitStruct_spi.Pin       = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5;
 		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI4;
+	}
+	else
+	{
+		device_ptr->FaultHandler(device_ptr, INVALID_SPI_BASE);
+		return;
 	}
 	
 	device_ptr->spi.Instance = ((SPI_TypeDef *) spi_base);
@@ -94,6 +136,12 @@ private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint3
 	device_ptr->spi.Init.CRCPolynomial = 10;
 	
 	status = HAL_SPI_Init(&device_ptr->spi);
+	
+	if (status != HAL_OK)
+	{
+		device_ptr->FaultHandler(device_ptr, HAL_SPI_INIT_ERROR);
+		return;
+	}
 	
 	GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
 	GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
@@ -128,6 +176,7 @@ private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint3
 	device_ptr->ce_pin = ce_pin;
 	device_ptr->cs_pin = cs_pin;
 	device_ptr->int_pin = int_pin;
+	device_ptr->configured = 1; // Mark as configured
 }
 
 private void spi_set_ce_lo(NrfSpiDevice_ptr ptr)

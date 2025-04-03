@@ -368,7 +368,12 @@ struct nrf_update_interface
 struct nrf_action_interface
 {
 	void(* PowerOnReset)(NrfSpiDevice_ptr); // Sets all device registers to the same values they have after powering off/on.
-	void(* Initialize)(NrfSpiDevice_ptr);
+	/*
+	 * @brief Initializes the NRF registers prior to setting up TX or RX operation.
+	 * @param device_ptr Pointer to the configured NRF device structure that contains the SPI and GPIO control structures.
+	 * 
+	 */
+	void(* Initialize)(NrfSpiDevice_ptr device_ptr);
 	void(* PowerUpTx)(NrfSpiDevice_ptr);
 	void(* PowerDown)(NrfSpiDevice_ptr);
 };

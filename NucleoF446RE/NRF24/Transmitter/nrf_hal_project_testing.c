@@ -20,11 +20,13 @@ typedef struct
 	unsigned long fields[3];
 } BoardId;
 
+void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code);
+
 
 void update(NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP_ptr);
 
 void enter_rx_mode(NrfSpiDevice_ptr device_ptr);
-
+void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code);
 int get_board_id();
 void spin_100_uS();
 void send_commands(NrfSpiDevice_ptr device_ptr, int count);
@@ -89,7 +91,7 @@ int maintest(void)
 	
 	// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device);
+	nrf24_hal_support.Configure(SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device, fault_handler);
 	
 	// Snapshot all regsiters
 	
@@ -194,6 +196,12 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 		spin_100_uS();
 	}
 }
+
+void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)
+{
+	;
+}
+
 
 void trapif(int value, NrfSpiDevice_ptr device_ptr)
 {
