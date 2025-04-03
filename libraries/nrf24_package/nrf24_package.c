@@ -1,3 +1,4 @@
+// Should always be the very first line in the implementation source file.
 #define nrf24_package_implementer
 
 #include <stdint.h>
@@ -5,7 +6,7 @@
 #include <nrf24_hal_support.library.h>
 #include <nrf24_package.library.h>
 
-// Declare all static functions
+// Declare all static (private) functions
 
 private void ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 private void WriteConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
@@ -61,13 +62,10 @@ private void WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8
 private void SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr);
 private void PowerUpTx(NrfSpiDevice_ptr device_ptr);
 private void PowerDown(NrfSpiDevice_ptr device_ptr);
-
 private void FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
-
 private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 private void Initialize(NrfSpiDevice_ptr device_ptr);
-
 private void WriteTxPayload(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 
 
@@ -632,8 +630,6 @@ private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_
 	ReadFifoStatusRegister(device_ptr, &(Value->FifoStatus), NrfStatus);
 	ReadDynpdRegister(device_ptr, &(Value->Dynpd), NrfStatus);
 	ReadFeatureRegister(device_ptr, &(Value->Feature), NrfStatus);
-	
-
 }
 
 private void Initialize(NrfSpiDevice_ptr device_ptr)

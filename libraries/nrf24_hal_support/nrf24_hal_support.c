@@ -1,8 +1,9 @@
+// Should always be the very first line in the implementation source file.
 #define nrf24_hal_support_implementer
 
 #include <stm32f4xx_hal.h>
 #include <nrf24_hal_support.library.h>
-#include <nrf24_package.library.h>
+//#include <nrf24_package.library.h>
 
 // Declare all static functions
 private void spi_set_ce_lo(NrfSpiDevice_ptr);
