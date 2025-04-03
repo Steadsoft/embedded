@@ -2,8 +2,6 @@ typedef const struct nrf24_package_interface nrf24_package_struct, * nrf24_packa
 typedef const struct nrf_registers nrf24_register_names;
 typedef const struct nrf_commands nrf24_command_names;
 
-
-
 /*---------------------------------------------------------------------*/
 /* Registers are all defined as unions to faciliate access to their    */
 /* individual fields yet also enable low level code to pass the fields */
@@ -27,6 +25,4 @@ typedef struct NrfReg_RX_PW_struct NrfReg_RX_PW, * NrfReg_RX_PW_ptr;
 typedef struct NrfReg_FIFO_STATUS_struct NrfReg_FIFO_STATUS, * NrfReg_FIFO_STATUS_ptr;
 typedef struct NrfReg_DYNPD_struct NrfReg_DYNPD, * NrfReg_DYNPD_ptr;
 typedef struct NrfReg_FEATURE_struct NrfReg_FEATURE, * NrfReg_FEATURE_ptr;
-
 typedef struct NrfReg_ALL_REGISTERS_struct NrfReg_ALL_REGISTERS, * NrfReg_ALL_REGISTERS_ptr;
-

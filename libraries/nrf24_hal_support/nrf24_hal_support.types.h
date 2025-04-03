@@ -1,13 +1,3 @@
-struct nrf24_io_descriptor
-{
-	SPI_HandleTypeDef * spi_ptr;
-	GPIO_TypeDef * gpio_ptr;
-	
-	HAL_StatusTypeDef status;
-	uint8_t cs_pin;
-	uint8_t ce_pin;
-};
-
 struct nrf24_hal_support_interface
 {
 	void(*init_spi)(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr);

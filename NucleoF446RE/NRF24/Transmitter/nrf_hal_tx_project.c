@@ -86,7 +86,6 @@ int main(void)
 	NrfReg_STATUS status_mask_irq = { 0 };
 	NrfReg_STATUS status_irq = { 0 };
 	SPI_HandleTypeDef spi = { 0 }; 
-	NrfIoDescriptor io_descriptor = { 0 };
 	uint32_t state = 0;
 	uint8_t buffer[32] = { 0 };
 	//uint8_t[4] send_polls = 0;

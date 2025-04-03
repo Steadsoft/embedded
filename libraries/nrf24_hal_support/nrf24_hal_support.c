@@ -132,6 +132,7 @@ static void init_spi(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_
 	device_ptr->gpio_ptr = (GPIO_TypeDef *)(gpio_base);
 	device_ptr->ce_pin = ce_pin;
 	device_ptr->cs_pin = cs_pin;
+	device_ptr->int_pin = int_pin;
 }
 
 static void spi_set_ce_lo(NrfSpiDevice_ptr ptr)

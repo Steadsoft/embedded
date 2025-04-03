@@ -84,7 +84,6 @@ int maintest(void)
 	NrfReg_STATUS status;
 	SPI_HandleTypeDef spi; 
 	NrfSpiDevice device; 
-	NrfIoDescriptor descriptor;
 	NrfReg_CONFIG cfg;
 	NrfReg_SETUP_AW aw = { 0 };
 	
