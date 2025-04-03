@@ -12,20 +12,20 @@ static void spi_set_csn_hi(NrfSpiDevice_ptr);
 static void exchange_bytes(NrfSpiDevice_ptr, uint8_t[], uint8_t[], uint8_t);
 static void read_bytes(NrfSpiDevice_ptr, uint8_t bytes_in_ptr[], uint8_t count);
 static void write_bytes(NrfSpiDevice_ptr, uint8_t bytes_out_ptr[], uint8_t count);
-static void init_spi(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr);
+static void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr);
 static void pulse_led_forever(uint32_t interval);
 
 // Declare the global library interface with same name as library
 nrf24_hal_support_struct nrf24_hal_support =
 {
-	.init_spi = init_spi,
-	.spi_set_ce_lo = spi_set_ce_lo,
-	.spi_set_ce_hi = spi_set_ce_hi,
-	.spi_set_csn_lo = spi_set_csn_lo,
-	.spi_set_csn_hi = spi_set_csn_hi,
-	.exchange_bytes = exchange_bytes,
-	.read_bytes = read_bytes,
-	.write_bytes = write_bytes,
+	.Configure = init_spi,
+	.Deactivate = spi_set_ce_lo,
+	.Activate = spi_set_ce_hi,
+	.Select = spi_set_csn_lo,
+	.Deselect = spi_set_csn_hi,
+	.ExchangeBytes = exchange_bytes,
+	.ReadBytes = read_bytes,
+	.WriteBytes = write_bytes,
 	.flash_led_forever = pulse_led_forever
 };
 
@@ -54,12 +54,8 @@ static void pulse_led_forever(uint32_t interval)
 
 // Initiaize the SPI and associated GPIO pins based on the supplied SPI base address.
 // The int pin, ce pin nd cs pin are assumed to be on the same IO port as the specified SPI.
-static void Initialize(SPI_HandleTypeDef * spi_ptr, NrfSpiDevice_ptr device_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin)
-{
-	init_spi(spi_ptr, spi_base, int_pin, ce_pin, cs_pin, device_ptr);
-}
 
-static void init_spi(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr)
+static void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr)
 {
 	unsigned long gpio_base;
 	HAL_StatusTypeDef status;
@@ -84,20 +80,20 @@ static void init_spi(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_
 		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI4;
 	}
 	
-	spi_ptr->Instance = ((SPI_TypeDef *) spi_base);
-	spi_ptr->Init.Mode = SPI_MODE_MASTER; 
-	spi_ptr->Init.Direction = SPI_DIRECTION_2LINES;
-	spi_ptr->Init.DataSize = SPI_DATASIZE_8BIT;
-	spi_ptr->Init.CLKPolarity = SPI_POLARITY_LOW;
-	spi_ptr->Init.CLKPhase = SPI_PHASE_1EDGE;
-	spi_ptr->Init.NSS = SPI_NSS_SOFT; // SPI_NSS_HARD_OUTPUT
-	spi_ptr->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
-	spi_ptr->Init.FirstBit = SPI_FIRSTBIT_MSB;
-	spi_ptr->Init.TIMode = SPI_TIMODE_DISABLED;
-	spi_ptr->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
-	spi_ptr->Init.CRCPolynomial = 10;
+	device_ptr->spi.Instance = ((SPI_TypeDef *) spi_base);
+	device_ptr->spi.Init.Mode = SPI_MODE_MASTER; 
+	device_ptr->spi.Init.Direction = SPI_DIRECTION_2LINES;
+	device_ptr->spi.Init.DataSize = SPI_DATASIZE_8BIT;
+	device_ptr->spi.Init.CLKPolarity = SPI_POLARITY_LOW;
+	device_ptr->spi.Init.CLKPhase = SPI_PHASE_1EDGE;
+	device_ptr->spi.Init.NSS = SPI_NSS_SOFT; // SPI_NSS_HARD_OUTPUT
+	device_ptr->spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+	device_ptr->spi.Init.FirstBit = SPI_FIRSTBIT_MSB;
+	device_ptr->spi.Init.TIMode = SPI_TIMODE_DISABLED;
+	device_ptr->spi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
+	device_ptr->spi.Init.CRCPolynomial = 10;
 	
-	status = HAL_SPI_Init(spi_ptr);
+	status = HAL_SPI_Init(&device_ptr->spi);
 	
 	GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
 	GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
@@ -128,7 +124,6 @@ static void init_spi(SPI_HandleTypeDef * spi_ptr, unsigned long spi_base, int32_
 	HAL_GPIO_WritePin((GPIO_TypeDef *)(gpio_base), cs_pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin((GPIO_TypeDef *)(gpio_base), ce_pin, GPIO_PIN_RESET);
 	
-	device_ptr->spi_ptr = spi_ptr;
 	device_ptr->gpio_ptr = (GPIO_TypeDef *)(gpio_base);
 	device_ptr->ce_pin = ce_pin;
 	device_ptr->cs_pin = cs_pin;
@@ -153,7 +148,7 @@ static void spi_set_csn_hi(NrfSpiDevice_ptr ptr)
 }
 static void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
 {
-	ptr->status = HAL_SPI_TransmitReceive(ptr->spi_ptr, bytes_out_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
+	ptr->status = HAL_SPI_TransmitReceive(&ptr->spi, bytes_out_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
 	
 	if (ptr->status != HAL_OK)
 		pulse_led_forever(100);
@@ -161,7 +156,7 @@ static void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_
 
 static void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count)
 {
-	ptr->status = HAL_SPI_Receive(ptr->spi_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
+	ptr->status = HAL_SPI_Receive(&ptr->spi, bytes_in_ptr, count, HAL_MAX_DELAY);
 	
 	if (ptr->status != HAL_OK)
 		pulse_led_forever(100);
@@ -169,7 +164,7 @@ static void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t cou
 
 static void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count)
 {
-	ptr->status = HAL_SPI_Transmit(ptr->spi_ptr, bytes_out_ptr, count, HAL_MAX_DELAY);
+	ptr->status = HAL_SPI_Transmit(&ptr->spi, bytes_out_ptr, count, HAL_MAX_DELAY);
 	
 	if (ptr->status != HAL_OK)
 		pulse_led_forever(100);

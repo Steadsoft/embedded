@@ -311,9 +311,9 @@ static void _ReadStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr V
 {
 	uint8_t command = NrfCommand.NOP | Nrf24Register.STATUS;
 	
-	nrf24_hal_support.spi_set_csn_lo(device_ptr);
-	nrf24_hal_support.exchange_bytes(device_ptr, &command, (uint8_t*)Value, 1);
-	nrf24_hal_support.spi_set_csn_hi(device_ptr);
+	nrf24_hal_support.Select(device_ptr);
+	nrf24_hal_support.ExchangeBytes(device_ptr, &command, (uint8_t*)Value, 1);
+	nrf24_hal_support.Deselect(device_ptr);
 
 }
 static void _WriteStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS_ptr NrfStatus)
@@ -447,18 +447,18 @@ static void _ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 {
 	uint8_t command = NrfCommand.R_REGISTER | Register;
 	
-	nrf24_hal_support.spi_set_csn_lo(device_ptr);
-	nrf24_hal_support.write_bytes(device_ptr, &command, 1);
-	nrf24_hal_support.read_bytes(device_ptr, Value, 1);
-	nrf24_hal_support.spi_set_csn_hi(device_ptr);
+	nrf24_hal_support.Select(device_ptr);
+	nrf24_hal_support.WriteBytes(device_ptr, &command, 1);
+	nrf24_hal_support.ReadBytes(device_ptr, Value, 1);
+	nrf24_hal_support.Deselect(device_ptr);
 }
 static void _WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command[2] = { NrfCommand.W_REGISTER | Register, Value };
 	
-	nrf24_hal_support.spi_set_csn_lo(device_ptr);
-	nrf24_hal_support.write_bytes(device_ptr, command, 2);
-	nrf24_hal_support.spi_set_csn_hi(device_ptr);
+	nrf24_hal_support.Select(device_ptr);
+	nrf24_hal_support.WriteBytes(device_ptr, command, 2);
+	nrf24_hal_support.Deselect(device_ptr);
 }
 static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus)
 {
@@ -489,10 +489,10 @@ static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 	
 	*BytesRead = bytes;
 	
-	nrf24_hal_support.spi_set_csn_lo(device_ptr);
-	nrf24_hal_support.exchange_bytes(device_ptr, &command, (uint8_t*)NrfStatus,1);
-	nrf24_hal_support.read_bytes(device_ptr, Value, bytes);
-	nrf24_hal_support.spi_set_csn_hi(device_ptr);
+	nrf24_hal_support.Select(device_ptr);
+	nrf24_hal_support.ExchangeBytes(device_ptr, &command, (uint8_t*)NrfStatus,1);
+	nrf24_hal_support.ReadBytes(device_ptr, Value, bytes);
+	nrf24_hal_support.Deselect(device_ptr);
 }
 static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus)
 {
@@ -519,10 +519,10 @@ static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Regist
 	
 	*BytesWritten = bytes;
 	
-	nrf24_hal_support.spi_set_csn_lo(device_ptr);
-	nrf24_hal_support.exchange_bytes(device_ptr, &command, (uint8_t*)NrfStatus, 1);
-	nrf24_hal_support.write_bytes(device_ptr, Value, bytes);
-	nrf24_hal_support.spi_set_csn_hi(device_ptr);
+	nrf24_hal_support.Select(device_ptr);
+	nrf24_hal_support.ExchangeBytes(device_ptr, &command, (uint8_t*)NrfStatus, 1);
+	nrf24_hal_support.WriteBytes(device_ptr, Value, bytes);
+	nrf24_hal_support.Deselect(device_ptr);
 }
 
 // Set all regsiters to the same values they get set to, when the device is powered off/on
@@ -652,8 +652,8 @@ static void _Initialize(NrfSpiDevice_ptr device_ptr)
 	NrfReg_SETUP_AW setup_aw = { 0 };
 	NrfReg_RF_CH rf_ch = { 0 };
 	
-	nrf24_hal_support.spi_set_ce_lo(device_ptr);
-	nrf24_hal_support.spi_set_csn_hi(device_ptr);
+	nrf24_hal_support.Deactivate(device_ptr);
+	nrf24_hal_support.Deselect(device_ptr);
 	
 	nrf24_package.Write.CONFIG(device_ptr, config, &status); // Zeroize the config register
 	nrf24_package.Write.EN_AA(device_ptr, en_aa, &status); // Zeroize the auto-ack register
@@ -681,7 +681,7 @@ static void _PowerDown(NrfSpiDevice_ptr device_ptr)
 	NrfReg_CONFIG config = { 0 };
 	NrfReg_STATUS status;
 	
-	nrf24_hal_support.spi_set_ce_lo(device_ptr);
+	nrf24_hal_support.Deactivate(device_ptr);
 
 	nrf24_package.Read.CONFIG(device_ptr, &config, &status);
 	
@@ -728,18 +728,18 @@ static void _FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatu
 {
 	uint8_t command = NrfCommand.FLUSH_TX;
 	
-	nrf24_hal_support.spi_set_csn_lo(device_ptr);
-	nrf24_hal_support.exchange_bytes(device_ptr, &command, (uint8_t*)NrfStatus, 1);
-	nrf24_hal_support.spi_set_csn_hi(device_ptr);
+	nrf24_hal_support.Select(device_ptr);
+	nrf24_hal_support.ExchangeBytes(device_ptr, &command, (uint8_t*)NrfStatus, 1);
+	nrf24_hal_support.Deselect(device_ptr);
 }
 
 static void _FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = NrfCommand.FLUSH_RX;
 
-	nrf24_hal_support.spi_set_csn_lo(device_ptr);
-	nrf24_hal_support.exchange_bytes(device_ptr, &command, (uint8_t*)NrfStatus, 1);
-	nrf24_hal_support.spi_set_csn_hi(device_ptr);
+	nrf24_hal_support.Select(device_ptr);
+	nrf24_hal_support.ExchangeBytes(device_ptr, &command, (uint8_t*)NrfStatus, 1);
+	nrf24_hal_support.Deselect(device_ptr);
 }
 
 static void _WriteTxPayload(NrfSpiDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus)
@@ -754,7 +754,7 @@ static void _WriteTxPayload(NrfSpiDevice_ptr device_ptr, uint8_t * data_ptr, uin
 			buffer[X + 1] = data_ptr[X];
 	}
 
-	nrf24_hal_support.spi_set_csn_lo(device_ptr);
-	nrf24_hal_support.write_bytes(device_ptr, buffer, data_len + 1);
-	nrf24_hal_support.spi_set_csn_hi(device_ptr);
+	nrf24_hal_support.Select(device_ptr);
+	nrf24_hal_support.WriteBytes(device_ptr, buffer, data_len + 1);
+	nrf24_hal_support.Deselect(device_ptr);
 }

@@ -89,7 +89,7 @@ int maintest(void)
 	
 	// Perform all IO related initialization
 	
-	nrf24_hal_support.init_spi(&spi, SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device);
+	nrf24_hal_support.Configure(SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device);
 	
 	// Snapshot all regsiters
 	

@@ -50,7 +50,7 @@ struct nrf_commands
 
 struct nrf_spi_device
 {
-	SPI_HandleTypeDef * spi_ptr;
+	SPI_HandleTypeDef spi;
 	GPIO_TypeDef * gpio_ptr;
 	HAL_StatusTypeDef status;
 	uint8_t cs_pin;

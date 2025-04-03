@@ -10,6 +10,11 @@
 #ifdef __cplusplus
 extern "C"
 #endif
+	
+	
+#define SPI_CS GPIO_PIN_4
+#define NRF_CE GPIO_PIN_1
+
 typedef struct
 {
 	unsigned long fields[3];
@@ -79,15 +84,12 @@ int maintest(void)
 	NrfReg_STATUS status;
 	SPI_HandleTypeDef spi; 
 	NrfSpiDevice device; 
-	NrfIoDescriptor descriptor;
 	NrfReg_CONFIG cfg;
 	NrfReg_SETUP_AW aw = { 0 };
 	
 	// Perform all IO related initialization
 	
-	nrf24_hal_support.init_spi(&spi);
-	nrf24_hal_support.init_control_pins();
-	nrf24_hal_support.init_device(&spi, &device, &descriptor);
+	nrf24_hal_support.Configure(SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device); 
 	
 	// Snapshot all regsiters
 	

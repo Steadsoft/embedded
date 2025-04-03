@@ -9,6 +9,10 @@
 # define ROUNDUP(N,ALIGN)	        (((N) +  ((ALIGN)-1)) & ~((ALIGN)-1))
 //#include <cmsis_gcc.h>
 
+#define SPI_CS GPIO_PIN_4
+#define NRF_CE GPIO_PIN_1
+
+
 // SEE: http://blog.gorski.pm/stm32-unique-id
 
 #ifdef __cplusplus
@@ -91,7 +95,6 @@ int main(void)
 	NrfReg_STATUS status_mask_irq = { 0 };
 	NrfReg_STATUS status_irq = { 0 };
 	SPI_HandleTypeDef spi = { 0 }; 
-	NrfIoDescriptor descriptor = { 0 };
 	uint32_t state = 0;
 	uint8_t buffer[32] = { 0 };
 	uint8_t send_polls = 0;
@@ -116,9 +119,7 @@ int main(void)
 	
 	// Perform all IO related initialization
 	
-	nrf24_hal_support.init_spi(&spi);
-	nrf24_hal_support.init_control_pins();
-	nrf24_hal_support.init_device(&spi, &device, &descriptor);
+	nrf24_hal_support.Configure(SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device); 
 	
 	// Snapshot all regsiters
 	
@@ -171,9 +172,9 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 	
 	// We must now pulse CE high for > 10 uS for RF transmision to begin.
 	
-	nrf24_hal_support.spi_set_ce_hi(device_ptr->io_ptr);
-	spin_20_uS(); 
-	nrf24_hal_support.spi_set_ce_lo(device_ptr->io_ptr);
+	nrf24_hal_support.Activate(device_ptr);
+	spin_100_uS(); 
+	nrf24_hal_support.Deactivate(device_ptr);
 	sent_messages_count++;
 }
 
@@ -270,7 +271,7 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	NrfReg_CONFIG config = { 0 };
 	NrfReg_CONFIG config_mask = { 0 };
 	
-	nrf24_hal_support.spi_set_ce_lo(device_ptr->io_ptr);
+	nrf24_hal_support.Deactivate(device_ptr);
 	
 	nrf24_package.Command.FlushRxFifo(device_ptr, &status);
 	
@@ -295,7 +296,7 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, config_mask, &status);
 
-	nrf24_hal_support.spi_set_ce_hi(device_ptr->io_ptr);
+	nrf24_hal_support.Activate(device_ptr);
 }
 
 void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr)	
