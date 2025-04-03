@@ -101,7 +101,7 @@ private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint3
  
 	HAL_GPIO_Init((GPIO_TypeDef *)(gpio_base), &GPIO_InitStruct_spi);
 	
-	if (int_pin < 0)
+	if (int_pin >= 0)
 	{
 		GPIO_InitStruct_irq.Pin = int_pin;
 		GPIO_InitStruct_irq.Mode = GPIO_MODE_IT_FALLING;

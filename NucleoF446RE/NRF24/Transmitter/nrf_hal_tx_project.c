@@ -18,6 +18,7 @@ extern "C"
 	
 #define SPI_CS GPIO_PIN_4
 #define NRF_CE GPIO_PIN_1
+#define NRF_IR GPIO_PIN_0
 	
 void SysTick_Handler(void)
 {
@@ -108,7 +109,7 @@ int main(void)
 	
 	/// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device); 
+	nrf24_hal_support.Configure(SPI1_BASE, NRF_IR, NRF_CE, SPI_CS, &device); 
 	
 //	while (1)
 //	{
@@ -121,15 +122,15 @@ int main(void)
 
 	/// Snapshot all regsiters
 	
-	nrf24_package.Read.ALL_REGISTERS(&device, &everything_before, &status);
+//	nrf24_package.Read.ALL_REGISTERS(&device, &everything_before, &status);
 	
 	/// Force all register into their hardware reset state.
 	
-	nrf24_package.Action.PowerOnReset(&device);
+//	nrf24_package.Action.PowerOnReset(&device);
 	
 	/// Snapshot all regsiters
 	
-	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
+//	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
 		
 	nrf24_package.Action.Initialize(&device);
 	
