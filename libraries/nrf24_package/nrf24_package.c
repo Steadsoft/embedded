@@ -6,6 +6,53 @@
 #include <nrf24_hal_support.library.h>
 #include <nrf24_package.library.h>
 
+const nrf24_register_names Nrf24Register =
+{ 
+	.CONFIG = 0x00,
+	.EN_AA = 0x01,
+	.EN_RXADDR = 0x02,
+	.SETUP_AW = 0x03,
+	.SETUP_RETR = 0x04,
+	.RF_CH = 0x05,
+	.RF_SETUP = 0x06,
+	.STATUS = 0x07,
+	.OBSERVE_TX = 0x08,
+	.RPD = 0x09,
+	.RX_ADDR_P0 = 0x0A,
+	.RX_ADDR_P1 = 0x0B,
+	.RX_ADDR_P2 = 0x0C,
+	.RX_ADDR_P3 = 0x0D,
+	.RX_ADDR_P4 = 0x0E,
+	.RX_ADDR_P5 = 0x0F,
+	.TX_ADDR = 0x10,
+	.RX_PW_P0 = 0x11,
+	.RX_PW_P1 = 0x12,
+	.RX_PW_P2 = 0x13,
+	.RX_PW_P3 = 0x14,
+	.RX_PW_P4 = 0x15,
+	.RX_PW_P5 = 0x16,
+	.FIFO_STATUS = 0x17,
+	.DYNPD = 0x1C,
+	.FEATURE = 0x1D
+};
+
+const nrf24_command_names NrfCommand =
+{ 
+	.R_REGISTER = 0x00,
+	.W_REGISTER = 0x20,
+	.R_RX_PAYLOAD = 0x61,
+	.W_TX_PAYLOAD = 0xA0,
+	.FLUSH_TX = 0xE1,
+	.FLUSH_RX = 0xE2,
+	.REUSE_TX_PL = 0xE3,
+	.R_RX_PL_WID = 0x60,
+	.W_ACK_PAYLOAD = 0xA8,
+	.W_TX_PAYLOAD_NOACK = 0xB0,
+	.NOP = 0xFF
+};
+
+
+
 // Declare all static (private) functions
 
 private void ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
@@ -55,10 +102,10 @@ private void UpdateDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value
 private void ReadFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 private void WriteFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_STATUS_ptr NrfStatus);
 private void UpdateFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_FEATURE Mask, NrfReg_STATUS_ptr NrfStatus);
-private void ReadSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus);
-private void WriteSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus);
-private void ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
-private void WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
+private void ReadSingleByteRegister(NrfSpiDevice * device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus);
+private void ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatu);
+private void WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
 private void SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr);
 private void PowerUpTx(NrfSpiDevice_ptr device_ptr);
 private void PowerDown(NrfSpiDevice_ptr device_ptr);
@@ -132,11 +179,11 @@ nrf24_package_struct nrf24_package =
 	},
 	.Action =
 	{ 
+		// This is a misnomer, but we will use this to power up the device in RX mode.
+		.PowerDown = PowerDown,
 		.PowerOnReset = SetToPowerOnResetState,
 		.Initialize = Initialize,
 		.PowerUpTx = PowerUpTx,
-		// This is a misnomer, but we will use this to power up the device in RX mode.
-		.PowerDown = PowerDown
 	},
 	.Command =
 	{ 
@@ -149,51 +196,6 @@ nrf24_package_struct nrf24_package =
 	{ 
 		.STATUS = (NrfReg_STATUS)  { 0 }
 	}
-};
-
-const nrf24_register_names Nrf24Register =
-{ 
-	.CONFIG = 0x00,
-	.EN_AA = 0x01,
-	.EN_RXADDR = 0x02,
-	.SETUP_AW = 0x03,
-	.SETUP_RETR = 0x04,
-	.RF_CH = 0x05,
-	.RF_SETUP = 0x06,
-	.STATUS = 0x07,
-	.OBSERVE_TX = 0x08,
-	.RPD = 0x09,
-	.RX_ADDR_P0 = 0x0A,
-	.RX_ADDR_P1 = 0x0B,
-	.RX_ADDR_P2 = 0x0C,
-	.RX_ADDR_P3 = 0x0D,
-	.RX_ADDR_P4 = 0x0E,
-	.RX_ADDR_P5 = 0x0F,
-	.TX_ADDR = 0x10,
-	.RX_PW_P0 = 0x11,
-	.RX_PW_P1 = 0x12,
-	.RX_PW_P2 = 0x13,
-	.RX_PW_P3 = 0x14,
-	.RX_PW_P4 = 0x15,
-	.RX_PW_P5 = 0x16,
-	.FIFO_STATUS = 0x17,
-	.DYNPD = 0x1C,
-	.FEATURE = 0x1D
-};
-
-const nrf24_command_names NrfCommand =
-{ 
-	.R_REGISTER = 0x00,
-	.W_REGISTER = 0x20,
-	.R_RX_PAYLOAD = 0x61,
-	.W_TX_PAYLOAD = 0xA0,
-	.FLUSH_TX = 0xE1,
-	.FLUSH_RX = 0xE2,
-	.REUSE_TX_PL = 0xE3,
-	.R_RX_PL_WID = 0x60,
-	.W_ACK_PAYLOAD = 0xA8,
-	.W_TX_PAYLOAD_NOACK = 0xB0,
-	.NOP = 0xFF
 };
 
 
@@ -441,7 +443,7 @@ private void UpdateFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE V
 	ReadSingleByteRegister(device_ptr, Nrf24Register.FEATURE, &old_value, NrfStatus);
 	WriteSingleByteRegister(device_ptr, Nrf24Register.FEATURE, TWIDDLE(old_value, Value, Mask), NrfStatus);
 }
-private void ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus)
+private void ReadSingleByteRegister(NrfSpiDevice * device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = NrfCommand.R_REGISTER | Register;
 	
@@ -644,7 +646,7 @@ private void Initialize(NrfSpiDevice_ptr device_ptr)
 	NrfReg_EN_AA en_aa = { 0 };
 	NrfReg_EN_RXADDR en_rxaddr = { 0 };
 	NrfReg_SETUP_RETR setup_retr = { 0 };
-  	NrfReg_CONFIG config = { 0 };
+	NrfReg_CONFIG config = { 0 };
 	NrfReg_SETUP_AW setup_aw = { 0 };
 	NrfReg_RF_CH rf_ch = { 0 };
 	

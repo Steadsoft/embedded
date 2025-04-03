@@ -33,6 +33,9 @@
 /*                                                                                       */
 /* Libraries can be layered but a lower layer library cannot refer to a higher one.      */
 /*                                                                                       */
+/* Only the library implementation source or consumer source files should include any    */
+/* non-package headers like HAL and STM32 headers and so on, NONE of the package header  */
+/* files should ever include scch headers.                                               */
 /*---------------------------------------------------------------------------------------*/
 
 // These heaader files must always be ordered this way.

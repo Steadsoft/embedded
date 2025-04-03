@@ -9,11 +9,11 @@ private void spi_set_ce_lo(NrfSpiDevice_ptr);
 private void spi_set_ce_hi(NrfSpiDevice_ptr);
 private void spi_set_csn_lo(NrfSpiDevice_ptr);
 private void spi_set_csn_hi(NrfSpiDevice_ptr);
-private void exchange_bytes(NrfSpiDevice_ptr, uint8_t[], uint8_t[], uint8_t);
-private void read_bytes(NrfSpiDevice_ptr, uint8_t bytes_in_ptr[], uint8_t count);
-private void write_bytes(NrfSpiDevice_ptr, uint8_t bytes_out_ptr[], uint8_t count);
+private void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count);
 private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr);
 private void pulse_led_forever(uint32_t interval);
+private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count);
+private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
 
 // Declare the global library interface with same name as library
 nrf24_hal_support_struct nrf24_hal_support =
@@ -153,7 +153,6 @@ private void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8
 	if (ptr->status != HAL_OK)
 		pulse_led_forever(100);
 }
-
 private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count)
 {
 	ptr->status = HAL_SPI_Receive(&ptr->spi, bytes_in_ptr, count, HAL_MAX_DELAY);
@@ -161,7 +160,6 @@ private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t co
 	if (ptr->status != HAL_OK)
 		pulse_led_forever(100);
 }
-
 private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count)
 {
 	ptr->status = HAL_SPI_Transmit(&ptr->spi, bytes_out_ptr, count, HAL_MAX_DELAY);
