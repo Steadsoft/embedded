@@ -5,15 +5,15 @@
 #include <nrf24_package.library.h>
 
 // Declare all static functions
-static void spi_set_ce_lo(NrfSpiDevice_ptr);
-static void spi_set_ce_hi(NrfSpiDevice_ptr);
-static void spi_set_csn_lo(NrfSpiDevice_ptr);
-static void spi_set_csn_hi(NrfSpiDevice_ptr);
-static void exchange_bytes(NrfSpiDevice_ptr, uint8_t[], uint8_t[], uint8_t);
-static void read_bytes(NrfSpiDevice_ptr, uint8_t bytes_in_ptr[], uint8_t count);
-static void write_bytes(NrfSpiDevice_ptr, uint8_t bytes_out_ptr[], uint8_t count);
-static void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr);
-static void pulse_led_forever(uint32_t interval);
+private void spi_set_ce_lo(NrfSpiDevice_ptr);
+private void spi_set_ce_hi(NrfSpiDevice_ptr);
+private void spi_set_csn_lo(NrfSpiDevice_ptr);
+private void spi_set_csn_hi(NrfSpiDevice_ptr);
+private void exchange_bytes(NrfSpiDevice_ptr, uint8_t[], uint8_t[], uint8_t);
+private void read_bytes(NrfSpiDevice_ptr, uint8_t bytes_in_ptr[], uint8_t count);
+private void write_bytes(NrfSpiDevice_ptr, uint8_t bytes_out_ptr[], uint8_t count);
+private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr);
+private void pulse_led_forever(uint32_t interval);
 
 // Declare the global library interface with same name as library
 nrf24_hal_support_struct nrf24_hal_support =
@@ -30,7 +30,7 @@ nrf24_hal_support_struct nrf24_hal_support =
 };
 
 // Implementation 
-static void pulse_led_forever(uint32_t interval)
+private void pulse_led_forever(uint32_t interval)
 {
 	volatile uint8_t cease = 0;
 	
@@ -55,7 +55,7 @@ static void pulse_led_forever(uint32_t interval)
 // Initiaize the SPI and associated GPIO pins based on the supplied SPI base address.
 // The int pin, ce pin nd cs pin are assumed to be on the same IO port as the specified SPI.
 
-static void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr)
+private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr)
 {
 	unsigned long gpio_base;
 	HAL_StatusTypeDef status;
@@ -130,23 +130,23 @@ static void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32
 	device_ptr->int_pin = int_pin;
 }
 
-static void spi_set_ce_lo(NrfSpiDevice_ptr ptr)
+private void spi_set_ce_lo(NrfSpiDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->ce_pin, GPIO_PIN_RESET);
 }
-static void spi_set_ce_hi(NrfSpiDevice_ptr ptr)
+private void spi_set_ce_hi(NrfSpiDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->ce_pin, GPIO_PIN_SET);
 }
-static void spi_set_csn_lo(NrfSpiDevice_ptr ptr)
+private void spi_set_csn_lo(NrfSpiDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_RESET);
 }
-static void spi_set_csn_hi(NrfSpiDevice_ptr ptr)
+private void spi_set_csn_hi(NrfSpiDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_SET);
 }
-static void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
+private void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
 {
 	ptr->status = HAL_SPI_TransmitReceive(&ptr->spi, bytes_out_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
 	
@@ -154,7 +154,7 @@ static void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_
 		pulse_led_forever(100);
 }
 
-static void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count)
+private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count)
 {
 	ptr->status = HAL_SPI_Receive(&ptr->spi, bytes_in_ptr, count, HAL_MAX_DELAY);
 	
@@ -162,7 +162,7 @@ static void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t cou
 		pulse_led_forever(100);
 }
 
-static void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count)
+private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count)
 {
 	ptr->status = HAL_SPI_Transmit(&ptr->spi, bytes_out_ptr, count, HAL_MAX_DELAY);
 	

@@ -7,68 +7,68 @@
 
 // Declare all static functions
 
-static void _ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_CONFIG Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_EN_AA Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_EN_RXADDR Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_SETUP_AW Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_SETUP_RETR Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_RF_CH Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_RF_SETUP Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr Value);
-static void _WriteStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask);
-static void _ReadObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_OBSERVE_TX Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_RPD Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_FIFO_STATUS Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_DYNPD Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_STATUS_ptr NrfStatus);
-static void _UpdateFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_FEATURE Mask, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus);
-static void _ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
-static void _WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
-static void _SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr);
-static void _PowerUpTx(NrfSpiDevice_ptr device_ptr);
-static void _PowerDown(NrfSpiDevice_ptr device_ptr);
+private void ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_CONFIG Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_EN_AA Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_EN_RXADDR Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_SETUP_AW Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_SETUP_RETR Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_RF_CH Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_RF_SETUP Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr Value);
+private void WriteStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask);
+private void ReadObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_OBSERVE_TX Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_RPD Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+private void WriteLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+private void ReadShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+private void WriteShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+private void ReadTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus);
+private void ReadRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+private void WriteRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+private void ReadFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_FIFO_STATUS Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_DYNPD Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_STATUS_ptr NrfStatus);
+private void UpdateFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_FEATURE Mask, NrfReg_STATUS_ptr NrfStatus);
+private void ReadSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus);
+private void WriteSingleByteRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus);
+private void ReadMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
+private void WriteMultiBytesRegister(NrfSpiDevice * SPI, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
+private void SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr);
+private void PowerUpTx(NrfSpiDevice_ptr device_ptr);
+private void PowerDown(NrfSpiDevice_ptr device_ptr);
 
-static void _FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
-static void _FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
+private void FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
+private void FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 
-static void _ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-static void _Initialize(NrfSpiDevice_ptr device_ptr);
+private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+private void Initialize(NrfSpiDevice_ptr device_ptr);
 
-static void _WriteTxPayload(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
+private void WriteTxPayload(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 
 
 // Declare the global library interface with same name as library
@@ -77,75 +77,75 @@ nrf24_package_struct nrf24_package =
 { 
 	.Read = 
 	{     
-		.CONFIG = _ReadConfigRegister,
-		.EN_AA = _ReadEnAaRegister,
-		.EN_RXADDR = _ReadEnRxAddrRegister,
-		.SETUP_AW = _ReadSetupAwRegister,
-		.SETUP_RETR = _ReadSetupRetrRegister,
-		.RF_CH = _ReadRfChannelRegister,
-		.RF_SETUP = _ReadRfSetupRegister,
-		.STATUS = _ReadStatusRegister,
-		.OBSERVE_TX = _ReadObserveTxRegister,
-		.RPD = _ReadRpdRegister,
-		.RX_ADDR_LONG = _ReadLongRxAddrRegister,
-		.RX_ADDR_SHORT = _ReadShortRxAddrRegister,
-		.TX_ADDR_LONG = _ReadTxAddrRegister,
-		.RX_PW = _ReadRxPwRegister,
-		.FIFO_STATUS = _ReadFifoStatusRegister,
-		.DYNPD = _ReadDynpdRegister,
-		.FEATURE = _ReadFeatureRegister,
-		.ALL_REGISTERS = _ReadAllRegisters,
+		.CONFIG = ReadConfigRegister,
+		.EN_AA = ReadEnAaRegister,
+		.EN_RXADDR = ReadEnRxAddrRegister,
+		.SETUP_AW = ReadSetupAwRegister,
+		.SETUP_RETR = ReadSetupRetrRegister,
+		.RF_CH = ReadRfChannelRegister,
+		.RF_SETUP = ReadRfSetupRegister,
+		.STATUS = ReadStatusRegister,
+		.OBSERVE_TX = ReadObserveTxRegister,
+		.RPD = ReadRpdRegister,
+		.RX_ADDR_LONG = ReadLongRxAddrRegister,
+		.RX_ADDR_SHORT = ReadShortRxAddrRegister,
+		.TX_ADDR_LONG = ReadTxAddrRegister,
+		.RX_PW = ReadRxPwRegister,
+		.FIFO_STATUS = ReadFifoStatusRegister,
+		.DYNPD = ReadDynpdRegister,
+		.FEATURE = ReadFeatureRegister,
+		.ALL_REGISTERS = ReadAllRegisters,
 	},
 	.Write = 
 	{ 
-		.CONFIG = _WriteConfigRegister,
-		.EN_AA = _WriteEnAaRegister,
-		.EN_RXADDR = _WriteEnRxAddrRegister,
-		.SETUP_AW = _WriteSetupAwRegister,
-		.SETUP_RETR = _WriteSetupRetrRegister,
-		.RF_CH = _WriteRfChannelRegister,
-		.RF_SETUP = _WriteRfSetupRegister,
-		.STATUS = _WriteStatusRegister,
-		.OBSERVE_TX = _WriteObserveTxRegister,
-		.RPD = _WriteRpdRegister,
-		.RX_ADDR_LONG = _WriteLongRxAddrRegister,
-		.RX_ADDR_SHORT = _WriteShortRxAddrRegister,
-		.TX_ADDR_LONG = _WriteTxAddrRegister,
-		.RX_PW = _WriteRxPwRegister,
-		.FIFO_STATUS = _WriteFifoStatusRegister,
-		.DYNPD = _WriteDynpdRegister,
-		.FEATURE = _WriteFeatureRegister,
+		.CONFIG = WriteConfigRegister,
+		.EN_AA = WriteEnAaRegister,
+		.EN_RXADDR = WriteEnRxAddrRegister,
+		.SETUP_AW = WriteSetupAwRegister,
+		.SETUP_RETR = WriteSetupRetrRegister,
+		.RF_CH = WriteRfChannelRegister,
+		.RF_SETUP = WriteRfSetupRegister,
+		.STATUS = WriteStatusRegister,
+		.OBSERVE_TX = WriteObserveTxRegister,
+		.RPD = WriteRpdRegister,
+		.RX_ADDR_LONG = WriteLongRxAddrRegister,
+		.RX_ADDR_SHORT = WriteShortRxAddrRegister,
+		.TX_ADDR_LONG = WriteTxAddrRegister,
+		.RX_PW = WriteRxPwRegister,
+		.FIFO_STATUS = WriteFifoStatusRegister,
+		.DYNPD = WriteDynpdRegister,
+		.FEATURE = WriteFeatureRegister,
 	},
 	.Update =
 	{ 
-		.CONFIG = _UpdateConfigRegister,
-		.EN_AA = _UpdateEnAaRegister,
-		.EN_RXADDR = _UpdateEnRxAddrRegister,
-		.SETUP_AW = _UpdateSetupAwRegister,
-		.SETUP_RETR = _UpdateSetupRetrRegister,
-		.RF_CH = _UpdateRfChannelRegister,
-		.RF_SETUP = _UpdateRfSetupRegister,
-		.STATUS = _UpdateStatusRegister,
-		.OBSERVE_TX = _UpdateObserveTxRegister,
-		.RPD = _UpdateRpdRegister,
-		.FIFO_STATUS = _UpdateFifoStatusRegister,
-		.DYNPD = _UpdateDynpdRegister,
-		.FEATURE = _UpdateFeatureRegister,
+		.CONFIG = UpdateConfigRegister,
+		.EN_AA = UpdateEnAaRegister,
+		.EN_RXADDR = UpdateEnRxAddrRegister,
+		.SETUP_AW = UpdateSetupAwRegister,
+		.SETUP_RETR = UpdateSetupRetrRegister,
+		.RF_CH = UpdateRfChannelRegister,
+		.RF_SETUP = UpdateRfSetupRegister,
+		.STATUS = UpdateStatusRegister,
+		.OBSERVE_TX = UpdateObserveTxRegister,
+		.RPD = UpdateRpdRegister,
+		.FIFO_STATUS = UpdateFifoStatusRegister,
+		.DYNPD = UpdateDynpdRegister,
+		.FEATURE = UpdateFeatureRegister,
 	},
 	.Action =
 	{ 
-		.PowerOnReset = _SetToPowerOnResetState,
-		.Initialize = _Initialize,
-		.PowerUpTx = _PowerUpTx,
+		.PowerOnReset = SetToPowerOnResetState,
+		.Initialize = Initialize,
+		.PowerUpTx = PowerUpTx,
 		// This is a misnomer, but we will use this to power up the device in RX mode.
-		.PowerDown = _PowerDown
+		.PowerDown = PowerDown
 	},
 	.Command =
 	{ 
-		.FlushTxFifo = _FlushTxFifo,
-		.FlushRxFifo = _FlushRxFifo,
+		.FlushTxFifo = FlushTxFifo,
+		.FlushRxFifo = FlushRxFifo,
 		 // TODO add support for REUSE_TX_PL as well.
-		.WriteTxPayload = _WriteTxPayload,
+		.WriteTxPayload = WriteTxPayload,
 	},
 	.EmptyRegister =
 	{ 
@@ -202,112 +202,112 @@ const nrf24_command_names NrfCommand =
 // Implementation 
 
 
-static void _ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+private void ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.CONFIG, BYTE_ADDRESS(Value), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.CONFIG, BYTE_ADDRESS(Value), NrfStatus);
 }
-static void _WriteConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus)
+private void WriteConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.CONFIG, BYTE_VALUE(Value), NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.CONFIG, BYTE_VALUE(Value), NrfStatus);
 }
-static void _UpdateConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_CONFIG Mask, NrfReg_STATUS_ptr NrfStatus)
-{
-	uint8_t old_value;
-	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.CONFIG, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.CONFIG, TWIDDLE(old_value, Value, Mask), NrfStatus);
-}
-static void _ReadEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA_ptr Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.EN_AA, BYTE_ADDRESS(Value), NrfStatus);
-}
-static void _WriteEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.EN_AA, BYTE_VALUE(Value), NrfStatus);
-}
-static void _UpdateEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_EN_AA Mask, NrfReg_STATUS_ptr NrfStatus)
+private void UpdateConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_CONFIG Mask, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t old_value;
 	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.EN_AA, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.EN_AA, TWIDDLE(old_value, Value, Mask), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.CONFIG, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.CONFIG, TWIDDLE(old_value, Value, Mask), NrfStatus);
 }
-static void _ReadEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+private void ReadEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.EN_RXADDR, BYTE_ADDRESS(Value), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.EN_AA, BYTE_ADDRESS(Value), NrfStatus);
 }
-static void _WriteEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_STATUS_ptr NrfStatus)
+private void WriteEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.EN_RXADDR, BYTE_VALUE(Value), NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.EN_AA, BYTE_VALUE(Value), NrfStatus);
 }
-static void _UpdateEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_EN_RXADDR Mask, NrfReg_STATUS_ptr NrfStatus)
-{
-	uint8_t old_value;
-	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.EN_RXADDR, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.EN_RXADDR, TWIDDLE(old_value, Value, Mask), NrfStatus);
-}
-static void _ReadSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW_ptr Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, BYTE_ADDRESS(Value), NrfStatus);
-}
-static void _WriteSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, BYTE_VALUE(Value), NrfStatus);
-}
-static void _UpdateSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_SETUP_AW Mask, NrfReg_STATUS_ptr NrfStatus)
+private void UpdateEnAaRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_EN_AA Mask, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t old_value;
 	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, TWIDDLE(old_value, Value, Mask), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.EN_AA, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.EN_AA, TWIDDLE(old_value, Value, Mask), NrfStatus);
 }
-static void _ReadSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+private void ReadEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_RETR, BYTE_ADDRESS(Value), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.EN_RXADDR, BYTE_ADDRESS(Value), NrfStatus);
 }
-static void _WriteSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_STATUS_ptr NrfStatus)
+private void WriteEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.SETUP_RETR, BYTE_VALUE(Value), NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.EN_RXADDR, BYTE_VALUE(Value), NrfStatus);
 }
-static void _UpdateSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_SETUP_RETR Mask, NrfReg_STATUS_ptr NrfStatus)
-{
-	uint8_t old_value;
-	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_RETR, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.SETUP_RETR, TWIDDLE(old_value, Value, Mask), NrfStatus);
-}
-static void _ReadRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH_ptr Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.RF_CH, BYTE_ADDRESS(Value), NrfStatus);
-}
-static void _WriteRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.RF_CH, BYTE_VALUE(Value), NrfStatus);
-}
-static void _UpdateRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_RF_CH Mask, NrfReg_STATUS_ptr NrfStatus)
+private void UpdateEnRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_EN_RXADDR Mask, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t old_value;
 	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.RF_CH, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.RF_CH, TWIDDLE(old_value, Value, Mask), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.EN_RXADDR, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.EN_RXADDR, TWIDDLE(old_value, Value, Mask), NrfStatus);
 }
-static void _ReadRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+private void ReadSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.RF_SETUP, BYTE_ADDRESS(Value), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, BYTE_ADDRESS(Value), NrfStatus);
 }
-static void _WriteRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_STATUS_ptr NrfStatus)
+private void WriteSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.RF_SETUP, BYTE_VALUE(Value), NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, BYTE_VALUE(Value), NrfStatus);
 }
-static void _UpdateRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_RF_SETUP Mask, NrfReg_STATUS_ptr NrfStatus)
+private void UpdateSetupAwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_SETUP_AW Mask, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t old_value;
 	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.RF_SETUP, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.RF_SETUP, TWIDDLE(old_value, Value, Mask), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, TWIDDLE(old_value, Value, Mask), NrfStatus);
 }
-static void _ReadStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr Value)
+private void ReadSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_RETR, BYTE_ADDRESS(Value), NrfStatus);
+}
+private void WriteSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	WriteSingleByteRegister(device_ptr, Nrf24Register.SETUP_RETR, BYTE_VALUE(Value), NrfStatus);
+}
+private void UpdateSetupRetrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_SETUP_RETR Mask, NrfReg_STATUS_ptr NrfStatus)
+{
+	uint8_t old_value;
+	
+	ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_RETR, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.SETUP_RETR, TWIDDLE(old_value, Value, Mask), NrfStatus);
+}
+private void ReadRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	ReadSingleByteRegister(device_ptr, Nrf24Register.RF_CH, BYTE_ADDRESS(Value), NrfStatus);
+}
+private void WriteRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	WriteSingleByteRegister(device_ptr, Nrf24Register.RF_CH, BYTE_VALUE(Value), NrfStatus);
+}
+private void UpdateRfChannelRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_RF_CH Mask, NrfReg_STATUS_ptr NrfStatus)
+{
+	uint8_t old_value;
+	
+	ReadSingleByteRegister(device_ptr, Nrf24Register.RF_CH, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.RF_CH, TWIDDLE(old_value, Value, Mask), NrfStatus);
+}
+private void ReadRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	ReadSingleByteRegister(device_ptr, Nrf24Register.RF_SETUP, BYTE_ADDRESS(Value), NrfStatus);
+}
+private void WriteRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	WriteSingleByteRegister(device_ptr, Nrf24Register.RF_SETUP, BYTE_VALUE(Value), NrfStatus);
+}
+private void UpdateRfSetupRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_RF_SETUP Mask, NrfReg_STATUS_ptr NrfStatus)
+{
+	uint8_t old_value;
+	
+	ReadSingleByteRegister(device_ptr, Nrf24Register.RF_SETUP, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.RF_SETUP, TWIDDLE(old_value, Value, Mask), NrfStatus);
+}
+private void ReadStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr Value)
 {
 	uint8_t command = NrfCommand.NOP | Nrf24Register.STATUS;
 	
@@ -316,134 +316,134 @@ static void _ReadStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr V
 	nrf24_hal_support.Deselect(device_ptr);
 
 }
-static void _WriteStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS_ptr NrfStatus)
+private void WriteStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.STATUS, BYTE_VALUE(Value), NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.STATUS, BYTE_VALUE(Value), NrfStatus);
 }
-static void _UpdateStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask)
+private void UpdateStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask)
 {
 	NrfReg_STATUS old_value;
 	
-	_ReadStatusRegister(device_ptr, &old_value);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.STATUS, TWIDDLE(old_value, Value, Mask), &old_value);
+	ReadStatusRegister(device_ptr, &old_value);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.STATUS, TWIDDLE(old_value, Value, Mask), &old_value);
 }
-static void _ReadObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+private void ReadObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.OBSERVE_TX, BYTE_ADDRESS(Value), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.OBSERVE_TX, BYTE_ADDRESS(Value), NrfStatus);
 }
-static void _WriteObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_STATUS_ptr NrfStatus)
+private void WriteObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.OBSERVE_TX, BYTE_VALUE(Value), NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.OBSERVE_TX, BYTE_VALUE(Value), NrfStatus);
 }
-static void _UpdateObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_OBSERVE_TX Mask, NrfReg_STATUS_ptr NrfStatus)
-{
-	uint8_t old_value;
-	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.OBSERVE_TX, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.OBSERVE_TX, TWIDDLE(old_value, Value, Mask), NrfStatus);
-}
-static void _ReadRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD_ptr Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.RPD, BYTE_ADDRESS(Value), NrfStatus);
-}
-static void _WriteRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.RPD, BYTE_VALUE(Value), NrfStatus);
-}
-static void _UpdateRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_RPD Mask, NrfReg_STATUS_ptr NrfStatus)
+private void UpdateObserveTxRegister(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_OBSERVE_TX Mask, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t old_value;
 	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.RPD, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.RPD, TWIDDLE(old_value, Value, Mask), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.OBSERVE_TX, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.OBSERVE_TX, TWIDDLE(old_value, Value, Mask), NrfStatus);
 }
-static void _ReadLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
+private void ReadRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	ReadSingleByteRegister(device_ptr, Nrf24Register.RPD, BYTE_ADDRESS(Value), NrfStatus);
+}
+private void WriteRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	WriteSingleByteRegister(device_ptr, Nrf24Register.RPD, BYTE_VALUE(Value), NrfStatus);
+}
+private void UpdateRpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_RPD Mask, NrfReg_STATUS_ptr NrfStatus)
+{
+	uint8_t old_value;
+	
+	ReadSingleByteRegister(device_ptr, Nrf24Register.RPD, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.RPD, TWIDDLE(old_value, Value, Mask), NrfStatus);
+}
+private void ReadLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t bytes_read;
-	_ReadMultiBytesRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, Value->value, &bytes_read, NrfStatus);
+	ReadMultiBytesRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, Value->value, &bytes_read, NrfStatus);
 }
-static void _WriteLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
+private void WriteLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
 }
-static void _ReadShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
+private void ReadShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_ADDRESS(Value), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_ADDRESS(Value), NrfStatus);
 }
-static void _WriteShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
+private void WriteShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
 }
 
-static void _ReadTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+private void ReadTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t bytes_read;
-	_ReadMultiBytesRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_ADDRESS(Value), &bytes_read, NrfStatus);
+	ReadMultiBytesRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_ADDRESS(Value), &bytes_read, NrfStatus);
 }
 
 // TODO This register is actually 5 bytes and so are several others,  so we need to fix this
 
-static void _WriteTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus)
+private void WriteTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_VALUE(Value), NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_VALUE(Value), NrfStatus);
 }
 
-static void _ReadRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
+private void ReadRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.RX_PW_P0 + Pipe, BYTE_ADDRESS(Value), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.RX_PW_P0 + Pipe, BYTE_ADDRESS(Value), NrfStatus);
 }
-static void _WriteRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW Value, uint8_t Pipe,NrfReg_STATUS_ptr NrfStatus)
+private void WriteRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW Value, uint8_t Pipe,NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.RX_PW_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
-}
-
-static void _ReadFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS_ptr Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.FIFO_STATUS, BYTE_ADDRESS(Value), NrfStatus);
-}
-static void _WriteFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.FIFO_STATUS, BYTE_VALUE(Value), NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.RX_PW_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
 }
 
-static void _UpdateFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_FIFO_STATUS Mask, NrfReg_STATUS_ptr NrfStatus)
+private void ReadFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	ReadSingleByteRegister(device_ptr, Nrf24Register.FIFO_STATUS, BYTE_ADDRESS(Value), NrfStatus);
+}
+private void WriteFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	WriteSingleByteRegister(device_ptr, Nrf24Register.FIFO_STATUS, BYTE_VALUE(Value), NrfStatus);
+}
+
+private void UpdateFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_FIFO_STATUS Mask, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t old_value;
 	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.FIFO_STATUS, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.FIFO_STATUS, TWIDDLE(old_value, Value, Mask), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.FIFO_STATUS, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.FIFO_STATUS, TWIDDLE(old_value, Value, Mask), NrfStatus);
 }
-static void _ReadDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+private void ReadDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.DYNPD, BYTE_ADDRESS(Value), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.DYNPD, BYTE_ADDRESS(Value), NrfStatus);
 }
-static void _WriteDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_STATUS_ptr NrfStatus)
+private void WriteDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.DYNPD, BYTE_VALUE(Value), NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.DYNPD, BYTE_VALUE(Value), NrfStatus);
 }
-static void _UpdateDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_DYNPD Mask, NrfReg_STATUS_ptr NrfStatus)
-{
-	uint8_t old_value;
-	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.DYNPD, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.DYNPD, TWIDDLE(old_value, Value, Mask), NrfStatus);
-}
-static void _ReadFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE_ptr Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.FEATURE, BYTE_ADDRESS(Value), NrfStatus);
-}
-static void _WriteFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_STATUS_ptr NrfStatus)
-{
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.FEATURE, BYTE_VALUE(Value), NrfStatus);
-}
-static void _UpdateFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_FEATURE Mask, NrfReg_STATUS_ptr NrfStatus)
+private void UpdateDynpdRegister(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_DYNPD Mask, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t old_value;
 	
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.FEATURE, &old_value, NrfStatus);
-	_WriteSingleByteRegister(device_ptr, Nrf24Register.FEATURE, TWIDDLE(old_value, Value, Mask), NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.DYNPD, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.DYNPD, TWIDDLE(old_value, Value, Mask), NrfStatus);
 }
-static void _ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus)
+private void ReadFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	ReadSingleByteRegister(device_ptr, Nrf24Register.FEATURE, BYTE_ADDRESS(Value), NrfStatus);
+}
+private void WriteFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_STATUS_ptr NrfStatus)
+{
+	WriteSingleByteRegister(device_ptr, Nrf24Register.FEATURE, BYTE_VALUE(Value), NrfStatus);
+}
+private void UpdateFeatureRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_FEATURE Mask, NrfReg_STATUS_ptr NrfStatus)
+{
+	uint8_t old_value;
+	
+	ReadSingleByteRegister(device_ptr, Nrf24Register.FEATURE, &old_value, NrfStatus);
+	WriteSingleByteRegister(device_ptr, Nrf24Register.FEATURE, TWIDDLE(old_value, Value, Mask), NrfStatus);
+}
+private void ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = NrfCommand.R_REGISTER | Register;
 	
@@ -452,7 +452,7 @@ static void _ReadSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 	nrf24_hal_support.ReadBytes(device_ptr, Value, 1);
 	nrf24_hal_support.Deselect(device_ptr);
 }
-static void _WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus)
+private void WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command[2] = { NrfCommand.W_REGISTER | Register, Value };
 	
@@ -460,7 +460,7 @@ static void _WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Regist
 	nrf24_hal_support.WriteBytes(device_ptr, command, 2);
 	nrf24_hal_support.Deselect(device_ptr);
 }
-static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus)
+private void ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = NrfCommand.R_REGISTER | Register;
 	uint8_t width;
@@ -470,9 +470,9 @@ static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 	*BytesRead = 0;
 	*NrfStatus = (NrfReg_STATUS){ 0 };
 	
-	_ReadSetupAwRegister(device_ptr, &aw, NrfStatus);
+	ReadSetupAwRegister(device_ptr, &aw, NrfStatus);
 
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, &width, NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, &width, NrfStatus);
 	
 	switch (width)
 	{
@@ -494,7 +494,7 @@ static void _ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Registe
 	nrf24_hal_support.ReadBytes(device_ptr, Value, bytes);
 	nrf24_hal_support.Deselect(device_ptr);
 }
-static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus)
+private void WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = NrfCommand.W_REGISTER | Register;
 	uint8_t width;
@@ -502,7 +502,7 @@ static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Regist
 	
 	*NrfStatus = (NrfReg_STATUS){ 0 };
 
-	_ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, &width, NrfStatus);
+	ReadSingleByteRegister(device_ptr, Nrf24Register.SETUP_AW, &width, NrfStatus);
 	
 	switch (width)
 	{
@@ -528,7 +528,7 @@ static void _WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Regist
 // Set all regsiters to the same values they get set to, when the device is powered off/on
 // This function does not actually cycle the power, only simulate it in the sense that
 // the device registers are in the same state as if it had been power cycled.
-static void _SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr)
+private void SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG configuration = { 0 };
@@ -604,39 +604,39 @@ static void _SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr)
 	nrf24_package.Write.FEATURE(device_ptr, feature, &status);
 }
 
-static void _ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus)
+private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	_ReadConfigRegister(device_ptr, &(Value->Config), NrfStatus);
-	_ReadEnAaRegister(device_ptr, &(Value->EnAa), NrfStatus);
-	_ReadEnRxAddrRegister(device_ptr, &(Value->RxAddr), NrfStatus);
-	_ReadSetupAwRegister(device_ptr, &(Value->SetupAw), NrfStatus);
-	_ReadSetupRetrRegister(device_ptr, &(Value->SetupRetr), NrfStatus);
-	_ReadRfChannelRegister(device_ptr, &(Value->RfCh), NrfStatus);
-	_ReadRfSetupRegister(device_ptr, &(Value->RfSetup), NrfStatus);
-	_ReadStatusRegister(device_ptr, &(Value->Status));
-	_ReadObserveTxRegister(device_ptr, &(Value->ObserveTx), NrfStatus);
-	_ReadRpdRegister(device_ptr, &(Value->Rpd), NrfStatus);
-	_ReadLongRxAddrRegister(device_ptr, &(Value->RxAddrP0), 0, NrfStatus);
-	_ReadLongRxAddrRegister(device_ptr, &(Value->RxAddrP1), 1, NrfStatus);
-	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP2), 2, NrfStatus);
-	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP3), 3, NrfStatus);
-	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP4), 4, NrfStatus);
-	_ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP5), 5, NrfStatus);
-	_ReadTxAddrRegister(device_ptr, &(Value->TxAddr), NrfStatus);
-	_ReadRxPwRegister(device_ptr, &(Value->RxPwP0), 0, NrfStatus);
-	_ReadRxPwRegister(device_ptr, &(Value->RxPwP1), 0, NrfStatus);
-	_ReadRxPwRegister(device_ptr, &(Value->RxPwP2), 0, NrfStatus);
-	_ReadRxPwRegister(device_ptr, &(Value->RxPwP3), 0, NrfStatus);
-	_ReadRxPwRegister(device_ptr, &(Value->RxPwP4), 0, NrfStatus);
-	_ReadRxPwRegister(device_ptr, &(Value->RxPwP5), 0, NrfStatus);
-	_ReadFifoStatusRegister(device_ptr, &(Value->FifoStatus), NrfStatus);
-	_ReadDynpdRegister(device_ptr, &(Value->Dynpd), NrfStatus);
-	_ReadFeatureRegister(device_ptr, &(Value->Feature), NrfStatus);
+	ReadConfigRegister(device_ptr, &(Value->Config), NrfStatus);
+	ReadEnAaRegister(device_ptr, &(Value->EnAa), NrfStatus);
+	ReadEnRxAddrRegister(device_ptr, &(Value->RxAddr), NrfStatus);
+	ReadSetupAwRegister(device_ptr, &(Value->SetupAw), NrfStatus);
+	ReadSetupRetrRegister(device_ptr, &(Value->SetupRetr), NrfStatus);
+	ReadRfChannelRegister(device_ptr, &(Value->RfCh), NrfStatus);
+	ReadRfSetupRegister(device_ptr, &(Value->RfSetup), NrfStatus);
+	ReadStatusRegister(device_ptr, &(Value->Status));
+	ReadObserveTxRegister(device_ptr, &(Value->ObserveTx), NrfStatus);
+	ReadRpdRegister(device_ptr, &(Value->Rpd), NrfStatus);
+	ReadLongRxAddrRegister(device_ptr, &(Value->RxAddrP0), 0, NrfStatus);
+	ReadLongRxAddrRegister(device_ptr, &(Value->RxAddrP1), 1, NrfStatus);
+	ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP2), 2, NrfStatus);
+	ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP3), 3, NrfStatus);
+	ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP4), 4, NrfStatus);
+	ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP5), 5, NrfStatus);
+	ReadTxAddrRegister(device_ptr, &(Value->TxAddr), NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RxPwP0), 0, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RxPwP1), 0, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RxPwP2), 0, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RxPwP3), 0, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RxPwP4), 0, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RxPwP5), 0, NrfStatus);
+	ReadFifoStatusRegister(device_ptr, &(Value->FifoStatus), NrfStatus);
+	ReadDynpdRegister(device_ptr, &(Value->Dynpd), NrfStatus);
+	ReadFeatureRegister(device_ptr, &(Value->Feature), NrfStatus);
 	
 
 }
 
-static void _Initialize(NrfSpiDevice_ptr device_ptr)
+private void Initialize(NrfSpiDevice_ptr device_ptr)
 {
 	// Do generic configuration that is independent of whether we are 
 	// transmitting or receiving. 
@@ -676,7 +676,7 @@ static void _Initialize(NrfSpiDevice_ptr device_ptr)
 
 }
 
-static void _PowerDown(NrfSpiDevice_ptr device_ptr)
+private void PowerDown(NrfSpiDevice_ptr device_ptr)
 {
 	NrfReg_CONFIG config = { 0 };
 	NrfReg_STATUS status;
@@ -690,7 +690,7 @@ static void _PowerDown(NrfSpiDevice_ptr device_ptr)
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
 
-static void _PowerUpTx(NrfSpiDevice_ptr device_ptr)
+private void PowerUpTx(NrfSpiDevice_ptr device_ptr)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG config = { 0 };
@@ -724,7 +724,7 @@ static void _PowerUpTx(NrfSpiDevice_ptr device_ptr)
 
 }
 
-static void _FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
+private void FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = NrfCommand.FLUSH_TX;
 	
@@ -733,7 +733,7 @@ static void _FlushTxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatu
 	nrf24_hal_support.Deselect(device_ptr);
 }
 
-static void _FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
+private void FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = NrfCommand.FLUSH_RX;
 
@@ -742,7 +742,7 @@ static void _FlushRxFifo(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatu
 	nrf24_hal_support.Deselect(device_ptr);
 }
 
-static void _WriteTxPayload(NrfSpiDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus)
+private void WriteTxPayload(NrfSpiDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t buffer[33];
 	
