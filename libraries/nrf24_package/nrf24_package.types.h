@@ -48,15 +48,6 @@ struct nrf_commands
 
 // This type represents all of the hardware specific items needed by the library.
 
-struct nrf_spi_device
-{
-	SPI_HandleTypeDef spi;
-	GPIO_TypeDef * gpio_ptr;
-	HAL_StatusTypeDef status;
-	uint8_t cs_pin;
-	uint8_t ce_pin;
-	uint8_t int_pin;
-};
 
 // Register structures
 
