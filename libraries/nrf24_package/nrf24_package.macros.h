@@ -6,6 +6,7 @@
 
 #if defined(nrf24_package_implementer)
 	#define private static
+    #define public 
 	#define E7 0xE7
 	#define C2 0xC2
 	#define C3 0xC3

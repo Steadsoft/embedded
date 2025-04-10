@@ -4,6 +4,8 @@
 #include <stm32f4xx_hal.h>
 #include <nrf24_hal_support.library.h>
 
+#define elif else if
+
 // Declare all static functions
 private void spi_set_ce_lo(NrfSpiDevice_ptr);
 private void spi_set_ce_hi(NrfSpiDevice_ptr);
@@ -16,7 +18,7 @@ private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t co
 private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
 
 // Declare the global library interface with same name as library
-nrf24_hal_support_struct nrf24_hal_support =
+public nrf24_hal_support_struct nrf24_hal_support =
 {
 	.Configure = init_spi,
 	.Deactivate = spi_set_ce_lo,
@@ -108,7 +110,7 @@ private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint3
 		GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
 		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
 	}
-	else if (spi_base == SPI4_BASE)
+	elif (spi_base == SPI4_BASE)
 	{
 		gpio_base = GPIOB_BASE;
 		__SPI4_CLK_ENABLE();
@@ -126,8 +128,11 @@ private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint3
 	device_ptr->spi.Init.Mode = SPI_MODE_MASTER; 
 	device_ptr->spi.Init.Direction = SPI_DIRECTION_2LINES;
 	device_ptr->spi.Init.DataSize = SPI_DATASIZE_8BIT;
+	
+	// These two settings set the SPI mode to 0
 	device_ptr->spi.Init.CLKPolarity = SPI_POLARITY_LOW;
 	device_ptr->spi.Init.CLKPhase = SPI_PHASE_1EDGE;
+	
 	device_ptr->spi.Init.NSS = SPI_NSS_SOFT; // SPI_NSS_HARD_OUTPUT
 	device_ptr->spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
 	device_ptr->spi.Init.FirstBit = SPI_FIRSTBIT_MSB;

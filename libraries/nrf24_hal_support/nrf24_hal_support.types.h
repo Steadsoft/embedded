@@ -24,9 +24,9 @@ struct nrf24_hal_support_interface
 	 Sets the NRF device's SPI CSN pin to low 
 	 */
 	void(*Select)(NrfSpiDevice_ptr);
-	/// <summary>
-	/// Sets the NRF device's SPI CSN pin to high 
-	/// </summmary>
+	/**
+	 Sets the NRF device's SPI CSN pin to high 
+	*/
 	void(*Deselect)(NrfSpiDevice_ptr);
 	void(*ExchangeBytes)(NrfSpiDevice_ptr, uint8_t[], uint8_t[], uint8_t);
 	void(*ReadBytes)(NrfSpiDevice_ptr, uint8_t bytes_in_ptr[], uint8_t count);

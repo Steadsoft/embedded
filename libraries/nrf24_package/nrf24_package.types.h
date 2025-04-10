@@ -376,14 +376,15 @@ struct nrf_action_interface
 	void(* Initialize)(NrfSpiDevice_ptr device_ptr);
 	void(* PowerUpTx)(NrfSpiDevice_ptr);
 	void(* PowerDown)(NrfSpiDevice_ptr);
+	void(* EnterTransmitMode)(NrfSpiDevice_ptr, NrfReg_TX_ADDR_LONG Address, NrfReg_RF_CH Channel);
 };
 
 // These represent the documented commands
 struct nrf_command_interface
 {
-	void(* FlushTxFifo)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
-	void(* FlushRxFifo)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
-	void(* WriteTxPayload)(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
+	void(* FLUSH_TX)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+	void(* FLUSH_RX)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+	void(* W_TX_PAYLOAD)(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 	void(* ReadRxPayload)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
 };
 

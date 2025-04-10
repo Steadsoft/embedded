@@ -20,6 +20,8 @@ extern "C"
 #define NRF_CE GPIO_PIN_1
 #define NRF_IR GPIO_PIN_0
 	
+#define elif else if	
+	
 void SysTick_Handler(void)
 {
 	HAL_IncTick();
@@ -115,26 +117,17 @@ int main(void)
 	
 	nrf24_hal_support.Configure(SPI1_BASE, NRF_IR, NRF_CE, SPI_CS, &device, fault_handler); 
 	
-//	while (1)
-//	{
-//		NrfReg_CONFIG configuration = { 0 };
-//		nrf24_package.SetRegister.CONFIG(&device, configuration, &status);
-//		HAL_Delay(10);
-//
-//	}
-
-
 	/// Snapshot all regsiters
 	
-//	nrf24_package.Read.ALL_REGISTERS(&device, &everything_before, &status);
+	nrf24_package.Read.ALL_REGISTERS(&device, &everything_before, &status);
 	
 	/// Force all register into their hardware reset state.
 	
-//	nrf24_package.Action.PowerOnReset(&device);
+	nrf24_package.Action.PowerOnReset(&device);
 	
 	/// Snapshot all regsiters
 	
-//	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
+	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
 		
 	nrf24_package.Action.Initialize(&device);
 	
@@ -165,6 +158,9 @@ int main(void)
 		}
 		
 		TM_NRF24L01_Transmit(&device, buffer, 32);
+		
+		HAL_Delay(1);
+
 
 	}
 
@@ -175,11 +171,7 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 {
 	NrfReg_STATUS status;
 	
-	nrf24_package.Command.FlushTxFifo(device_ptr, &status);
-	
-	HAL_Delay(10);
-	
-	nrf24_package.Command.WriteTxPayload(device_ptr, data, len, &status);
+	nrf24_package.Command.W_TX_PAYLOAD(device_ptr, data, len, &status);
 	
 	// We must now pulse CE high for > 10 uS for RF transmision to begin. See Page 23 of chip manual.
 	
@@ -197,7 +189,7 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	
 	nrf24_hal_support.Deactivate(device_ptr);
 	
-	nrf24_package.Command.FlushRxFifo(device_ptr, &status);
+	nrf24_package.Command.FLUSH_RX(device_ptr, &status);
 	
 	status.RX_DR = 1;
 	status.TX_DS = 1;
