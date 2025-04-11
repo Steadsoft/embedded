@@ -191,9 +191,9 @@ struct NrfReg_STATUS_struct
 {
 	uint8_t  TX_FULL : 1;
 	uint8_t  RX_P_NO : 3;
-	uint8_t  MAX_RT : 1;
-	uint8_t  TX_DS : 1;
-	uint8_t  RX_DR : 1;
+	uint8_t  MAX_RT : 1; // Interrupt flag, write a 1 to clear
+	uint8_t  TX_DS : 1;  // Interrupt flag, write a 1 to clear
+	uint8_t  RX_DR : 1;  // Interrupt flag, write a 1 to clear
 	uint8_t  RESERVED : 1;
 };
 

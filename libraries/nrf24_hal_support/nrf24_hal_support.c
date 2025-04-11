@@ -12,7 +12,7 @@ private void spi_set_ce_hi(NrfSpiDevice_ptr);
 private void spi_set_csn_lo(NrfSpiDevice_ptr);
 private void spi_set_csn_hi(NrfSpiDevice_ptr);
 private void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count);
-private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler);
+private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler);
 private void pulse_led_forever(uint32_t interval);
 private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count);
 private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
@@ -20,7 +20,7 @@ private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t 
 // Declare the global library interface with same name as library
 public nrf24_hal_support_struct nrf24_hal_support =
 {
-	.Configure = init_spi,
+	.Configure = configure,
 	.Deactivate = spi_set_ce_lo,
 	.Activate = spi_set_ce_hi,
 	.Select = spi_set_csn_lo,
@@ -54,10 +54,10 @@ private void pulse_led_forever(uint32_t interval)
 	}
 }
 
-// Initiaize the SPI and associated GPIO pins based on the supplied SPI base address.
-// The int pin, ce pin nd cs pin are assumed to be on the same IO port as the specified SPI.
+// Configure the SPI and associated GPIO pins based on the supplied SPI base address.
+// The int pin, ce pin and cs pin are assumed to be on the same IO port as the specified SPI.
 
-private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler)
+private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler)
 {
 	unsigned long gpio_base;
 	HAL_StatusTypeDef status;
@@ -100,7 +100,6 @@ private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint3
 		device_ptr->FaultHandler(device_ptr, INVALID_PIN_COMBINATION);
 		return;
 	}
-
 
 	if (spi_base == SPI1_BASE)
 	{
@@ -162,8 +161,8 @@ private void init_spi(uint32_t spi_base, int32_t int_pin, uint32_t ce_pin, uint3
 		GPIO_InitStruct_spi.Speed = GPIO_SPEED_FAST;
 		HAL_GPIO_Init((GPIO_TypeDef *)(gpio_base), &GPIO_InitStruct_irq);
 		/* EXTI interrupt init*/
-		HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
-		HAL_NVIC_EnableIRQ(EXTI0_IRQn); 
+		HAL_NVIC_SetPriority(ext_int_id, 0, 0);
+		HAL_NVIC_EnableIRQ(ext_int_id); 
 	}
 	
 	// Init the control pins

@@ -561,6 +561,7 @@ private void SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr)
 	NrfReg_RX_ADDR_SHORT rx_addr_short_p4 = { .value = C5 };
 	NrfReg_RX_ADDR_SHORT rx_addr_short_p5 = { .value = C6 };
 	NrfReg_RX_PW rx_pw = { 0 };
+	NrfReg_FIFO_STATUS fifo_status = { 0 };
 	NrfReg_DYNPD dynpd = { 0 };
 	NrfReg_FEATURE feature = { 0 };
 	
@@ -614,8 +615,24 @@ private void SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr)
 	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 3, &status);
 	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 4, &status);
 	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 5, &status);
+	nrf24_package.Write.FIFO_STATUS(device_ptr, fifo_status, &status);
+	nrf24_package.Command.FLUSH_TX(device_ptr, &status);
+	nrf24_package.Command.FLUSH_RX(device_ptr, &status);
 	nrf24_package.Write.DYNPD(device_ptr, dynpd, &status);
 	nrf24_package.Write.FEATURE(device_ptr, feature, &status);
+	
+	NrfReg_STATUS reset_status = { 0 };
+	
+	reset_status.RX_P_NO = 7;
+	
+	// Setting these to 1 is how we clerar them.
+	
+	reset_status.RX_DR	= 1;
+	reset_status.TX_DS = 1;
+	reset_status.MAX_RT = 1;
+	
+	nrf24_package.Write.STATUS(device_ptr, reset_status, &status);
+	
 }
 
 private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus)

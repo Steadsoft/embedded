@@ -37,7 +37,7 @@ typedef struct
 volatile uint32_t tx_ds_interrupt_count = 0;
 volatile uint32_t sent_messages_count = 0;
 
-volatile uint8_t tx_ds_irq_clear_pending = 0;
+volatile uint8_t tx_completed = 0;
 
 static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code);
 
@@ -96,10 +96,11 @@ int main(void)
 	uint32_t state = 0;
 	uint8_t buffer[32] = { 0 };
 	//uint8_t[4] send_polls = 0;
+	int spins = 0;
 	
 	HAL_Init();
 	
-	tx_ds_irq_clear_pending = 0;
+	tx_completed = 0;
 	
 	short Y = 0;
 	
@@ -115,7 +116,7 @@ int main(void)
 	
 	/// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI1_BASE, NRF_IR, NRF_CE, SPI_CS, &device, fault_handler); 
+	nrf24_hal_support.Configure(SPI1_BASE, NRF_IR, EXTI0_IRQn, NRF_CE, SPI_CS, &device, fault_handler); 
 	
 	/// Snapshot all regsiters
 	
@@ -141,27 +142,17 @@ int main(void)
 
 	while (1)
 	{
-		for (int X = 0; X < 610; X++)
-		{
-			if (tx_ds_irq_clear_pending)
-				break;
-		}
-
-		if (tx_ds_irq_clear_pending)
-		{
-			EXTI0_IRQPostHandler(&device);
-		}
-		else
-		{
-			
-			tx_ds_irq_clear_pending = 0;
-		}
 		
 		TM_NRF24L01_Transmit(&device, buffer, 32);
 		
-		HAL_Delay(1);
-
-
+		spins = 0;
+		
+		while (tx_completed == 0)
+		{
+			spins++;
+		}
+		
+		//HAL_Delay(1);
 	}
 
 	return(0);
@@ -170,6 +161,8 @@ int main(void)
 void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len)
 {
 	NrfReg_STATUS status;
+	
+	tx_completed = 0;
 	
 	nrf24_package.Command.W_TX_PAYLOAD(device_ptr, data, len, &status);
 	
@@ -191,11 +184,15 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	
 	nrf24_package.Command.FLUSH_RX(device_ptr, &status);
 	
+	// Clear all three interrupt flags in case any are on
+	
 	status.RX_DR = 1;
 	status.TX_DS = 1;
 	status.MAX_RT = 1;
 	
 	nrf24_package.Write.STATUS(device_ptr, status, &status);
+	
+	// Indicate which config bits to update
 	
 	config_mask.PWR_UP = 1;
 	config_mask.PRIM_RX = 1;
@@ -203,12 +200,13 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	config_mask.MASK_RX_DR = 1;
 	config_mask.MASK_TX_DS = 1;
 
-	config.PWR_UP = 1;
-	config.PRIM_RX = 1;
+	// Set the config bits
 	
-	config.MASK_MAX_RT = 1;
-	config.MASK_RX_DR = 1;
-	config.MASK_TX_DS = 0; // Data sent interrupt will be generated (not masked, not inhibited)
+	config.PWR_UP = 1; // power up the device
+	config.PRIM_RX = 0; // set to TX mode
+	config.MASK_MAX_RT = 1; // disable this interrupt
+	config.MASK_RX_DR = 1;  // disable this interrupt
+	config.MASK_TX_DS = 0;  // Data sent interrupt will be generated (not masked, not inhibited)
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, config_mask, &status);
 
@@ -218,25 +216,25 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 
 void EXTI0_IRQHandler(void)
 {
-	tx_ds_irq_clear_pending = 1;
-	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
-} 
-
-void EXTI0_IRQPostHandler(NrfSpiDevice_ptr device_ptr)
-{
 	NrfReg_STATUS status_irq;
+	
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 	
 	tx_ds_interrupt_count++;
 	
-	nrf24_package.Read.STATUS(device_ptr, &status_irq);
+	nrf24_package.Read.STATUS(&device, &status_irq);
 
+	// If the interrupt for TX complete, clear just that bit
+	
 	if (status_irq.TX_DS)
 	{
-		nrf24_package.Write.STATUS(device_ptr, status_irq, &status_irq);
+		status_irq.RX_DR = 0;
+		status_irq.MAX_RT = 0;
+		nrf24_package.Write.STATUS(&device, status_irq, &status_irq);
+		tx_completed = 1;
 	}
-	
-	tx_ds_irq_clear_pending = 0;
-}
+} 
+
 
 static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)
 {
