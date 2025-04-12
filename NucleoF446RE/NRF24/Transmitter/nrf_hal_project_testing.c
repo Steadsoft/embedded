@@ -91,7 +91,7 @@ int maintest(void)
 	
 	// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI1_BASE, GPIO_PIN_0, EXTI0_IRQn, NRF_CE, SPI_CS, &device, fault_handler);
+	nrf24_hal_support.Configure(SPI1, TIM1, GPIO_PIN_0, EXTI0_IRQn, NRF_CE, SPI_CS, &device, fault_handler);
 	
 	// Snapshot all regsiters
 	

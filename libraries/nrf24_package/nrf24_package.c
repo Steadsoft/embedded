@@ -209,6 +209,9 @@ public nrf24_package_struct nrf24_package =
 private void PulseCE(NrfSpiDevice_ptr device_ptr)
 {
 	nrf24_hal_support.Activate(device_ptr);
+	
+	// Given the brevity of the pulse at just over 10 uS, it is
+	// fine to "poll" here it only spins a few times so isn't that big a cost.
 		
 	__HAL_TIM_SET_COUNTER(&(device_ptr->pulse_timer), 0); // Reset the timer
 	while (__HAL_TIM_GET_COUNTER(&(device_ptr->pulse_timer)) < 12) 

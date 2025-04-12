@@ -102,7 +102,6 @@ int main(void)
 	
 
 
-	tx_completed = 0;
 	
 	short Y = 0;
 	
@@ -118,7 +117,7 @@ int main(void)
 	
 	/// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI1_BASE, NRF_IR, EXTI0_IRQn, NRF_CE, SPI_CS, &device, fault_handler); 
+	nrf24_hal_support.Configure(SPI1, TIM1, NRF_IR, EXTI0_IRQn, NRF_CE, SPI_CS, &device, fault_handler); 
 	
 	/// Force all register into their hardware reset state.
 	

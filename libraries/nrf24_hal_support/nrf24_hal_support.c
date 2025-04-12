@@ -12,7 +12,7 @@ private void spi_set_ce_hi(NrfSpiDevice_ptr);
 private void spi_set_csn_lo(NrfSpiDevice_ptr);
 private void spi_set_csn_hi(NrfSpiDevice_ptr);
 private void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count);
-private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler);
+private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t int_pin, uint32_t ext_int_id, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler);
 private void pulse_led_forever(uint32_t interval);
 private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count);
 private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
@@ -57,9 +57,9 @@ private void pulse_led_forever(uint32_t interval)
 // Configure the SPI and associated GPIO pins based on the supplied SPI base address.
 // The int pin, ce pin and cs pin are assumed to be on the same IO port as the specified SPI.
 
-private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler)
+private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t int_pin, uint32_t ext_int_id, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler)
 {
-	unsigned long gpio_base;
+	GPIO_TypeDef * gpio_base;
 	HAL_StatusTypeDef status;
 	GPIO_InitTypeDef  GPIO_InitStruct_ctrl = { 0 };
 	GPIO_InitTypeDef  GPIO_InitStruct_spi = { 0 };
@@ -101,17 +101,17 @@ private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, 
 		return;
 	}
 
-	if (spi_base == SPI1_BASE)
+	if (spi_base == SPI1)
 	{
-		gpio_base = GPIOA_BASE;
+		gpio_base = GPIOA;
 		__SPI1_CLK_ENABLE();
 		__GPIOA_CLK_ENABLE();
 		GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
 		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
 	}
-	elif (spi_base == SPI4_BASE)
+	elif (spi_base == SPI4)
 	{
-		gpio_base = GPIOB_BASE;
+		gpio_base = GPIOB;
 		__SPI4_CLK_ENABLE();
 		__GPIOB_CLK_ENABLE();
 		GPIO_InitStruct_spi.Pin       = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5;
@@ -123,7 +123,7 @@ private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, 
 		return;
 	}
 	
-	device_ptr->spi.Instance = ((SPI_TypeDef *) spi_base);
+	device_ptr->spi.Instance = spi_base;
 	device_ptr->spi.Init.Mode = SPI_MODE_MASTER; 
 	device_ptr->spi.Init.Direction = SPI_DIRECTION_2LINES;
 	device_ptr->spi.Init.DataSize = SPI_DATASIZE_8BIT;
@@ -151,7 +151,7 @@ private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, 
 	GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
 	GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
  
-	HAL_GPIO_Init((GPIO_TypeDef *)(gpio_base), &GPIO_InitStruct_spi);
+	HAL_GPIO_Init(gpio_base, &GPIO_InitStruct_spi);
 	
 	if (int_pin >= 0)
 	{
@@ -159,7 +159,7 @@ private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, 
 		GPIO_InitStruct_irq.Mode = GPIO_MODE_IT_FALLING;
 		GPIO_InitStruct_irq.Pull = GPIO_PULLUP;
 		GPIO_InitStruct_spi.Speed = GPIO_SPEED_FAST;
-		HAL_GPIO_Init((GPIO_TypeDef *)(gpio_base), &GPIO_InitStruct_irq);
+		HAL_GPIO_Init(gpio_base, &GPIO_InitStruct_irq);
 		/* EXTI interrupt init*/
 		HAL_NVIC_SetPriority(ext_int_id, 0, 0);
 		HAL_NVIC_EnableIRQ(ext_int_id); 
@@ -172,9 +172,9 @@ private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, 
 	GPIO_InitStruct_ctrl.Pull  = GPIO_PULLUP;
 	GPIO_InitStruct_ctrl.Speed = GPIO_SPEED_LOW;
 
-	HAL_GPIO_Init((GPIO_TypeDef *)(gpio_base), &GPIO_InitStruct_ctrl);
-	HAL_GPIO_WritePin((GPIO_TypeDef *)(gpio_base), cs_pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin((GPIO_TypeDef *)(gpio_base), ce_pin, GPIO_PIN_RESET);
+	HAL_GPIO_Init(gpio_base, &GPIO_InitStruct_ctrl);
+	HAL_GPIO_WritePin(gpio_base, cs_pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(gpio_base, ce_pin, GPIO_PIN_RESET);
 	
 	// Init the pulse timer for pulsing CE (a bit more than 10uS)
 	
@@ -183,7 +183,7 @@ private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, 
 	uint32_t sysClockFreq = HAL_RCC_GetSysClockFreq() / 1000000; 	
 
 	// Configure TIM1
-	device_ptr->pulse_timer.Instance = TIM1;
+	device_ptr->pulse_timer.Instance = tim_base;
 	device_ptr->pulse_timer.Init.Prescaler = sysClockFreq - 1; // Set prescaler for 1 MHz timer clock (assuming 72 MHz system clock)
 	device_ptr->pulse_timer.Init.CounterMode = TIM_COUNTERMODE_UP;
 	device_ptr->pulse_timer.Init.Period = 0xFFFF; // Max count value
@@ -204,7 +204,7 @@ private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, 
 		device_ptr->FaultHandler(device_ptr, HAL_TIM_START_ERROR);
 	}
 	
-	device_ptr->gpio_ptr = (GPIO_TypeDef *)(gpio_base);
+	device_ptr->gpio_ptr = gpio_base;
 	device_ptr->ce_pin = ce_pin;
 	device_ptr->cs_pin = cs_pin;
 	device_ptr->int_pin = int_pin;
