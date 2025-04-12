@@ -176,6 +176,34 @@ private void configure(uint32_t spi_base, int32_t int_pin, uint32_t ext_int_id, 
 	HAL_GPIO_WritePin((GPIO_TypeDef *)(gpio_base), cs_pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin((GPIO_TypeDef *)(gpio_base), ce_pin, GPIO_PIN_RESET);
 	
+	// Init the pulse timer for pulsing CE (a bit more than 10uS)
+	
+	__HAL_RCC_TIM1_CLK_ENABLE();
+	
+	uint32_t sysClockFreq = HAL_RCC_GetSysClockFreq() / 1000000; 	
+
+	// Configure TIM1
+	device_ptr->pulse_timer.Instance = TIM1;
+	device_ptr->pulse_timer.Init.Prescaler = sysClockFreq - 1; // Set prescaler for 1 MHz timer clock (assuming 72 MHz system clock)
+	device_ptr->pulse_timer.Init.CounterMode = TIM_COUNTERMODE_UP;
+	device_ptr->pulse_timer.Init.Period = 0xFFFF; // Max count value
+	device_ptr->pulse_timer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	device_ptr->pulse_timer.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+
+	if (HAL_TIM_Base_Init(&(device_ptr->pulse_timer)) != HAL_OK)
+	{
+		// Initialization Error
+		device_ptr->FaultHandler(device_ptr, HAL_TIM_INIT_ERROR);
+	}
+
+	// Start TIM1
+	
+	if (HAL_TIM_Base_Start(&(device_ptr->pulse_timer)) != HAL_OK)
+	{
+		// Initialization Error
+		device_ptr->FaultHandler(device_ptr, HAL_TIM_START_ERROR);
+	}
+	
 	device_ptr->gpio_ptr = (GPIO_TypeDef *)(gpio_base);
 	device_ptr->ce_pin = ce_pin;
 	device_ptr->cs_pin = cs_pin;

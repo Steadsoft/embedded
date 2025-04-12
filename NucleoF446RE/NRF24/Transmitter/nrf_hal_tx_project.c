@@ -100,6 +100,8 @@ int main(void)
 	
 	HAL_Init();
 	
+
+
 	tx_completed = 0;
 	
 	short Y = 0;
@@ -118,27 +120,20 @@ int main(void)
 	
 	nrf24_hal_support.Configure(SPI1_BASE, NRF_IR, EXTI0_IRQn, NRF_CE, SPI_CS, &device, fault_handler); 
 	
-	/// Snapshot all regsiters
-	
-	nrf24_package.Read.ALL_REGISTERS(&device, &everything_before, &status);
-	
 	/// Force all register into their hardware reset state.
 	
 	nrf24_package.Action.PowerOnReset(&device);
-	
-	/// Snapshot all regsiters
-	
-	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
 		
 	nrf24_package.Action.Initialize(&device);
 	
-	nrf24_package.Action.PowerUpTx(&device);
-
-	nrf24_package.Read.STATUS(&device, &status);
+	while (1)
+	{
+		nrf24_package.Action.PulseCE(&device);
+		
+		HAL_Delay(1);
+	}
 	
-	status_irq = nrf24_package.EmptyRegister.STATUS;
-	status_mask_irq = nrf24_package.EmptyRegister.STATUS;
-	status_mask_irq.TX_DS = 1; // Update TX_DS set it to OFF
+	nrf24_package.Action.PowerUpTx(&device);
 
 	while (1)
 	{
@@ -152,7 +147,7 @@ int main(void)
 			spins++;
 		}
 		
-		//HAL_Delay(1);
+		HAL_Delay(1);
 	}
 
 	return(0);
@@ -169,6 +164,9 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 	// We must now pulse CE high for > 10 uS for RF transmision to begin. See Page 23 of chip manual.
 	
 	nrf24_hal_support.Activate(device_ptr);
+	
+	//__HAL_TIM_SET_COUNTER
+	
 	spin_100_uS(); 
 	nrf24_hal_support.Deactivate(device_ptr);
 	sent_messages_count++;
@@ -202,7 +200,7 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 
 	// Set the config bits
 	
-	config.PWR_UP = 1; // power up the device
+	config.PWR_UP = 1; // power up the device, this will cause the device to eneter Standby-1 mode
 	config.PRIM_RX = 0; // set to TX mode
 	config.MASK_MAX_RT = 1; // disable this interrupt
 	config.MASK_RX_DR = 1;  // disable this interrupt

@@ -37,6 +37,7 @@ struct nrf24_hal_support_interface
 struct nrf_spi_device
 {
 	SPI_HandleTypeDef spi;
+	TIM_HandleTypeDef pulse_timer;
 	GPIO_TypeDef * gpio_ptr;
 	HAL_StatusTypeDef status;
 	uint8_t cs_pin;
@@ -55,6 +56,9 @@ enum nrf_error_code
 	INVALID_PIN_COMBINATION,
 	INVALID_SPI_BASE,
 	HAL_SPI_INIT_ERROR,
+	HAL_TIM_INIT_ERROR,
+    HAL_TIM_START_ERROR
+
 };
 
 

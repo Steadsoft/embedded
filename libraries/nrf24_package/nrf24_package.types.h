@@ -377,6 +377,8 @@ struct nrf_action_interface
 	void(* PowerUpTx)(NrfSpiDevice_ptr);
 	void(* PowerDown)(NrfSpiDevice_ptr);
 	void(* EnterTransmitMode)(NrfSpiDevice_ptr, NrfReg_TX_ADDR_LONG Address, NrfReg_RF_CH Channel);
+	void(* PulseCE)(NrfSpiDevice_ptr device_ptr);
+
 };
 
 // These represent the documented commands

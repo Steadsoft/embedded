@@ -115,6 +115,8 @@ private void FLUSH_RX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 private void Initialize(NrfSpiDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
+private void PowerUpTx(NrfSpiDevice_ptr device_ptr);
+private void PulseCE(NrfSpiDevice_ptr device_ptr);
 
 
 // Declare the global library interface with same name as library
@@ -185,7 +187,8 @@ public nrf24_package_struct nrf24_package =
 		.PowerOnReset = SetToPowerOnResetState,
 		.Initialize = Initialize,
 		.PowerUpTx = PowerUpTx,
-		.EnterTransmitMode = EnterTransmitMode
+		.EnterTransmitMode = EnterTransmitMode,
+		.PulseCE = PulseCE,
 	},
 	.Command =
 	{ 
@@ -202,6 +205,19 @@ public nrf24_package_struct nrf24_package =
 
 
 // Implementation 
+
+private void PulseCE(NrfSpiDevice_ptr device_ptr)
+{
+	nrf24_hal_support.Activate(device_ptr);
+		
+	__HAL_TIM_SET_COUNTER(&(device_ptr->pulse_timer), 0); // Reset the timer
+	while (__HAL_TIM_GET_COUNTER(&(device_ptr->pulse_timer)) < 12) 
+	{
+		;
+	}
+		
+	nrf24_hal_support.Deactivate(device_ptr);
+}
 
 private void EnterTransmitMode(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Address, NrfReg_RF_CH Channel)
 {
