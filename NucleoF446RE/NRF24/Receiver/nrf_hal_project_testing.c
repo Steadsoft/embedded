@@ -30,6 +30,7 @@ void spin_100_uS();
 void send_commands(NrfSpiDevice_ptr device_ptr, int count);
 void trapif(int, NrfSpiDevice_ptr);
 void initialize_nrf(NrfSpiDevice_ptr device_ptr);
+static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code);
 
 void print_register(uint8_t Register, uint8_t Value);
 
@@ -89,7 +90,7 @@ int maintest(void)
 	
 	// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device); 
+	nrf24_hal_support.Configure(SPI1, TIM1, GPIO_PIN_0, EXTI0_IRQn, NRF_CE, SPI_CS, &device, fault_handler); 
 	
 	// Snapshot all regsiters
 	
@@ -238,4 +239,10 @@ void print_register(uint8_t Register, uint8_t Value)
 		}
 	}
 }
+
+static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)
+{
+	;
+}
+
 

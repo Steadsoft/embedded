@@ -51,6 +51,9 @@ void spin_100_uS();
 void spin_20_uS();
 void spin_500_uS();
 
+static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code);
+
+
 void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr);
 
 void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len);
@@ -119,7 +122,7 @@ int main(void)
 	
 	// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI1_BASE, GPIO_PIN_0, NRF_CE, SPI_CS, &device); 
+	nrf24_hal_support.Configure(SPI1, TIM1, GPIO_PIN_0, EXTI0_IRQn, NRF_CE, SPI_CS, &device, fault_handler); 
 	
 	// Snapshot all regsiters
 	
@@ -166,9 +169,9 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 {
 	NrfReg_STATUS status;
 	
-	nrf24_package.Command.FlushTxFifo(device_ptr, &status);
+	nrf24_package.Command.FLUSH_TX(device_ptr, &status);
 	
-	nrf24_package.Command.WriteTxPayload(device_ptr, data, len, &status);
+	nrf24_package.Command.W_TX_PAYLOAD(device_ptr, data, len, &status);
 	
 	// We must now pulse CE high for > 10 uS for RF transmision to begin.
 	
@@ -247,8 +250,8 @@ void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
 	
 	// Clear FIFOs
 	
-	nrf24_package.Command.FlushRxFifo(device_ptr, &status);
-	nrf24_package.Command.FlushTxFifo(device_ptr, &status);
+	nrf24_package.Command.FLUSH_RX(device_ptr, &status);
+	nrf24_package.Command.FLUSH_TX(device_ptr, &status);
 	
 	// Clear interrupts
 	
@@ -273,7 +276,7 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	
 	nrf24_hal_support.Deactivate(device_ptr);
 	
-	nrf24_package.Command.FlushRxFifo(device_ptr, &status);
+	nrf24_package.Command.FLUSH_RX(device_ptr, &status);
 	
 	status.RX_DR = 1;
 	status.TX_DS = 1;
@@ -376,4 +379,9 @@ void CreateMemoryPool(uint8_t Size, uint8_t Quantity, uint8_t Alignment, PoolHea
 void AllocateInPool(PoolHeader_ptr * Pool_ptr)
 {
 	
+}
+
+static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)
+{
+	;
 }
