@@ -95,25 +95,10 @@ int main(void)
 	SPI_HandleTypeDef spi = { 0 }; 
 	uint32_t state = 0;
 	uint8_t buffer[32] = { 0 };
-	//uint8_t[4] send_polls = 0;
-	int spins = 0;
 	
 	HAL_Init();
 	
-
-
-	
-	short Y = 0;
-	
-	for (int X = 0; X < 32; X++)
-	{
-		buffer[X] = 0xAA + Y;
-		Y++;
-	}
-	
-	HAL_Delay(1000);
-	
-	int board = get_board_id();
+	for (int X = 0; X < 32; X++) buffer[X] = 0xAA + X;
 	
 	/// Perform all IO related initialization
 	
@@ -125,12 +110,12 @@ int main(void)
 		
 	nrf24_package.Action.Initialize(&device);
 	
-	while (1)
-	{
-		nrf24_package.Action.PulseCE(&device);
-		
-		HAL_Delay(1);
-	}
+//	while (1)
+//	{
+//		nrf24_package.Action.PulseCE(&device);
+//		
+//		HAL_Delay(1);
+//	}
 	
 	nrf24_package.Action.PowerUpTx(&device);
 
@@ -138,13 +123,6 @@ int main(void)
 	{
 		
 		TM_NRF24L01_Transmit(&device, buffer, 32);
-		
-		spins = 0;
-		
-		while (tx_completed == 0)
-		{
-			spins++;
-		}
 		
 		HAL_Delay(1);
 	}
@@ -162,12 +140,10 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 	
 	// We must now pulse CE high for > 10 uS for RF transmision to begin. See Page 23 of chip manual.
 	
-	nrf24_hal_support.Activate(device_ptr);
+	//nrf24_hal_support.Activate(device_ptr);
 	
-	//__HAL_TIM_SET_COUNTER
+	nrf24_package.Action.PulseCE(device_ptr);
 	
-	spin_100_uS(); 
-	nrf24_hal_support.Deactivate(device_ptr);
 	sent_messages_count++;
 }
 
@@ -181,7 +157,7 @@ void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
 	
 	nrf24_package.Command.FLUSH_RX(device_ptr, &status);
 	
-	// Clear all three interrupt flags in case any are on
+	// Clear (by writing a 1, see docs) all three interrupt flags in case any are on
 	
 	status.RX_DR = 1;
 	status.TX_DS = 1;
