@@ -35,7 +35,7 @@ typedef struct
 
 
 volatile uint32_t tx_ds_interrupt_count = 0;
-volatile uint32_t sent_messages_count = 0;
+volatile uint32_t transmit_count = 0;
 
 volatile uint8_t tx_completed = 0;
 
@@ -95,7 +95,8 @@ int main(void)
 	SPI_HandleTypeDef spi = { 0 }; 
 	uint32_t state = 0;
 	uint8_t buffer[32] = { 0 };
-	
+	uint8_t tx_addr[] = { 0xE7, 0xE7, 0xE7, 0xE7, 0xE7}; // this is just the default system reset value for the TX_ADDR reg
+
 	HAL_Init();
 	
 	for (int X = 0; X < 32; X++) buffer[X] = 0xAA + X;
@@ -110,14 +111,7 @@ int main(void)
 		
 	nrf24_package.Action.Initialize(&device);
 	
-//	while (1)
-//	{
-//		nrf24_package.Action.PulseCE(&device);
-//		
-//		HAL_Delay(1);
-//	}
-	
-	nrf24_package.Action.PowerUpTx(&device);
+	nrf24_package.Action.PowerUpTx(&device, tx_addr, 4);
 
 	while (1)
 	{
@@ -144,7 +138,7 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 	
 	nrf24_package.Action.PulseCE(device_ptr);
 	
-	sent_messages_count++;
+	transmit_count++;
 }
 
 void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
@@ -195,7 +189,7 @@ void EXTI0_IRQHandler(void)
 	
 	tx_ds_interrupt_count++;
 	
-	nrf24_package.Read.STATUS(&device, &status_irq);
+	nrf24_package.Read.STATUS(&device, &status_irq); // sends a NOP to read status
 
 	// If the interrupt for TX complete, clear just that bit
 	

@@ -374,7 +374,8 @@ struct nrf_action_interface
 	 * 
 	 */
 	void(* Initialize)(NrfSpiDevice_ptr device_ptr);
-	void(* PowerUpTx)(NrfSpiDevice_ptr);
+	void(* PowerUpTx)(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel);
+	void(* PowerUpRx)(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel);
 	void(* PowerDown)(NrfSpiDevice_ptr);
 	void(* EnterTransmitMode)(NrfSpiDevice_ptr, NrfReg_TX_ADDR_LONG Address, NrfReg_RF_CH Channel);
 	void(* PulseCE)(NrfSpiDevice_ptr device_ptr);

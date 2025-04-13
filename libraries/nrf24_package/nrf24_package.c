@@ -108,14 +108,15 @@ private void WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Regist
 private void ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatu);
 private void WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
 private void SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr);
-private void PowerUpTx(NrfSpiDevice_ptr device_ptr);
+//private void PowerUpTx(NrfSpiDevice_ptr device_ptr);
 private void PowerDown(NrfSpiDevice_ptr device_ptr);
 private void FLUSH_TX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void FLUSH_RX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 private void Initialize(NrfSpiDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-private void PowerUpTx(NrfSpiDevice_ptr device_ptr);
+private void PowerUpTx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel);
+private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel);
 private void PulseCE(NrfSpiDevice_ptr device_ptr);
 
 
@@ -187,7 +188,7 @@ public nrf24_package_struct nrf24_package =
 		.PowerOnReset = SetToPowerOnResetState,
 		.Initialize = Initialize,
 		.PowerUpTx = PowerUpTx,
-		.EnterTransmitMode = EnterTransmitMode,
+		.PowerUpRx = PowerUpRx,
 		.PulseCE = PulseCE,
 	},
 	.Command =
@@ -222,17 +223,6 @@ private void PulseCE(NrfSpiDevice_ptr device_ptr)
 	nrf24_hal_support.Deactivate(device_ptr);
 }
 
-private void EnterTransmitMode(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Address, NrfReg_RF_CH Channel)
-{
-	nrf24_hal_support.Deactivate(device_ptr);
-	nrf24_hal_support.Deselect(device_ptr);
-	
-	WriteRfChannelRegister(device_ptr, Channel, NULL);
-	WriteTxAddrRegister(device_ptr, Address, NULL);
-	PowerUpTx(device_ptr);
-	
-	nrf24_hal_support.Activate(device_ptr);
-}
 
 private void ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
@@ -700,7 +690,11 @@ private void Initialize(NrfSpiDevice_ptr device_ptr)
 	NrfReg_SETUP_AW setup_aw = { 0 };
 	NrfReg_RF_CH rf_ch = { 0 };
 	
-	if (!device_ptr->configured) ; // lets devise an exception callback for any errors like this.
+	if (!device_ptr->configured) 
+	{
+		device_ptr->FaultHandler(device_ptr, DEVICE_MUST_BE_CONFIGURED);
+		return;
+	}
 	
 	nrf24_hal_support.Deactivate(device_ptr);
 	nrf24_hal_support.Deselect(device_ptr);
@@ -740,12 +734,24 @@ private void PowerDown(NrfSpiDevice_ptr device_ptr)
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
 
-private void PowerUpTx(NrfSpiDevice_ptr device_ptr)
+private void PowerUpTx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG config = { 0 };
 	NrfReg_CONFIG bits_to_change = { 0 };
 	NrfReg_RF_CH rf_ch = { 0 };
+	NrfReg_TX_ADDR_LONG tx_addr = { 0 };
+	
+	tx_addr.value[0] = address[0];
+	tx_addr.value[1] = address[1];
+	tx_addr.value[2] = address[2];
+	tx_addr.value[3] = address[3];
+	tx_addr.value[4] = address[4];
+
+	rf_ch.RF_CH = channel; 
+	
+	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status);
+	nrf24_package.Write.TX_ADDR_LONG(device_ptr, tx_addr, &status);
 	
 	// Clear interrupts
 	
@@ -761,18 +767,35 @@ private void PowerUpTx(NrfSpiDevice_ptr device_ptr)
 	// Set mode to TX
 
 	bits_to_change.PWR_UP = 1;
-	bits_to_change.PRIM_RX = 1;
+	bits_to_change.PRIM_RX = 1; 
 	
 	config.PWR_UP = 1;
 	config.PRIM_RX = 0;
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
-	
-	rf_ch.RF_CH = 4; // 2404 MHz
-	
-	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status);
 
 }
+
+private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel)
+{
+	NrfReg_STATUS status;
+	NrfReg_RF_CH rf_ch = { 0 };
+	NrfReg_RX_ADDR_LONG rx_addr = { 0 };
+	
+	rx_addr.value[0] = address[0];
+	rx_addr.value[1] = address[1];
+	rx_addr.value[2] = address[2];
+	rx_addr.value[3] = address[3];
+	rx_addr.value[4] = address[4];
+
+	rf_ch.RF_CH = channel; 
+	
+	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status);
+	nrf24_package.Write.RX_ADDR_LONG(device_ptr, rx_addr, pipe, &status);
+
+	
+}
+
 
 private void FLUSH_TX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
 {

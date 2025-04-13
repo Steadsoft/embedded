@@ -102,49 +102,27 @@ int main(void)
 	uint8_t buffer[32] = { 0 };
 	uint8_t send_polls = 0;
 	PoolHeader_ptr pool_ptr; 
-	
+	uint8_t rx_addr[] = { 0xE7, 0xE7, 0xE7, 0xE7, 0xE7 }; // this is just the default system reset value for the RX_ADDR_P0 reg
+
 //	CreateMemoryPool(17, 64, 8, &pool_ptr);
 //	CreateMemoryPool(23, 64, 8, &pool_ptr);
 //	CreateMemoryPool(24, 64, 8, &pool_ptr);
 
 	HAL_Init();
 	
-	tx_ds_irq_clear_pending = 0;
-	
-	for (int X = 0; X < 32; X++)
-	{
-		buffer[X] = 0xAA;
-	}
-	
-	HAL_Delay(1000);
-	
-	int board = get_board_id();
-	
 	// Perform all IO related initialization
 	
 	nrf24_hal_support.Configure(SPI1, TIM1, GPIO_PIN_0, EXTI0_IRQn, NRF_CE, SPI_CS, &device, fault_handler); 
-	
-	// Snapshot all regsiters
-	
-	nrf24_package.Read.ALL_REGISTERS(&device, &everything_before, &status);
-	
+
 	// Force all register into their hardware reset state.
 	
 	nrf24_package.Action.PowerOnReset(&device);
 	
-	// Snapshot all regsiters
-	
-	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
+	nrf24_package.Action.PowerOnReset(&device);
 		
-	initialize_nrf24_device(&device);
+	nrf24_package.Action.Initialize(&device);
 	
-	TM_NRF24L01_PowerUpTx(&device);
-	
-	nrf24_package.Read.STATUS(&device, &status);
-	
-	status_irq = nrf24_package.EmptyRegister.STATUS;
-	status_mask_irq = nrf24_package.EmptyRegister.STATUS;
-	status_mask_irq.TX_DS = 1; // Update TX_DS set it to OFF
+	nrf24_package.Action.PowerUpRx(&device, rx_addr, 0, 4); 
 
 	while (1)
 	{
