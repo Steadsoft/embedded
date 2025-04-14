@@ -114,15 +114,10 @@ int main(void)
 	
 	nrf24_package.Action.PowerUpTx(&device, tx_addr, 100);
 	
-	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
-
 
 	while (1)
 	{
-		
-		TM_NRF24L01_Transmit(&device, buffer, 32);
-		
-		msgs_tx++;
+		nrf24_package.Action.SendPayload(&device, buffer, 32);
 		
 		HAL_Delay(10);
 	}
@@ -130,61 +125,6 @@ int main(void)
 	return(0);
 }
 
-void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len)
-{
-	NrfReg_STATUS status;
-	
-	tx_completed = 0;
-	
-	nrf24_package.Command.W_TX_PAYLOAD(device_ptr, data, len, &status);
-	
-	// We must now pulse CE high for > 10 uS for RF transmision to begin. See Page 23 of chip manual.
-	
-	//nrf24_hal_support.Activate(device_ptr);
-	
-	nrf24_package.Action.PulseCE(device_ptr);
-	
-	transmit_count++;
-}
-
-void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
-{
-	NrfReg_STATUS status;
-	NrfReg_CONFIG config = { 0 };
-	NrfReg_CONFIG config_mask = { 0 };
-	
-	nrf24_hal_support.Deactivate(device_ptr);
-	
-	nrf24_package.Command.FLUSH_RX(device_ptr, &status);
-	
-	// Clear (by writing a 1, see docs) all three interrupt flags in case any are on
-	
-	status.RX_DR = 1;
-	status.TX_DS = 1;
-	status.MAX_RT = 1;
-	
-	nrf24_package.Write.STATUS(device_ptr, status, &status);
-	
-	// Indicate which config bits to update
-	
-	config_mask.PWR_UP = 1;
-	config_mask.PRIM_RX = 1;
-	config_mask.MASK_MAX_RT = 1;
-	config_mask.MASK_RX_DR = 1;
-	config_mask.MASK_TX_DS = 1;
-
-	// Set the config bits
-	
-	config.PWR_UP = 1; // power up the device, this will cause the device to eneter Standby-1 mode
-	config.PRIM_RX = 0; // set to TX mode
-	config.MASK_MAX_RT = 1; // disable this interrupt
-	config.MASK_RX_DR = 1;  // disable this interrupt
-	config.MASK_TX_DS = 0;  // Data sent interrupt will be generated (not masked, not inhibited)
-	
-	nrf24_package.Update.CONFIG(device_ptr, config, config_mask, &status);
-
-	nrf24_hal_support.Activate(device_ptr);
-}
 
 
 void EXTI0_IRQHandler(void)

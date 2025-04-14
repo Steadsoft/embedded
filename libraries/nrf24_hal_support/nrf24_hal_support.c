@@ -9,6 +9,9 @@
 
 #define elif else if
 
+private NrfSpiDevice zeroized = { 0 };
+
+
 // Declare all static functions
 private void spi_set_ce_lo(NrfSpiDevice_ptr);
 private void spi_set_ce_hi(NrfSpiDevice_ptr);
@@ -64,6 +67,8 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t i
 	GPIO_InitTypeDef  GPIO_InitStruct_ctrl = { 0 };
 	GPIO_InitTypeDef  GPIO_InitStruct_spi = { 0 };
 	GPIO_InitTypeDef  GPIO_InitStruct_irq = { 0 };
+	
+	(*device_ptr) = zeroized; // ensure the struct is in a clean state
 	
 	if (device_ptr == NULL)
 	{

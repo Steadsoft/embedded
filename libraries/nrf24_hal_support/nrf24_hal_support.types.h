@@ -45,6 +45,8 @@ struct nrf_spi_device
 	uint8_t int_pin;
 	uint8_t configured;
 	nrf_fault_handler FaultHandler;
+	uint32_t tx_count;
+	uint32_t rx_count;
 };
 
 enum nrf_error_code
@@ -59,6 +61,7 @@ enum nrf_error_code
 	HAL_TIM_INIT_ERROR,
     HAL_TIM_START_ERROR,
 	DEVICE_MUST_BE_CONFIGURED,
+	INVALID_PAYLOAD_SIZE
 
 };
 

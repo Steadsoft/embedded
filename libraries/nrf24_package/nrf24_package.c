@@ -120,6 +120,8 @@ private void PowerUpTx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t 
 private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel);
 private void PulseCE(NrfSpiDevice_ptr device_ptr);
 
+private void SendPayload(NrfSpiDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
+
 // Declare the global library interface with same name as library
 
 public nrf24_package_struct nrf24_package =
@@ -190,6 +192,7 @@ public nrf24_package_struct nrf24_package =
 		.PowerUpTx = PowerUpTx,
 		.PowerUpRx = PowerUpRx,
 		.PulseCE = PulseCE,
+		.SendPayload = SendPayload
 	},
 	.Command =
 	{ 
@@ -206,6 +209,26 @@ public nrf24_package_struct nrf24_package =
 };
 
 // Implementation 
+
+private void SendPayload(NrfSpiDevice_ptr device_ptr, uint8_t * buffer, uint8_t size)
+{
+	NrfReg_STATUS status;
+	
+	if (size == 0 || size > 32)
+	{
+		device_ptr->FaultHandler(device_ptr, INVALID_PAYLOAD_SIZE);
+		return;
+	}
+	
+	nrf24_package.Command.W_TX_PAYLOAD(device_ptr, buffer, size, &status);
+	
+	// We must now pulse CE high for > 10 uS for RF transmision to begin. See Page 23 of chip manual.
+	
+	nrf24_package.Action.PulseCE(device_ptr);
+	
+	device_ptr->tx_count++;
+
+}
 
 private void PulseCE(NrfSpiDevice_ptr device_ptr)
 {

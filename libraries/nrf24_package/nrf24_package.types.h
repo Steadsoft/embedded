@@ -379,6 +379,7 @@ struct nrf_action_interface
 	void(* PowerDown)(NrfSpiDevice_ptr);
 	void(* EnterTransmitMode)(NrfSpiDevice_ptr, NrfReg_TX_ADDR_LONG Address, NrfReg_RF_CH Channel);
 	void(* PulseCE)(NrfSpiDevice_ptr device_ptr);
+	void(* SendPayload)(NrfSpiDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
 
 };
 
