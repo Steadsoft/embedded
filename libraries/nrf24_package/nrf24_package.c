@@ -114,6 +114,8 @@ private void FLUSH_RX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 private void Initialize(NrfSpiDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
+private void R_RX_PAYLOAD(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
+
 private void PowerUpTx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel);
 private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel);
 private void PulseCE(NrfSpiDevice_ptr device_ptr);
@@ -195,6 +197,7 @@ public nrf24_package_struct nrf24_package =
 		.FLUSH_RX = FLUSH_RX,
 		 // TODO add support for REUSE_TX_PL as well.
 		.W_TX_PAYLOAD = W_TX_PAYLOAD,
+		.R_RX_PAYLOAD = R_RX_PAYLOAD
 	},
 	.EmptyRegister =
 	{ 
@@ -878,4 +881,14 @@ private void W_TX_PAYLOAD(NrfSpiDevice_ptr device_ptr, uint8_t * data_ptr, uint8
 	nrf24_hal_support.Select(device_ptr);
 	nrf24_hal_support.WriteBytes(device_ptr, buffer, data_len + 1);
 	nrf24_hal_support.Deselect(device_ptr);
+}
+
+private void R_RX_PAYLOAD(NrfSpiDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus)
+{
+
+	nrf24_hal_support.Select(device_ptr);
+	nrf24_hal_support.WriteBytes(device_ptr, &(NrfCommand.R_RX_PAYLOAD), 1);
+	nrf24_hal_support.ReadBytes(device_ptr, data_ptr, data_len);
+	nrf24_hal_support.Deselect(device_ptr);
+	
 }

@@ -82,6 +82,7 @@ NrfSpiDevice device = { 0 };
 
 int arr[4][3] = { { 2, 3, 1 }, { 19, 12, 7 }, { 10, 9, 8 }, { 3, 11, 5 } };
 
+int msgs_tx = 0;
 
 int main(void)
 {
@@ -111,7 +112,7 @@ int main(void)
 		
 	nrf24_package.Action.Initialize(&device);
 	
-	nrf24_package.Action.PowerUpTx(&device, tx_addr, 4);
+	nrf24_package.Action.PowerUpTx(&device, tx_addr, 100);
 	
 	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
 
@@ -121,7 +122,9 @@ int main(void)
 		
 		TM_NRF24L01_Transmit(&device, buffer, 32);
 		
-		HAL_Delay(1);
+		msgs_tx++;
+		
+		HAL_Delay(10);
 	}
 
 	return(0);
