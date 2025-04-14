@@ -1,12 +1,15 @@
-// Should always be the very first line in the implementation source file.
+// Should always be the very first line in the package implementation source file.
 #define nrf24_package_implementer
 
+// Include all required platform headers.
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
+
+// Include all required library headers
 #include <nrf24_hal_support.library.h>
 #include <nrf24_package.library.h>
 
-const nrf24_register_names Nrf24Register =
+public nrf24_register_names Nrf24Register =
 { 
 	.CONFIG = 0x00,
 	.EN_AA = 0x01,
@@ -36,7 +39,7 @@ const nrf24_register_names Nrf24Register =
 	.FEATURE = 0x1D
 };
 
-const nrf24_command_names NrfCommand =
+public nrf24_command_names NrfCommand =
 { 
 	.R_REGISTER = 0x00,
 	.W_REGISTER = 0x20,
@@ -50,8 +53,6 @@ const nrf24_command_names NrfCommand =
 	.W_TX_PAYLOAD_NOACK = 0xB0,
 	.NOP = 0xFF
 };
-
-
 
 // Declare all static (private) functions
 
@@ -108,7 +109,6 @@ private void WriteSingleByteRegister(NrfSpiDevice_ptr device_ptr, uint8_t Regist
 private void ReadMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatu);
 private void WriteMultiBytesRegister(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
 private void SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr);
-//private void PowerUpTx(NrfSpiDevice_ptr device_ptr);
 private void PowerDown(NrfSpiDevice_ptr device_ptr);
 private void FLUSH_TX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void FLUSH_RX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
@@ -118,7 +118,6 @@ private void W_TX_PAYLOAD(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len
 private void PowerUpTx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel);
 private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel);
 private void PulseCE(NrfSpiDevice_ptr device_ptr);
-
 
 // Declare the global library interface with same name as library
 
@@ -204,7 +203,6 @@ public nrf24_package_struct nrf24_package =
 	}
 };
 
-
 // Implementation 
 
 private void PulseCE(NrfSpiDevice_ptr device_ptr)
@@ -222,8 +220,6 @@ private void PulseCE(NrfSpiDevice_ptr device_ptr)
 		
 	nrf24_hal_support.Deactivate(device_ptr);
 }
-
-
 private void ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	ReadSingleByteRegister(device_ptr, Nrf24Register.CONFIG, BYTE_ADDRESS(Value), NrfStatus);
@@ -396,7 +392,6 @@ private void WriteShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADD
 {
 	WriteSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
 }
-
 private void ReadTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t bytes_read;
@@ -409,7 +404,6 @@ private void WriteTxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LON
 {
 	WriteSingleByteRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_VALUE(Value), NrfStatus);
 }
-
 private void ReadRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
 	ReadSingleByteRegister(device_ptr, Nrf24Register.RX_PW_P0 + Pipe, BYTE_ADDRESS(Value), NrfStatus);
@@ -418,7 +412,6 @@ private void WriteRxPwRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW Value, 
 {
 	WriteSingleByteRegister(device_ptr, Nrf24Register.RX_PW_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
 }
-
 private void ReadFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	ReadSingleByteRegister(device_ptr, Nrf24Register.FIFO_STATUS, BYTE_ADDRESS(Value), NrfStatus);
@@ -427,7 +420,6 @@ private void WriteFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_ST
 {
 	WriteSingleByteRegister(device_ptr, Nrf24Register.FIFO_STATUS, BYTE_VALUE(Value), NrfStatus);
 }
-
 private void UpdateFifoStatusRegister(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_FIFO_STATUS Mask, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t old_value;
@@ -643,7 +635,6 @@ private void SetToPowerOnResetState(NrfSpiDevice_ptr device_ptr)
 	nrf24_package.Write.STATUS(device_ptr, reset_status, &status);
 	
 }
-
 private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	ReadConfigRegister(device_ptr, &(Value->Config), NrfStatus);
@@ -673,7 +664,6 @@ private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_
 	ReadDynpdRegister(device_ptr, &(Value->Dynpd), NrfStatus);
 	ReadFeatureRegister(device_ptr, &(Value->Feature), NrfStatus);
 }
-
 private void Initialize(NrfSpiDevice_ptr device_ptr)
 {
 	// Do generic configuration that is independent of whether we are 
@@ -719,7 +709,6 @@ private void Initialize(NrfSpiDevice_ptr device_ptr)
 	nrf24_package.Write.RF_SETUP(device_ptr, rf_setup, &status); // Set RF settings
 
 }
-
 private void PowerDown(NrfSpiDevice_ptr device_ptr)
 {
 	NrfReg_CONFIG config = { 0 };
@@ -733,7 +722,6 @@ private void PowerDown(NrfSpiDevice_ptr device_ptr)
 	
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
-
 private void PowerUpTx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel)
 {
 	NrfReg_STATUS status;
@@ -775,7 +763,6 @@ private void PowerUpTx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t 
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 
 }
-
 private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel)
 {
 	NrfReg_STATUS status;
@@ -795,8 +782,6 @@ private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t 
 
 	
 }
-
-
 private void FLUSH_TX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = NrfCommand.FLUSH_TX;
@@ -805,7 +790,6 @@ private void FLUSH_TX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
 	nrf24_hal_support.ExchangeBytes(device_ptr, &command, (uint8_t*)NrfStatus, 1);
 	nrf24_hal_support.Deselect(device_ptr);
 }
-
 private void FLUSH_RX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t command = NrfCommand.FLUSH_RX;
@@ -814,7 +798,6 @@ private void FLUSH_RX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
 	nrf24_hal_support.ExchangeBytes(device_ptr, &command, (uint8_t*)NrfStatus, 1);
 	nrf24_hal_support.Deselect(device_ptr);
 }
-
 private void W_TX_PAYLOAD(NrfSpiDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t buffer[33];

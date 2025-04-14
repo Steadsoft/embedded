@@ -1,7 +1,10 @@
 // Should always be the very first line in the implementation source file.
 #define nrf24_hal_support_implementer
 
+// Include all required platform headers.
 #include <stm32f4xx_hal.h>
+
+// Include all required library headers
 #include <nrf24_hal_support.library.h>
 
 #define elif else if
@@ -30,7 +33,6 @@ public nrf24_hal_support_struct nrf24_hal_support =
 	.WriteBytes = write_bytes,
 	.flash_led_forever = pulse_led_forever
 };
-
 // Implementation 
 private void pulse_led_forever(uint32_t interval)
 {
@@ -53,10 +55,8 @@ private void pulse_led_forever(uint32_t interval)
 		HAL_Delay(interval);	
 	}
 }
-
 // Configure the SPI and associated GPIO pins based on the supplied SPI base address.
 // The int pin, ce pin and cs pin are assumed to be on the same IO port as the specified SPI.
-
 private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t int_pin, uint32_t ext_int_id, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler)
 {
 	GPIO_TypeDef * gpio_base;
@@ -210,7 +210,6 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t i
 	device_ptr->int_pin = int_pin;
 	device_ptr->configured = 1; // Mark as configured
 }
-
 private void spi_set_ce_lo(NrfSpiDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->ce_pin, GPIO_PIN_RESET);
