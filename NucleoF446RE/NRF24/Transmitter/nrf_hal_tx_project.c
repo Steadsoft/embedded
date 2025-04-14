@@ -112,6 +112,9 @@ int main(void)
 	nrf24_package.Action.Initialize(&device);
 	
 	nrf24_package.Action.PowerUpTx(&device, tx_addr, 4);
+	
+	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
+
 
 	while (1)
 	{

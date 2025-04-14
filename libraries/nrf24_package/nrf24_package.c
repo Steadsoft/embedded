@@ -639,7 +639,7 @@ private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_
 {
 	ReadConfigRegister(device_ptr, &(Value->Config), NrfStatus);
 	ReadEnAaRegister(device_ptr, &(Value->EnAa), NrfStatus);
-	ReadEnRxAddrRegister(device_ptr, &(Value->RxAddr), NrfStatus);
+	ReadEnRxAddrRegister(device_ptr, &(Value->EnRxAddr), NrfStatus);
 	ReadSetupAwRegister(device_ptr, &(Value->SetupAw), NrfStatus);
 	ReadSetupRetrRegister(device_ptr, &(Value->SetupRetr), NrfStatus);
 	ReadRfChannelRegister(device_ptr, &(Value->RfCh), NrfStatus);
@@ -655,11 +655,11 @@ private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_
 	ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP5), 5, NrfStatus);
 	ReadTxAddrRegister(device_ptr, &(Value->TxAddr), NrfStatus);
 	ReadRxPwRegister(device_ptr, &(Value->RxPwP0), 0, NrfStatus);
-	ReadRxPwRegister(device_ptr, &(Value->RxPwP1), 0, NrfStatus);
-	ReadRxPwRegister(device_ptr, &(Value->RxPwP2), 0, NrfStatus);
-	ReadRxPwRegister(device_ptr, &(Value->RxPwP3), 0, NrfStatus);
-	ReadRxPwRegister(device_ptr, &(Value->RxPwP4), 0, NrfStatus);
-	ReadRxPwRegister(device_ptr, &(Value->RxPwP5), 0, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RxPwP1), 1, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RxPwP2), 2, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RxPwP3), 3, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RxPwP4), 4, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RxPwP5), 5, NrfStatus);
 	ReadFifoStatusRegister(device_ptr, &(Value->FifoStatus), NrfStatus);
 	ReadDynpdRegister(device_ptr, &(Value->Dynpd), NrfStatus);
 	ReadFeatureRegister(device_ptr, &(Value->Feature), NrfStatus);
@@ -770,7 +770,9 @@ private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t 
 	NrfReg_RX_ADDR_LONG rx_addr = { 0 };
 	NrfReg_CONFIG bits_to_change = { 0 };
 	NrfReg_CONFIG config = { 0 };
-
+	NrfReg_EN_RXADDR en_rx_addr = { 0 };
+	NrfReg_RX_PW rx_pw = { 0 };
+	
 	rx_addr.value[0] = address[0];
 	rx_addr.value[1] = address[1];
 	rx_addr.value[2] = address[2];
@@ -793,6 +795,36 @@ private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t 
 	
 	nrf24_package.Update.STATUS(device_ptr, status, status);
 	
+	// enable the pipe;
+	
+	switch(pipe)
+		{
+		case 0:
+			en_rx_addr.ERX_P0 = 1;
+			break;
+		case 1: 
+			en_rx_addr.ERX_P1 = 1;
+			break;
+		case 2: 
+			en_rx_addr.ERX_P2 = 1;
+			break;
+		case 3: 
+			en_rx_addr.ERX_P3 = 1;
+			break;
+		case 4: 
+			en_rx_addr.ERX_P3 = 1;
+			break;
+		case 5: 
+			en_rx_addr.ERX_P3 = 1;
+			break;
+		}
+	
+	nrf24_package.Write.EN_RXADDR(device_ptr, en_rx_addr, &status);
+	
+	rx_pw.RX_PW_LEN = 32; // Set the RX payload width to 32 bytes.
+	
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, pipe, &status);
+	
 	// Set mode to RX
 
 	bits_to_change.PWR_UP = 1;
@@ -810,6 +842,9 @@ private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t 
 	config.MASK_RX_DR = 0;
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
+	
+	nrf24_hal_support.Activate(device_ptr);
+
 	
 }
 private void FLUSH_TX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)

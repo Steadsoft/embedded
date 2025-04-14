@@ -117,8 +117,6 @@ int main(void)
 	// Force all register into their hardware reset state.
 	
 	nrf24_package.Action.PowerOnReset(&device);
-	
-	nrf24_package.Action.PowerOnReset(&device);
 		
 	nrf24_package.Action.Initialize(&device);
 	
@@ -128,26 +126,16 @@ int main(void)
 
 	while (1)
 	{
-		HAL_Delay(-1);
+		HAL_Delay(10);
+		
+		nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
+		
+		if (everything_after.Status.RX_DR)
+			break;
+
 	}
 
 	return(0);
-}
-
-void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len)
-{
-	NrfReg_STATUS status;
-	
-	nrf24_package.Command.FLUSH_TX(device_ptr, &status);
-	
-	nrf24_package.Command.W_TX_PAYLOAD(device_ptr, data, len, &status);
-	
-	// We must now pulse CE high for > 10 uS for RF transmision to begin.
-	
-	nrf24_hal_support.Activate(device_ptr);
-	spin_100_uS(); 
-	nrf24_hal_support.Deactivate(device_ptr);
-	sent_messages_count++;
 }
 
 

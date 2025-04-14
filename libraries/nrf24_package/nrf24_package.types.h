@@ -276,7 +276,7 @@ struct NrfReg_ALL_REGISTERS_struct
 {
 	NrfReg_CONFIG Config;
 	NrfReg_EN_AA  EnAa;
-	NrfReg_EN_RXADDR RxAddr;
+	NrfReg_EN_RXADDR EnRxAddr;
 	NrfReg_SETUP_AW SetupAw;
 	NrfReg_SETUP_RETR SetupRetr;
 	NrfReg_RF_CH RfCh;
