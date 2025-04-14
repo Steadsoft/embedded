@@ -9,7 +9,7 @@
 #include <nrf24_hal_support.library.h>
 #include <nrf24_package.library.h>
 
-public nrf24_register_names Nrf24Register =
+public nrf24_register_names Nrf24Register = // We use this because we fan then qualify members for readability
 { 
 	.CONFIG = 0x00,
 	.EN_AA = 0x01,
@@ -38,8 +38,7 @@ public nrf24_register_names Nrf24Register =
 	.DYNPD = 0x1C,
 	.FEATURE = 0x1D
 };
-
-public nrf24_command_names NrfCommand =
+public nrf24_command_names NrfCommand = // We use this because we fan then qualify members for readability
 { 
 	.R_REGISTER = 0x00,
 	.W_REGISTER = 0x20,
@@ -382,7 +381,8 @@ private void ReadLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_
 }
 private void WriteLongRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
-	WriteSingleByteRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, BYTE_VALUE(Value), NrfStatus);
+	uint8_t bytes_written;
+	WriteMultiBytesRegister(device_ptr, Nrf24Register.RX_ADDR_P0 + Pipe, Value.value, &bytes_written, NrfStatus);
 }
 private void ReadShortRxAddrRegister(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
@@ -768,7 +768,9 @@ private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t 
 	NrfReg_STATUS status;
 	NrfReg_RF_CH rf_ch = { 0 };
 	NrfReg_RX_ADDR_LONG rx_addr = { 0 };
-	
+	NrfReg_CONFIG bits_to_change = { 0 };
+	NrfReg_CONFIG config = { 0 };
+
 	rx_addr.value[0] = address[0];
 	rx_addr.value[1] = address[1];
 	rx_addr.value[2] = address[2];
@@ -779,7 +781,35 @@ private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t 
 	
 	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status);
 	nrf24_package.Write.RX_ADDR_LONG(device_ptr, rx_addr, pipe, &status);
+	
+	// Clear interrupts
+	
+	status.RX_DR = 1;
+	status.TX_DS = 1;
+	status.MAX_RT = 1;
+	
+	// Since the mask would be the same as the status itself, we can just pass 
+	// it in for both args.
+	
+	nrf24_package.Update.STATUS(device_ptr, status, status);
+	
+	// Set mode to RX
 
+	bits_to_change.PWR_UP = 1;
+	bits_to_change.PRIM_RX = 1; 
+	bits_to_change.MASK_MAX_RT = 1;
+	bits_to_change.MASK_TX_DS = 1;
+	bits_to_change.MASK_RX_DR = 1;
+	
+	// Enable on the RX interrupt.
+	
+	config.PWR_UP = 1;
+	config.PRIM_RX = 1;
+	config.MASK_MAX_RT = 1;
+	config.MASK_TX_DS = 1;
+	config.MASK_RX_DR = 0;
+	
+	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 	
 }
 private void FLUSH_TX(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)

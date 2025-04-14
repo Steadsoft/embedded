@@ -123,21 +123,12 @@ int main(void)
 	nrf24_package.Action.Initialize(&device);
 	
 	nrf24_package.Action.PowerUpRx(&device, rx_addr, 0, 4); 
+	
+	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
 
 	while (1)
 	{
-		for (int X = 0; X < 610; X++)
-		{
-			if (tx_ds_irq_clear_pending)
-				break;
-		}
-
-		if (tx_ds_irq_clear_pending)
-		{
-			EXTI0_IRQPostHandler(&device);
-		}
-		
-		TM_NRF24L01_Transmit(&device, buffer, 32);
+		HAL_Delay(-1);
 	}
 
 	return(0);
@@ -159,160 +150,7 @@ void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t l
 	sent_messages_count++;
 }
 
-void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr)
-{
-	NrfReg_STATUS status = {0};
-	NrfReg_RX_PW rx_pw = { 0 };
-	NrfReg_RF_SETUP rf_setup = { 0 };
-	NrfReg_EN_AA en_aa = { 0 };
-	NrfReg_EN_RXADDR en_rxaddr = { 0 };
-	NrfReg_SETUP_RETR setup_retr = { 0 };
-	NrfReg_DYNPD dynpd = { 0 };
-	
-	// Set channel
-	
-	/* Set pipeline to max possible 32 bytes */
-	
-	rx_pw.RX_PW_LEN = 32;
-	
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 0, &status);
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 1, &status);
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 2, &status);
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 3, &status);
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 4, &status);
-	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 5, &status);
 
-	/* Set RF settings (2mbps, output power) */
-	
-	// 0 and 1 here sets speed to 2 Mbps
-	rf_setup.RF_DR_LOW = 0; 
-	rf_setup.RF_DR_HIGH = 1; 
-	
-	// 3 = 0 dBm
-	rf_setup.RF_PWR = 3; 
-	
-	nrf24_package.Write.RF_SETUP(device_ptr, rf_setup, &status);
-	
-	/* Enable auto-acknowledgment for all pipes */
-	
-//	en_aa.ENAA_P0 = 1;
-//	en_aa.ENAA_P1 = 1;
-//	en_aa.ENAA_P2 = 1;
-//	en_aa.ENAA_P3 = 1;
-//	en_aa.ENAA_P4 = 1;
-//	en_aa.ENAA_P5 = 1;
-	
-	nrf24_package.Write.EN_AA(device_ptr, en_aa, &status);
-	
-	/* Enable RX addresses */
-	
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P0 = 1;
-
-	nrf24_package.Write.EN_RXADDR(device_ptr, en_rxaddr, &status);
-	
-	/* Auto retransmit delay: 1000 (4x250) us and Up to 15 retransmit trials */
-	
-	setup_retr.ARC = 15;
-	setup_retr.ARD = 3;
-	
-	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status);
-	
-	/* Dynamic length configurations: No dynamic length */
-	
-	nrf24_package.Write.DYNPD(device_ptr, dynpd, &status);
-	
-	// Clear FIFOs
-	
-	nrf24_package.Command.FLUSH_RX(device_ptr, &status);
-	nrf24_package.Command.FLUSH_TX(device_ptr, &status);
-	
-	// Clear interrupts
-	
-	status.RX_DR = 1;
-	status.TX_DS = 1;
-	status.MAX_RT = 1;
-	
-	// Since the mask would be the same as the status itself, we can just pass 
-	// it in for both args.
-
-	nrf24_package.Update.STATUS(device_ptr, status, status);
-	
-	TM_NRF24L01_PowerUpRx(device_ptr);
-	
-}
-
-void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr)
-{
-	NrfReg_STATUS status;
-	NrfReg_CONFIG config = { 0 };
-	NrfReg_CONFIG config_mask = { 0 };
-	
-	nrf24_hal_support.Deactivate(device_ptr);
-	
-	nrf24_package.Command.FLUSH_RX(device_ptr, &status);
-	
-	status.RX_DR = 1;
-	status.TX_DS = 1;
-	status.MAX_RT = 1;
-	
-	nrf24_package.Read.STATUS(device_ptr, &status);
-	
-	config_mask.PWR_UP = 1;
-	config_mask.PRIM_RX = 1;
-	config_mask.MASK_MAX_RT = 1;
-	config_mask.MASK_RX_DR = 1;
-	config_mask.MASK_TX_DS = 1;
-
-	config.PWR_UP = 1;
-	config.PRIM_RX = 1;
-	
-	config.MASK_MAX_RT = 1;
-	config.MASK_RX_DR = 1;
-	config.MASK_TX_DS = 0; // Data sent interrupt will be generated (not masked, not inhibited)
-	
-	nrf24_package.Update.CONFIG(device_ptr, config, config_mask, &status);
-
-	nrf24_hal_support.Activate(device_ptr);
-}
-
-void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr)	
-{
-	NrfReg_STATUS status;
-	NrfReg_CONFIG config = { 0 };
-	NrfReg_CONFIG config_mask = { 0 };
-	NrfReg_RF_CH rf_ch = { 0 };
-	
-	// Clear interrupts
-	
-	status.RX_DR = 1;
-	status.TX_DS = 1;
-	status.MAX_RT = 1;
-	
-	// Since the mask would be the same as the status itself, we can just pass 
-	// it in for both args.
-	
-	nrf24_package.Update.STATUS(device_ptr, status, status);
-	
-	// Set mode to TX
-
-	config_mask.PWR_UP = 1;
-	config_mask.PRIM_RX = 1;
-	
-	config.PWR_UP = 1;
-	config.PRIM_RX = 0;
-	
-	nrf24_package.Update.CONFIG(device_ptr, config, config_mask, &status);
-	
-	rf_ch.RF_CH = 4; // 2404 MHz
-	
-	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status);
-	
-}
 
 void EXTI0_IRQHandler(void)
 {
@@ -337,22 +175,6 @@ void EXTI0_IRQPostHandler(NrfSpiDevice_ptr device_ptr)
 }
 
 
-void CreateMemoryPool(uint8_t Size, uint8_t Quantity, uint8_t Alignment, PoolHeader_ptr * Pool_ptr)
-{
-
-	uint32_t pool_size = (sizeof(PoolHeader)) + (ROUNDUP(Size, Alignment) * Quantity);
-		
-	PoolHeader_ptr allocated_ptr = malloc(pool_size);
-	
-	*allocated_ptr = (PoolHeader) { 0 };
-	
-	allocated_ptr->alignment = Alignment;
-	allocated_ptr->pool_size = pool_size;
-	allocated_ptr->quantity = Quantity;
-	allocated_ptr->size = (ROUNDUP(Size, Alignment));
-	
-	*Pool_ptr = allocated_ptr;
-}
 
 void AllocateInPool(PoolHeader_ptr * Pool_ptr)
 {
