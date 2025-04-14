@@ -55,7 +55,6 @@ public nrf24_command_names NrfCommand = // We use this because we fan then quali
 
 // Declare all static (private) functions
 
-private void EnterTransmitMode(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Address, NrfReg_RF_CH Channel);
 private void ReadConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 private void WriteConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
 private void UpdateConfigRegister(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_CONFIG Mask, NrfReg_STATUS_ptr NrfStatus);
@@ -115,11 +114,9 @@ private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_
 private void Initialize(NrfSpiDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void R_RX_PAYLOAD(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-
-private void PowerUpTx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel);
-private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel);
+private void EnterTransmitMode(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel);
+private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size);
 private void PulseCE(NrfSpiDevice_ptr device_ptr);
-
 private void SendPayload(NrfSpiDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
 
 // Declare the global library interface with same name as library
@@ -189,8 +186,8 @@ public nrf24_package_struct nrf24_package =
 		.PowerDown = PowerDown,
 		.PowerOnReset = SetToPowerOnResetState,
 		.Initialize = Initialize,
-		.PowerUpTx = PowerUpTx,
-		.PowerUpRx = PowerUpRx,
+		.EnterTransmitMode = EnterTransmitMode,
+		.EnterReceiveMode = PowerUpRx,
 		.PulseCE = PulseCE,
 		.SendPayload = SendPayload
 	},
@@ -748,7 +745,7 @@ private void PowerDown(NrfSpiDevice_ptr device_ptr)
 	
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
-private void PowerUpTx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel)
+private void EnterTransmitMode(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG config = { 0 };
@@ -789,7 +786,7 @@ private void PowerUpTx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t 
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 
 }
-private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel)
+private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size)
 {
 	NrfReg_STATUS status;
 	NrfReg_RF_CH rf_ch = { 0 };
@@ -847,7 +844,7 @@ private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t 
 	
 	nrf24_package.Write.EN_RXADDR(device_ptr, en_rx_addr, &status);
 	
-	rx_pw.RX_PW_LEN = 32; // Set the RX payload width to 32 bytes.
+	rx_pw.RX_PW_LEN = payload_size; // Set the RX payload width to 32 bytes.
 	
 	nrf24_package.Write.RX_PW(device_ptr, rx_pw, pipe, &status);
 	

@@ -112,8 +112,7 @@ int main(void)
 		
 	nrf24_package.Action.Initialize(&device);
 	
-	nrf24_package.Action.PowerUpTx(&device, tx_addr, 100);
-	
+	nrf24_package.Action.EnterTransmitMode(&device, tx_addr, 100);
 
 	while (1)
 	{

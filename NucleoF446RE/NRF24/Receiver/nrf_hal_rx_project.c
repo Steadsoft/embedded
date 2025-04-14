@@ -120,7 +120,7 @@ int main(void)
 		
 	nrf24_package.Action.Initialize(&device);
 	
-	nrf24_package.Action.PowerUpRx(&device, rx_addr, 1, 100); 
+	nrf24_package.Action.EnterReceiveMode(&device, rx_addr, 1, 100, 32); 
 	
 	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
 
@@ -144,17 +144,19 @@ void EXTI0_IRQHandler(void)
 {
 	uint8_t data[32];
 	NrfReg_STATUS status;
-
-	tx_ds_irq_clear_pending = 1;
+	
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 	
 	nrf24_package.Read.STATUS(&device, &status);
-	nrf24_package.Write.STATUS(&device, status, &status);
-
+	
+	if (status.RX_DR)
+	{
+		status.TX_DS = 0;
+		status.MAX_RT = 0;
+		nrf24_package.Write.STATUS(&device, status, &status);
+	}
 	
 	nrf24_package.Command.R_RX_PAYLOAD(&device, data, 32, &status);
-	
-	msgs_rx++;
 } 
 
 void EXTI0_IRQPostHandler(NrfSpiDevice_ptr device_ptr)
