@@ -113,6 +113,12 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t i
 		__GPIOA_CLK_ENABLE();
 		GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
 		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
+		GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
+		GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
+		GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
+ 
+		HAL_GPIO_Init(gpio_base, &GPIO_InitStruct_spi);
+
 	}
 	elif (spi_base == SPI4)
 	{
@@ -151,12 +157,6 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t i
 		device_ptr->FaultHandler(device_ptr, HAL_SPI_INIT_ERROR);
 		return;
 	}
-	
-	GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
-	GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
-	GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
- 
-	HAL_GPIO_Init(gpio_base, &GPIO_InitStruct_spi);
 	
 	if (int_pin >= 0)
 	{
