@@ -18,7 +18,7 @@ private void spi_set_ce_hi(NrfSpiDevice_ptr);
 private void spi_set_csn_lo(NrfSpiDevice_ptr);
 private void spi_set_csn_hi(NrfSpiDevice_ptr);
 private void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count);
-private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t int_pin, uint32_t ext_int_id, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler);
+private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler);
 private void pulse_led_forever(uint32_t interval);
 private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count);
 private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
@@ -60,7 +60,7 @@ private void pulse_led_forever(uint32_t interval)
 }
 // Configure the SPI and associated GPIO pins based on the supplied SPI base address.
 // The int pin, ce pin and cs pin are assumed to be on the same IO port as the specified SPI.
-private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t int_pin, uint32_t ext_int_id, uint32_t ce_pin, uint32_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler)
+private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler)
 {
 	GPIO_TypeDef * gpio_base;
 	HAL_StatusTypeDef status;
@@ -78,26 +78,26 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t i
 	
 	device_ptr->FaultHandler = handler;
 	
-	if (int_pin < GPIO_PIN_0 || int_pin > GPIO_PIN_15)
-	{
-		// Invalid interrupt pin number
-		device_ptr->FaultHandler(device_ptr, INVALID_INTERRUPT_PIN);
-		return;
-	}
-	
-	if (ce_pin < GPIO_PIN_0 || ce_pin > GPIO_PIN_15)
-	{
-		// Invalid CE pin number
-		device_ptr->FaultHandler(device_ptr, INVALID_CE_PIN);
-		return;
-	}
-	
-	if (cs_pin < GPIO_PIN_0 || cs_pin > GPIO_PIN_15)
-	{
-		// Invalid CS pin number
-		device_ptr->FaultHandler(device_ptr, INVALID_CS_PIN);
-		return;
-	}
+//	if (int_pin < GPIO_PIN_0 || int_pin > GPIO_PIN_15)
+//	{
+//		// Invalid interrupt pin number
+//		device_ptr->FaultHandler(device_ptr, INVALID_INTERRUPT_PIN);
+//		return;
+//	}
+//	
+//	if (ce_pin < GPIO_PIN_0 || ce_pin > GPIO_PIN_15)
+//	{
+//		// Invalid CE pin number
+//		device_ptr->FaultHandler(device_ptr, INVALID_CE_PIN);
+//		return;
+//	}
+//	
+//	if (cs_pin < GPIO_PIN_0 || cs_pin > GPIO_PIN_15)
+//	{
+//		// Invalid CS pin number
+//		device_ptr->FaultHandler(device_ptr, INVALID_CS_PIN);
+//		return;
+//	}
 	
 	if (int_pin == ce_pin || int_pin == cs_pin || ce_pin == cs_pin)
 	{
@@ -111,13 +111,13 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t i
 		gpio_base = GPIOA;
 		__SPI1_CLK_ENABLE();
 		__GPIOA_CLK_ENABLE();
-		GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
+		GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;  // SCK, MISO, MOSI
 		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
 		GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
 		GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
 		GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
  
-		HAL_GPIO_Init(gpio_base, &GPIO_InitStruct_spi);
+		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_spi);
 
 	}
 	elif (spi_base == SPI4)
@@ -172,14 +172,14 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t i
 	
 	// Init the control pins
 	
-	GPIO_InitStruct_ctrl.Pin   = ce_pin | cs_pin;
+	GPIO_InitStruct_ctrl.Pin   = DECODE_PIN(ce_pin) | DECODE_PIN(cs_pin);
 	GPIO_InitStruct_ctrl.Mode  = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct_ctrl.Pull  = GPIO_PULLUP;
 	GPIO_InitStruct_ctrl.Speed = GPIO_SPEED_LOW;
 
 	HAL_GPIO_Init(gpio_base, &GPIO_InitStruct_ctrl);
-	HAL_GPIO_WritePin(gpio_base, cs_pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(gpio_base, ce_pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(gpio_base, DECODE_PIN(cs_pin), GPIO_PIN_SET);
+	HAL_GPIO_WritePin(gpio_base, DECODE_PIN(ce_pin), GPIO_PIN_RESET);
 	
 	// Init the pulse timer for pulsing CE (a bit more than 10uS)
 	
@@ -210,8 +210,8 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int32_t i
 	}
 	
 	device_ptr->gpio_ptr = gpio_base;
-	device_ptr->ce_pin = ce_pin;
-	device_ptr->cs_pin = cs_pin;
+	device_ptr->ce_pin = DECODE_PIN(ce_pin);
+	device_ptr->cs_pin = DECODE_PIN(cs_pin);
 	device_ptr->int_pin = int_pin;
 	device_ptr->configured = 1; // Mark as configured
 }

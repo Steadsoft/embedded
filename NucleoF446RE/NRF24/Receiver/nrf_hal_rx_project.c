@@ -5,6 +5,8 @@
 #include <nrf24_hal_support.library.h>
 #include <nrf24_package.library.h>
 
+#include <nrf_hal_rx_project.h>
+
 #define ATOMIC_FLAG_OFF (atomic_flag){0};
 # define ROUNDUP(N,ALIGN)	        (((N) +  ((ALIGN)-1)) & ~((ALIGN)-1))
 //#include <cmsis_gcc.h>
@@ -53,12 +55,12 @@ void spin_500_uS();
 
 static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code);
 
+void pulse_led(uint32_t interval);
+
 
 void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr);
 
 void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len);
-void CreateMemoryPool(uint8_t Size, uint8_t Quantity, uint8_t Alignment, PoolHeader_ptr * Pool_ptr);
-void EXTI0_IRQPostHandler(NrfSpiDevice_ptr device_ptr);
 
 void spin_20_uS()
 {
@@ -88,6 +90,8 @@ NrfSpiDevice device = { 0 };
 
 int msgs_rx = 0;
 
+volatile int8_t msg_received = 0;
+
 int main(void)
 {
 	NrfReg_ALL_REGISTERS everything_before = { 0 };
@@ -104,16 +108,12 @@ int main(void)
 	PoolHeader_ptr pool_ptr; 
 	uint8_t rx_addr[] = { 0xE7, 0xE7, 0xE7, 0xE7, 0xE7 }; // this is just the default system reset value for the RX_ADDR_P0 reg
 
-//	CreateMemoryPool(17, 64, 8, &pool_ptr);
-//	CreateMemoryPool(23, 64, 8, &pool_ptr);
-//	CreateMemoryPool(24, 64, 8, &pool_ptr);
-
 	HAL_Init();
 	
 	// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI1, TIM1, GPIO_PIN_0, EXTI0_IRQn, NRF_CE, SPI_CS, &device, fault_handler); 
-
+	nrf24_hal_support.Configure(SPI1, TIM1, PA0, EXTI0_IRQn, PA1, PA4, &device, fault_handler); 
+	
 	// Force all register into their hardware reset state.
 	
 	nrf24_package.Action.PowerOnReset(&device);
@@ -122,23 +122,17 @@ int main(void)
 	
 	nrf24_package.Action.EnterReceiveMode(&device, rx_addr, 1, 100, 32); 
 	
-	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
-
 	while (1)
 	{
-		//HAL_Delay(-1);
-		
-		//nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
-		
-		//if (everything_after.Status.RX_DR)
-		//	break;
-
+		if (msg_received)
+		{
+			msg_received = 0;
+			pulse_led(100);
+		}
 	}
 
 	return(0);
 }
-
-
 
 void EXTI0_IRQHandler(void)
 {
@@ -157,29 +151,15 @@ void EXTI0_IRQHandler(void)
 	}
 	
 	nrf24_package.Command.R_RX_PAYLOAD(&device, data, 32, &status);
+	
+	msg_received = 1;
 } 
 
-void EXTI0_IRQPostHandler(NrfSpiDevice_ptr device_ptr)
+void pulse_led(uint32_t interval)
 {
-	NrfReg_STATUS status_irq;
-	
-	tx_ds_interrupt_count++;
-	
-	nrf24_package.Read.STATUS(device_ptr, &status_irq);
-
-	if (status_irq.TX_DS)
-	{
-		nrf24_package.Write.STATUS(device_ptr, status_irq, &status_irq);
-	}
-	
-	tx_ds_irq_clear_pending = 0;
-}
-
-
-
-void AllocateInPool(PoolHeader_ptr * Pool_ptr)
-{
-	
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+	HAL_Delay(interval);	
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 }
 
 static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)

@@ -118,7 +118,7 @@ int main(void)
 	{
 		nrf24_package.Action.SendPayload(&device, buffer, 32);
 		
-		HAL_Delay(10);
+		HAL_Delay(1000);
 	}
 
 	return(0);

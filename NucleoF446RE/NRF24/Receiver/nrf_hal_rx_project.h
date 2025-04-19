@@ -1,14 +1,9 @@
 
-#if defined(nrf24_hal_support_implementer)
-// Private macros can go here, these will never been seen by consumer code when compiled.
-	#define private static
-	#define public 
-#endif
-
 #define ENCODE_PIN(B,P) ((uint64_t)(((uint64_t)(B) << 16) | (uint16_t)(P)))
 #define DECODE_PIN(P)   ((uint16_t)((uint64_t)(P) & 0xFFFF))
 #define DECODE_BASE(P)  ((uint32_t)((uint64_t)(P) >> 16))
 
+#define PA0 ENCODE_PIN(GPIOA_BASE,GPIO_PIN_0)
 #define PA1 ENCODE_PIN(GPIOA_BASE,GPIO_PIN_1)
 #define PA2 ENCODE_PIN(GPIOA_BASE,GPIO_PIN_2)
 #define PA3 ENCODE_PIN(GPIOA_BASE,GPIO_PIN_3)
@@ -88,4 +83,3 @@
 #define PE13 ENCODE_PIN(GPIOE_BASE,GPIO_PIN_13)
 #define PE14 ENCODE_PIN(GPIOE_BASE,GPIO_PIN_14)
 #define PE15 ENCODE_PIN(GPIOE_BASE,GPIO_PIN_15)
-
