@@ -95,14 +95,13 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t 
 		GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
  
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_spi);
-
 	}
 	elif (spi_base == SPI2)
 	{
-		__SPI1_CLK_ENABLE();
+		__SPI2_CLK_ENABLE();
 		__GPIOB_CLK_ENABLE();
 		GPIO_InitStruct_spi.Pin       = GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; // SCK, MISO, MOSI
-		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
+		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI2;
 		GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
 		GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
 		GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
