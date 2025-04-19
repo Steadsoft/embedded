@@ -160,7 +160,7 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t i
 	
 	if (int_pin >= 0)
 	{
-		GPIO_InitStruct_irq.Pin = int_pin;
+		GPIO_InitStruct_irq.Pin = DECODE_PIN(int_pin);
 		GPIO_InitStruct_irq.Mode = GPIO_MODE_IT_FALLING;
 		GPIO_InitStruct_irq.Pull = GPIO_PULLUP;
 		GPIO_InitStruct_spi.Speed = GPIO_SPEED_FAST;
@@ -212,7 +212,7 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t i
 	device_ptr->gpio_ptr = gpio_base;
 	device_ptr->ce_pin = DECODE_PIN(ce_pin);
 	device_ptr->cs_pin = DECODE_PIN(cs_pin);
-	device_ptr->int_pin = int_pin;
+	device_ptr->int_pin = DECODE_PIN(int_pin);
 	device_ptr->configured = 1; // Mark as configured
 }
 private void spi_set_ce_lo(NrfSpiDevice_ptr ptr)
