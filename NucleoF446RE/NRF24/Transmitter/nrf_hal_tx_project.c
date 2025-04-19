@@ -32,7 +32,7 @@ typedef struct
 	unsigned long fields[3];
 } BoardId;
 
-
+int faults = 0;
 
 volatile uint32_t tx_ds_interrupt_count = 0;
 volatile uint32_t transmit_count = 0;
@@ -150,7 +150,7 @@ void EXTI0_IRQHandler(void)
 
 static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)
 {
-	;
+	faults++;
 }
 
 

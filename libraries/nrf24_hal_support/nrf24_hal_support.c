@@ -18,7 +18,7 @@ private void spi_set_ce_hi(NrfSpiDevice_ptr);
 private void spi_set_csn_lo(NrfSpiDevice_ptr);
 private void spi_set_csn_hi(NrfSpiDevice_ptr);
 private void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count);
-private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler);
+private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler);
 private void pulse_led_forever(uint32_t interval);
 private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count);
 private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
@@ -60,7 +60,7 @@ private void pulse_led_forever(uint32_t interval)
 }
 // Configure the SPI and associated GPIO pins based on the supplied SPI base address.
 // The int pin, ce pin and cs pin are assumed to be on the same IO port as the specified SPI.
-private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler)
+private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler)
 {
 	GPIO_TypeDef * gpio_base;
 	HAL_StatusTypeDef status;
@@ -161,7 +161,8 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t i
 		return;
 	}
 	
-	// The interrupt, cs and ce pins are all assume to be on the same GPIO port. 
+	// The interrupt, cs and ce pins are all assume to be on the same GPIO port
+	// and that need not be the same as the GPIO port used by the SPI device
 	
 	gpio_base = DECODE_BASE(cs_pin);
 	
@@ -218,27 +219,27 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t i
 	
 	// Attach the control pins details to the device struc
 	
-	device_ptr->gpio_ptr = gpio_base;
-	device_ptr->ce_pin = DECODE_PIN(ce_pin);
-	device_ptr->cs_pin = DECODE_PIN(cs_pin);
+	//device_ptr->gpio_ptr = gpio_base;
+	device_ptr->ce_pin = ce_pin;
+	device_ptr->cs_pin = cs_pin;
 	device_ptr->int_pin = DECODE_PIN(int_pin);
 	device_ptr->configured = 1; // Mark as configured
 }
 private void spi_set_ce_lo(NrfSpiDevice_ptr ptr)
 {
-	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->ce_pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DECODE_BASE(ptr->ce_pin), DECODE_PIN(ptr->ce_pin), GPIO_PIN_RESET);
 }
 private void spi_set_ce_hi(NrfSpiDevice_ptr ptr)
 {
-	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->ce_pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(DECODE_BASE(ptr->ce_pin), DECODE_PIN(ptr->ce_pin), GPIO_PIN_SET);
 }
 private void spi_set_csn_lo(NrfSpiDevice_ptr ptr)
 {
-	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DECODE_BASE(ptr->cs_pin), DECODE_PIN(ptr->cs_pin), GPIO_PIN_RESET);
 }
 private void spi_set_csn_hi(NrfSpiDevice_ptr ptr)
 {
-	HAL_GPIO_WritePin(ptr->gpio_ptr, ptr->cs_pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(DECODE_BASE(ptr->cs_pin), DECODE_PIN(ptr->cs_pin), GPIO_PIN_SET);
 }
 private void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
 {

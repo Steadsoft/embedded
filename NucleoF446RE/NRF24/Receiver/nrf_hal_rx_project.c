@@ -41,6 +41,7 @@ struct memory_pool_header
 
 typedef struct memory_pool_header PoolHeader, * PoolHeader_ptr;
 
+int faults = 0;
 
 volatile uint32_t tx_ds_interrupt_count = 0;
 volatile uint32_t sent_messages_count = 0;
@@ -164,5 +165,5 @@ void pulse_led(uint32_t interval)
 
 static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)
 {
-	;
+	faults++;
 }
