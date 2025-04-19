@@ -108,7 +108,6 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t i
 
 	if (spi_base == SPI1)
 	{
-		gpio_base = GPIOA;
 		__SPI1_CLK_ENABLE();
 		__GPIOA_CLK_ENABLE();
 		GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;  // SCK, MISO, MOSI
@@ -120,13 +119,17 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t i
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_spi);
 
 	}
-	elif (spi_base == SPI4)
+	elif (spi_base == SPI2)
 	{
-		gpio_base = GPIOB;
-		__SPI4_CLK_ENABLE();
+		__SPI1_CLK_ENABLE();
 		__GPIOB_CLK_ENABLE();
-		GPIO_InitStruct_spi.Pin       = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5;
-		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI4;
+		GPIO_InitStruct_spi.Pin       = GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; // SCK, MISO, MOSI
+		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
+		GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
+		GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
+		GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
+ 
+		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct_spi);
 	}
 	else
 	{
@@ -157,6 +160,10 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t i
 		device_ptr->FaultHandler(device_ptr, HAL_SPI_INIT_ERROR);
 		return;
 	}
+	
+	// The interrupt, cs and ce pins are all assume to be on the same GPIO port. 
+	
+	gpio_base = DECODE_BASE(cs_pin);
 	
 	if (int_pin >= 0)
 	{
@@ -208,6 +215,8 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, int64_t i
 		// Initialization Error
 		device_ptr->FaultHandler(device_ptr, HAL_TIM_START_ERROR);
 	}
+	
+	// Attach the control pins details to the device struc
 	
 	device_ptr->gpio_ptr = gpio_base;
 	device_ptr->ce_pin = DECODE_PIN(ce_pin);
