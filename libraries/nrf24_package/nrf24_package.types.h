@@ -374,8 +374,8 @@ struct nrf_action_interface
 	 * 
 	 */
 	void(* Initialize)(NrfDevice_ptr device_ptr);
-	void(* EnterTransmitMode)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power);
-	void(* EnterReceiveMode)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size);
+	void(* EnterTransmitMode)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate);
+	void(* EnterReceiveMode)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate);
 	void(* PowerDown)(NrfDevice_ptr);
 	void(* PulseCE)(NrfDevice_ptr device_ptr);
 	void(* SendPayload)(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);

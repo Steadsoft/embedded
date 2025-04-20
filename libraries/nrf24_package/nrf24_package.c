@@ -114,8 +114,8 @@ private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr
 private void Initialize(NrfDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void R_RX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-private void EnterTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power);
-private void PowerUpRx(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size);
+private void EnterTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate);
+private void PowerUpRx(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate);
 private void PulseCE(NrfDevice_ptr device_ptr);
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
 
@@ -738,7 +738,7 @@ private void PowerDown(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
-private void EnterTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power)
+private void EnterTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG config = { 0 };
@@ -769,10 +769,26 @@ private void EnterTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	
 	nrf24_package.Update.STATUS(device_ptr, status, status);
 	
+	// Set rate
+	
+	switch(rate)
+	{
+	case MIN_RATE:
+		rf_setup.RF_DR_LOW = 1; 
+		rf_setup.RF_DR_HIGH = 0;
+		break;
+	case MAX_RATE: 
+		rf_setup.RF_DR_LOW = 0; 
+		rf_setup.RF_DR_HIGH = 1;
+		break;
+	case MED_RATE:
+		rf_setup.RF_DR_LOW = 0; 
+		rf_setup.RF_DR_HIGH = 0;
+		break;
+	}
+	
 	// Set power
 	
-	rf_setup.RF_DR_LOW = 0; 
-	rf_setup.RF_DR_HIGH = 1;
 	rf_setup.RF_PWR = power;
 	
 	nrf24_package.Write.RF_SETUP(device_ptr, rf_setup, &status); // Set RF settings
@@ -788,7 +804,7 @@ private void EnterTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 	
 }
-private void PowerUpRx(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size)
+private void PowerUpRx(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate)
 {
 	NrfReg_STATUS status;
 	NrfReg_RF_CH rf_ch = { 0 };
@@ -797,7 +813,8 @@ private void PowerUpRx(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pip
 	NrfReg_CONFIG config = { 0 };
 	NrfReg_EN_RXADDR en_rx_addr = { 0 };
 	NrfReg_RX_PW rx_pw = { 0 };
-	
+	NrfReg_RF_SETUP rf_setup = { 0 }, rf_setup_mask = { 0 };
+
 	rx_addr.value[0] = address[0];
 	rx_addr.value[1] = address[1];
 	rx_addr.value[2] = address[2];
@@ -867,6 +884,29 @@ private void PowerUpRx(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pip
 	config.MASK_RX_DR = 0;
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
+	
+	// Set rate
+	
+	switch (rate)
+	{
+	case MIN_RATE:
+		rf_setup.RF_DR_LOW = 1; 
+		rf_setup.RF_DR_HIGH = 0;
+		break;
+	case MAX_RATE: 
+		rf_setup.RF_DR_LOW = 0; 
+		rf_setup.RF_DR_HIGH = 1;
+		break;
+	case MED_RATE:
+		rf_setup.RF_DR_LOW = 0; 
+		rf_setup.RF_DR_HIGH = 0;
+		break;
+	}
+	
+	rf_setup_mask.RF_DR_HIGH = 1;
+	rf_setup_mask.RF_DR_LOW = 1;
+
+	nrf24_package.Update.RF_SETUP(device_ptr, rf_setup, rf_setup_mask, &status); // Set RF settings
 	
 	nrf24_hal_support.Activate(device_ptr);
 

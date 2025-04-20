@@ -23,3 +23,13 @@
 	#define TWIDDLE(Current,New,Mask) (~(REG_TO_INT(Mask)) & REG_TO_INT(Current)) | (REG_TO_INT(Mask) & REG_TO_INT(New))
 #endif
 
+#define MAX_POWER 3
+#define HIGH_POWER 2
+#define LOW_POWER 1
+#define MIN_POWER 0
+
+#define MIN_RATE 1
+#define MED_RATE 0
+#define MAX_RATE 2
+
+
