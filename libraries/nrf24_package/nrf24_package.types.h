@@ -304,92 +304,92 @@ struct NrfReg_ALL_REGISTERS_struct
 };
 struct nrf_write_interface
 {
-	void(* CONFIG)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* EN_AA)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* EN_RXADDR)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* SETUP_AW)(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* SETUP_RETR)(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* RF_CH)(NrfSpiDevice_ptr device_ptr,  NrfReg_RF_CH Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* RF_SETUP)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* STATUS)(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* OBSERVE_TX)(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* RPD)(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* RX_ADDR_LONG)(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-	void(* RX_ADDR_SHORT)(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-	void(* TX_ADDR_LONG)(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* RX_PW)(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-	void(* FIFO_STATUS)(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* DYNPD)(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* FEATURE)(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* CONFIG)(NrfDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* EN_AA)(NrfDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* EN_RXADDR)(NrfDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* SETUP_AW)(NrfDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* SETUP_RETR)(NrfDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RF_CH)(NrfDevice_ptr device_ptr,  NrfReg_RF_CH Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RF_SETUP)(NrfDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* STATUS)(NrfDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* OBSERVE_TX)(NrfDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RPD)(NrfDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RX_ADDR_LONG)(NrfDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+	void(* RX_ADDR_SHORT)(NrfDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+	void(* TX_ADDR_LONG)(NrfDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RX_PW)(NrfDevice_ptr device_ptr, NrfReg_RX_PW Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+	void(* FIFO_STATUS)(NrfDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* DYNPD)(NrfDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* FEATURE)(NrfDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_STATUS_ptr NrfStatus);
 //	void(* SingleByteRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t * Value, NrfReg_STATUS_ptr NrfStatus);
 //	void(* MultiBytesRegister)(NrfSpiDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatus);
 
 };
 struct nrf_read_interface
 {
-	void(* CONFIG)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* EN_AA)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* EN_RXADDR)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* SETUP_AW)(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* SETUP_RETR)(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* RF_CH)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* RF_SETUP)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* STATUS)(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS_ptr Value);
-	void(* OBSERVE_TX)(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* RPD)(NrfSpiDevice_ptr device_ptr, NrfReg_RPD_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* RX_ADDR_LONG)(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-	void(* RX_ADDR_SHORT)(NrfSpiDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-	void(* TX_ADDR_LONG)(NrfSpiDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* RX_PW)(NrfSpiDevice_ptr device_ptr, NrfReg_RX_PW_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
-	void(* FIFO_STATUS)(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* DYNPD)(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* FEATURE)(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-	void(* ALL_REGISTERS)(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* CONFIG)(NrfDevice_ptr device_ptr, NrfReg_CONFIG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* EN_AA)(NrfDevice_ptr device_ptr, NrfReg_EN_AA_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* EN_RXADDR)(NrfDevice_ptr device_ptr, NrfReg_EN_RXADDR_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* SETUP_AW)(NrfDevice_ptr device_ptr, NrfReg_SETUP_AW_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* SETUP_RETR)(NrfDevice_ptr device_ptr, NrfReg_SETUP_RETR_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RF_CH)(NrfDevice_ptr device_ptr, NrfReg_RF_CH_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RF_SETUP)(NrfDevice_ptr device_ptr, NrfReg_RF_SETUP_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* STATUS)(NrfDevice_ptr device_ptr, NrfReg_STATUS_ptr Value);
+	void(* OBSERVE_TX)(NrfDevice_ptr device_ptr, NrfReg_OBSERVE_TX_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RPD)(NrfDevice_ptr device_ptr, NrfReg_RPD_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RX_ADDR_LONG)(NrfDevice_ptr device_ptr, NrfReg_RX_ADDR_LONG_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+	void(* RX_ADDR_SHORT)(NrfDevice_ptr device_ptr, NrfReg_RX_ADDR_SHORT_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+	void(* TX_ADDR_LONG)(NrfDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* RX_PW)(NrfDevice_ptr device_ptr, NrfReg_RX_PW_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus);
+	void(* FIFO_STATUS)(NrfDevice_ptr device_ptr, NrfReg_FIFO_STATUS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* DYNPD)(NrfDevice_ptr device_ptr, NrfReg_DYNPD_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* FEATURE)(NrfDevice_ptr device_ptr, NrfReg_FEATURE_ptr Value, NrfReg_STATUS_ptr NrfStatus);
+	void(* ALL_REGISTERS)(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 };
 
 struct nrf_update_interface
 {
-	void (* CONFIG)(NrfSpiDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_CONFIG Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* EN_AA)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_EN_AA Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* EN_RXADDR)(NrfSpiDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_EN_RXADDR Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* SETUP_AW)(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_SETUP_AW Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* SETUP_RETR)(NrfSpiDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_SETUP_RETR Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* RF_CH)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_RF_CH Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* RF_SETUP)(NrfSpiDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_RF_SETUP Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* STATUS)(NrfSpiDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask);
-	void (* OBSERVE_TX)(NrfSpiDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_OBSERVE_TX Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* RPD)(NrfSpiDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_RPD Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* FIFO_STATUS)(NrfSpiDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_FIFO_STATUS Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* DYNPD)(NrfSpiDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_DYNPD Mask, NrfReg_STATUS_ptr NrfStatus);
-	void (* FEATURE)(NrfSpiDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_FEATURE Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* CONFIG)(NrfDevice_ptr device_ptr, NrfReg_CONFIG Value, NrfReg_CONFIG Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* EN_AA)(NrfDevice_ptr device_ptr, NrfReg_EN_AA Value, NrfReg_EN_AA Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* EN_RXADDR)(NrfDevice_ptr device_ptr, NrfReg_EN_RXADDR Value, NrfReg_EN_RXADDR Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* SETUP_AW)(NrfDevice_ptr device_ptr, NrfReg_SETUP_AW Value, NrfReg_SETUP_AW Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* SETUP_RETR)(NrfDevice_ptr device_ptr, NrfReg_SETUP_RETR Value, NrfReg_SETUP_RETR Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* RF_CH)(NrfDevice_ptr device_ptr, NrfReg_RF_CH Value, NrfReg_RF_CH Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* RF_SETUP)(NrfDevice_ptr device_ptr, NrfReg_RF_SETUP Value, NrfReg_RF_SETUP Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* STATUS)(NrfDevice_ptr device_ptr, NrfReg_STATUS Value, NrfReg_STATUS Mask);
+	void (* OBSERVE_TX)(NrfDevice_ptr device_ptr, NrfReg_OBSERVE_TX Value, NrfReg_OBSERVE_TX Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* RPD)(NrfDevice_ptr device_ptr, NrfReg_RPD Value, NrfReg_RPD Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* FIFO_STATUS)(NrfDevice_ptr device_ptr, NrfReg_FIFO_STATUS Value, NrfReg_FIFO_STATUS Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* DYNPD)(NrfDevice_ptr device_ptr, NrfReg_DYNPD Value, NrfReg_DYNPD Mask, NrfReg_STATUS_ptr NrfStatus);
+	void (* FEATURE)(NrfDevice_ptr device_ptr, NrfReg_FEATURE Value, NrfReg_FEATURE Mask, NrfReg_STATUS_ptr NrfStatus);
 };
 
 // these are abstract composite operations
 struct nrf_action_interface
 {
-	void(* PowerOnReset)(NrfSpiDevice_ptr); // Sets all device registers to the same values they have after powering off/on.
+	void(* PowerOnReset)(NrfDevice_ptr); // Sets all device registers to the same values they have after powering off/on.
 	/*
 	 * @brief Initializes the NRF registers prior to setting up TX or RX operation.
 	 * @param device_ptr Pointer to the configured NRF device structure that contains the SPI and GPIO control structures.
 	 * 
 	 */
-	void(* Initialize)(NrfSpiDevice_ptr device_ptr);
-	void(* EnterTransmitMode)(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power);
-	void(* EnterReceiveMode)(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size);
-	void(* PowerDown)(NrfSpiDevice_ptr);
-	void(* PulseCE)(NrfSpiDevice_ptr device_ptr);
-	void(* SendPayload)(NrfSpiDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
+	void(* Initialize)(NrfDevice_ptr device_ptr);
+	void(* EnterTransmitMode)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power);
+	void(* EnterReceiveMode)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size);
+	void(* PowerDown)(NrfDevice_ptr);
+	void(* PulseCE)(NrfDevice_ptr device_ptr);
+	void(* SendPayload)(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
 
 };
 
 // These represent the documented commands
 struct nrf_command_interface
 {
-	void(* FLUSH_TX)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
-	void(* FLUSH_RX)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
-	void(* W_TX_PAYLOAD)(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-	void(* R_RX_PAYLOAD)(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-	void(* ReadRxPayload)(NrfSpiDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+	void(* FLUSH_TX)(NrfDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+	void(* FLUSH_RX)(NrfDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+	void(* W_TX_PAYLOAD)(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
+	void(* R_RX_PAYLOAD)(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
+	void(* ReadRxPayload)(NrfDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
 };
 
 struct nrf_empty

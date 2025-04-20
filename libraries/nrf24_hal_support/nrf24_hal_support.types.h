@@ -12,30 +12,30 @@ struct nrf24_hal_support_interface
 	 * @param cs_pin The GPIO pin number for the CSN (Chip Select Not) line.
 	 * @param device_ptr The returned configured device instance. 
 	*/
-	void(*Configure)(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler);
+	void(*Configure)(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler);
 	/** 
 	 Sets the NRF device's CE pin to low
 	 */
-	void(*Deactivate)(NrfSpiDevice_ptr);
+	void(*Deactivate)(NrfDevice_ptr);
 	/** 
 	 Sets the NRF device's CE pin to high 
 	 */
-	void(*Activate)(NrfSpiDevice_ptr);
+	void(*Activate)(NrfDevice_ptr);
 	/**
 	 Sets the NRF device's SPI CSN pin to low 
 	 */
-	void(*Select)(NrfSpiDevice_ptr);
+	void(*Select)(NrfDevice_ptr);
 	/**
 	 Sets the NRF device's SPI CSN pin to high 
 	*/
-	void(*Deselect)(NrfSpiDevice_ptr);
-	void(*ExchangeBytes)(NrfSpiDevice_ptr, uint8_t[], uint8_t[], uint8_t);
-	void(*ReadBytes)(NrfSpiDevice_ptr, uint8_t bytes_in_ptr[], uint8_t count);
-	void(*WriteBytes)(NrfSpiDevice_ptr, uint8_t bytes_out_ptr[], uint8_t count);
+	void(*Deselect)(NrfDevice_ptr);
+	void(*ExchangeBytes)(NrfDevice_ptr, uint8_t[], uint8_t[], uint8_t);
+	void(*ReadBytes)(NrfDevice_ptr, uint8_t bytes_in_ptr[], uint8_t count);
+	void(*WriteBytes)(NrfDevice_ptr, uint8_t bytes_out_ptr[], uint8_t count);
 	void(*flash_led_forever)(uint32_t interval);
 };
 
-struct nrf_spi_device
+struct nrf_device
 {
 	SPI_HandleTypeDef spi;
 	TIM_HandleTypeDef pulse_timer;

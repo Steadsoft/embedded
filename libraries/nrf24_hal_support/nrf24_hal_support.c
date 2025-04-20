@@ -9,19 +9,19 @@
 
 #define elif else if
 
-private NrfSpiDevice zeroized = { 0 };
+private NrfDevice zeroized = { 0 };
 
 
 // Declare all static functions
-private void spi_set_ce_lo(NrfSpiDevice_ptr);
-private void spi_set_ce_hi(NrfSpiDevice_ptr);
-private void spi_set_csn_lo(NrfSpiDevice_ptr);
-private void spi_set_csn_hi(NrfSpiDevice_ptr);
-private void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count);
-private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler);
+private void spi_set_ce_lo(NrfDevice_ptr);
+private void spi_set_ce_hi(NrfDevice_ptr);
+private void spi_set_csn_lo(NrfDevice_ptr);
+private void spi_set_csn_hi(NrfDevice_ptr);
+private void exchange_bytes(NrfDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count);
+private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler);
 private void pulse_led_forever(uint32_t interval);
-private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count);
-private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
+private void read_bytes(NrfDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count);
+private void write_bytes(NrfDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
 private void enable_clock_from_pin(uint64_t pin);
 
 // Declare the global library interface with same name as library
@@ -96,7 +96,7 @@ private void pulse_led_forever(uint32_t interval)
 }
 // Configure the SPI and associated GPIO pins based on the supplied SPI base address.
 // The int pin, ce pin and cs pin are assumed to be on the same IO port as the specified SPI.
-private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfSpiDevice_ptr device_ptr, nrf_fault_handler handler)
+private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler)
 {
 	HAL_StatusTypeDef status;
 	GPIO_InitTypeDef  GPIO_InitStruct_ctrl = { 0 };
@@ -246,37 +246,37 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t 
 	device_ptr->int_pin = DECODE_PIN(int_pin);
 	device_ptr->configured = 1; // Mark as configured
 }
-private void spi_set_ce_lo(NrfSpiDevice_ptr ptr)
+private void spi_set_ce_lo(NrfDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(DECODE_BASE(ptr->ce_pin), DECODE_PIN(ptr->ce_pin), GPIO_PIN_RESET);
 }
-private void spi_set_ce_hi(NrfSpiDevice_ptr ptr)
+private void spi_set_ce_hi(NrfDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(DECODE_BASE(ptr->ce_pin), DECODE_PIN(ptr->ce_pin), GPIO_PIN_SET);
 }
-private void spi_set_csn_lo(NrfSpiDevice_ptr ptr)
+private void spi_set_csn_lo(NrfDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(DECODE_BASE(ptr->cs_pin), DECODE_PIN(ptr->cs_pin), GPIO_PIN_RESET);
 }
-private void spi_set_csn_hi(NrfSpiDevice_ptr ptr)
+private void spi_set_csn_hi(NrfDevice_ptr ptr)
 {
 	HAL_GPIO_WritePin(DECODE_BASE(ptr->cs_pin), DECODE_PIN(ptr->cs_pin), GPIO_PIN_SET);
 }
-private void exchange_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
+private void exchange_bytes(NrfDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
 {
 	ptr->status = HAL_SPI_TransmitReceive(&ptr->spi, bytes_out_ptr, bytes_in_ptr, count, HAL_MAX_DELAY);
 	
 	if (ptr->status != HAL_OK)
 		pulse_led_forever(100);
 }
-private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count)
+private void read_bytes(NrfDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count)
 {
 	ptr->status = HAL_SPI_Receive(&ptr->spi, bytes_in_ptr, count, HAL_MAX_DELAY);
 	
 	if (ptr->status != HAL_OK)
 		pulse_led_forever(100);
 }
-private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count)
+private void write_bytes(NrfDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count)
 {
 	ptr->status = HAL_SPI_Transmit(&ptr->spi, bytes_out_ptr, count, HAL_MAX_DELAY);
 	

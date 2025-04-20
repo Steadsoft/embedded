@@ -23,14 +23,14 @@ typedef struct
 
 void update(NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP, NrfReg_RF_SETUP_ptr);
 
-void enter_rx_mode(NrfSpiDevice_ptr device_ptr);
+void enter_rx_mode(NrfDevice_ptr device_ptr);
 
 int get_board_id();
 void spin_100_uS();
-void send_commands(NrfSpiDevice_ptr device_ptr, int count);
-void trapif(int, NrfSpiDevice_ptr);
-void initialize_nrf(NrfSpiDevice_ptr device_ptr);
-static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code);
+void send_commands(NrfDevice_ptr device_ptr, int count);
+void trapif(int, NrfDevice_ptr);
+void initialize_nrf(NrfDevice_ptr device_ptr);
+static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
 
 void print_register(uint8_t Register, uint8_t Value);
 
@@ -84,7 +84,7 @@ int maintest(void)
 	
 	NrfReg_STATUS status;
 	SPI_HandleTypeDef spi; 
-	NrfSpiDevice device; 
+	NrfDevice device; 
 	NrfReg_CONFIG cfg;
 	NrfReg_SETUP_AW aw = { 0 };
 	
@@ -117,7 +117,7 @@ int maintest(void)
 
 
 
-void send_commands(NrfSpiDevice_ptr device_ptr, int count)
+void send_commands(NrfDevice_ptr device_ptr, int count)
 {
 	
 	// Declare some NRF register variables.
@@ -196,7 +196,7 @@ void send_commands(NrfSpiDevice_ptr device_ptr, int count)
 	}
 }
 
-void trapif(int value, NrfSpiDevice_ptr device_ptr)
+void trapif(int value, NrfDevice_ptr device_ptr)
 {
 	if (!value)
 		return;
@@ -240,7 +240,7 @@ void print_register(uint8_t Register, uint8_t Value)
 	}
 }
 
-static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)
+static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code)
 {
 	;
 }

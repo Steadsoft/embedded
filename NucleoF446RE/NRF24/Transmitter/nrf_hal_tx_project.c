@@ -43,20 +43,20 @@ volatile uint32_t transmit_count = 0;
 
 volatile uint8_t tx_completed = 0;
 
-static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code);
+static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
 
 
-void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr);
-void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr);
+void initialize_nrf24_device(NrfDevice_ptr device_ptr);
+void TM_NRF24L01_PowerUpRx(NrfDevice_ptr device_ptr);
 int get_board_id();
 void spin_100_uS();
 void spin_20_uS();
 void spin_500_uS();
 
-void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr);
+void TM_NRF24L01_PowerUpTx(NrfDevice_ptr device_ptr);
 
-void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len);
-void EXTI0_IRQPostHandler(NrfSpiDevice_ptr device_ptr);
+void TM_NRF24L01_Transmit(NrfDevice_ptr device_ptr, uint8_t * data, uint8_t len);
+void EXTI0_IRQPostHandler(NrfDevice_ptr device_ptr);
 
 void spin_20_uS()
 {
@@ -82,7 +82,7 @@ void spin_500_uS()
 	}
 }
 
-NrfSpiDevice device = { 0 }; 
+NrfDevice device = { 0 }; 
 
 int arr[4][3] = { { 2, 3, 1 }, { 19, 12, 7 }, { 10, 9, 8 }, { 3, 11, 5 } };
 
@@ -154,7 +154,7 @@ void EXTI0_IRQHandler(void)
 } 
 
 
-static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)
+static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code)
 {
 	faults++;
 }

@@ -47,23 +47,23 @@ volatile uint32_t tx_ds_interrupt_count = 0;
 volatile uint32_t sent_messages_count = 0;
 
 volatile uint8_t tx_ds_irq_clear_pending = 0;
-void initialize_nrf24_device(NrfSpiDevice_ptr device_ptr);
-void TM_NRF24L01_PowerUpRx(NrfSpiDevice_ptr device_ptr);
+void initialize_nrf24_device(NrfDevice_ptr device_ptr);
+void TM_NRF24L01_PowerUpRx(NrfDevice_ptr device_ptr);
 int get_board_id();
 void spin_100_uS();
 void spin_20_uS();
 void spin_500_uS();
 
-static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code);
+static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
 
 void pulse_led(uint32_t interval);
 
 void GPIOA_Pin5_Init(void);
 
 
-void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr);
+void TM_NRF24L01_PowerUpTx(NrfDevice_ptr device_ptr);
 
-void TM_NRF24L01_Transmit(NrfSpiDevice_ptr device_ptr, uint8_t * data, uint8_t len);
+void TM_NRF24L01_Transmit(NrfDevice_ptr device_ptr, uint8_t * data, uint8_t len);
 
 void spin_20_uS()
 {
@@ -89,7 +89,7 @@ void spin_500_uS()
 	}
 }
 
-NrfSpiDevice device = { 0 }; 
+NrfDevice device = { 0 }; 
 
 int msgs_rx = 0;
 
@@ -189,7 +189,7 @@ void GPIOA_Pin5_Init(void)
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
-static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)
+static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code)
 {
 	faults++;
 }
