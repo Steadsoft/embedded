@@ -58,6 +58,8 @@ static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code);
 
 void pulse_led(uint32_t interval);
 
+void GPIOA_Pin5_Init(void);
+
 
 void TM_NRF24L01_PowerUpTx(NrfSpiDevice_ptr device_ptr);
 
@@ -111,9 +113,11 @@ int main(void)
 
 	HAL_Init();
 	
+	GPIOA_Pin5_Init();
+	
 	// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI1, TIM1, PA0, EXTI0_IRQn, PA1, PA4, &device, fault_handler); 
+	nrf24_hal_support.Configure(SPI2, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
 	
 	// Force all register into their hardware reset state.
 	
@@ -130,14 +134,6 @@ int main(void)
 		if (msg_received)
 		{
 			msg_received = 0;
-			pulse_led(100);
-		}
-		
-		nrf24_package.Read.STATUS(&device, &status);
-		
-		if (status.RX_DR)
-		{
-			
 			pulse_led(100);
 		}
 		
@@ -170,9 +166,27 @@ void EXTI0_IRQHandler(void)
 
 void pulse_led(uint32_t interval)
 {
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-	HAL_Delay(interval);	
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+	HAL_Delay(interval);	
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+}
+
+void GPIOA_Pin5_Init(void)
+{
+	// Enable the GPIOA clock
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+
+	// Define a GPIO_InitTypeDef structure for configuration
+	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+	// Configure pin 5 as output
+	GPIO_InitStruct.Pin = GPIO_PIN_5;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; // Push-pull output
+	GPIO_InitStruct.Pull = GPIO_NOPULL; // No pull-up or pull-down resistor
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; // Low frequency for LED
+
+	// Initialize the GPIOA pin
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
 static void fault_handler(NrfSpiDevice_ptr device_ptr, NrfErrorCode code)

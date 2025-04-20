@@ -22,6 +22,7 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t 
 private void pulse_led_forever(uint32_t interval);
 private void read_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count);
 private void write_bytes(NrfSpiDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
+private void enable_clock_from_pin(uint64_t pin);
 
 // Declare the global library interface with same name as library
 public nrf24_hal_support_struct nrf24_hal_support =
@@ -36,6 +37,41 @@ public nrf24_hal_support_struct nrf24_hal_support =
 	.WriteBytes = write_bytes,
 	.flash_led_forever = pulse_led_forever
 };
+
+private void enable_clock_from_pin(uint64_t pin)
+{
+	// Enable the GPIO clock for the pin
+	
+	uint32_t base = (uint32_t)(DECODE_BASE(pin));
+	
+	switch (base)
+	{
+	case GPIOA_BASE:
+		__GPIOA_CLK_ENABLE();
+		break;
+	case GPIOB_BASE: 
+		__GPIOB_CLK_ENABLE();
+		break;	
+	case GPIOC_BASE: 
+		__GPIOC_CLK_ENABLE();
+		break;
+	case GPIOD_BASE: 
+		__GPIOD_CLK_ENABLE();
+		break;
+	case GPIOE_BASE: 
+		__GPIOE_CLK_ENABLE();
+		break;
+	case GPIOF_BASE: 
+		__GPIOF_CLK_ENABLE();
+		break;
+	case GPIOG_BASE: 
+		__GPIOG_CLK_ENABLE();
+		break;
+	case GPIOH_BASE: 
+		__GPIOH_CLK_ENABLE();
+		break;
+	}
+}
 // Implementation 
 private void pulse_led_forever(uint32_t interval)
 {
@@ -83,6 +119,10 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t 
 		device_ptr->FaultHandler(device_ptr, INVALID_PIN_COMBINATION);
 		return;
 	}
+	
+	enable_clock_from_pin(int_pin);
+	enable_clock_from_pin(ce_pin);
+	enable_clock_from_pin(cs_pin);
 
 	if (spi_base == SPI1) // For now we use a fixed set of pins for the SPI based on the chosen SPI number.
 	{
