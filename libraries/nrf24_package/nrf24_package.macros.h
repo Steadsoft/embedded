@@ -23,13 +23,11 @@
 	#define TWIDDLE(Current,New,Mask) (~(REG_TO_INT(Mask)) & REG_TO_INT(Current)) | (REG_TO_INT(Mask) & REG_TO_INT(New))
 #endif
 
-#define MAX_POWER 3
-#define HIGH_POWER 2
-#define LOW_POWER 1
-#define MIN_POWER 0
+#define MAX_POWER  3   // 0dBm    
+#define HIGH_POWER 2   // -6dBm
+#define LOW_POWER  1   // -12dBm
+#define MIN_POWER  0   // -18dBm
 
-#define MIN_RATE 1
-#define MED_RATE 0
-#define MAX_RATE 2
-
-
+#define MIN_RATE 1 // 250 kbps
+#define MED_RATE 0 // 1 Mbps
+#define MAX_RATE 2 // 2 Mbps
