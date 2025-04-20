@@ -19,6 +19,10 @@ extern "C"
 #define SPI_CS GPIO_PIN_4
 #define NRF_CE GPIO_PIN_1
 #define NRF_IR GPIO_PIN_0
+#define MAX 3
+#define HIGH 2
+#define LOW 1
+#define MIN 0
 	
 #define elif else if	
 	
@@ -112,7 +116,7 @@ int main(void)
 		
 	nrf24_package.Action.Initialize(&device);
 	
-	nrf24_package.Action.EnterTransmitMode(&device, tx_addr, 100);
+	nrf24_package.Action.EnterTransmitMode(&device, tx_addr, 100, MIN);
 
 	while (1)
 	{

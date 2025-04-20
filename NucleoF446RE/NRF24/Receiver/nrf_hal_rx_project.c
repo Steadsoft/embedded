@@ -113,7 +113,7 @@ int main(void)
 	
 	// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI2, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
+	nrf24_hal_support.Configure(SPI1, TIM1, PA0, EXTI0_IRQn, PA1, PA4, &device, fault_handler); 
 	
 	// Force all register into their hardware reset state.
 	
@@ -123,6 +123,8 @@ int main(void)
 	
 	nrf24_package.Action.EnterReceiveMode(&device, rx_addr, 1, 100, 32); 
 	
+	nrf24_package.Read.ALL_REGISTERS(&device, &everything_after, &status);
+	
 	while (1)
 	{
 		if (msg_received)
@@ -130,6 +132,16 @@ int main(void)
 			msg_received = 0;
 			pulse_led(100);
 		}
+		
+		nrf24_package.Read.STATUS(&device, &status);
+		
+		if (status.RX_DR)
+		{
+			
+			pulse_led(100);
+		}
+		
+		HAL_Delay(10);
 	}
 
 	return(0);

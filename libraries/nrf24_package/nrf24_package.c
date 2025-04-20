@@ -114,7 +114,7 @@ private void ReadAllRegisters(NrfSpiDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_
 private void Initialize(NrfSpiDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void R_RX_PAYLOAD(NrfSpiDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-private void EnterTransmitMode(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel);
+private void EnterTransmitMode(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power);
 private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size);
 private void PulseCE(NrfSpiDevice_ptr device_ptr);
 private void SendPayload(NrfSpiDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
@@ -695,7 +695,6 @@ private void Initialize(NrfSpiDevice_ptr device_ptr)
 	// SEE: https://www.youtube.com/watch?v=mB7LsiscM78
 	
 	NrfReg_STATUS status = { 0 };
-	NrfReg_RF_SETUP rf_setup = { 0 };
 	NrfReg_EN_AA en_aa = { 0 };
 	NrfReg_EN_RXADDR en_rxaddr = { 0 };
 	NrfReg_SETUP_RETR setup_retr = { 0 };
@@ -724,12 +723,6 @@ private void Initialize(NrfSpiDevice_ptr device_ptr)
 	rf_ch.RF_CH	= 0; // default to 2400 MHz
 	
 	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status); // Set RF channel.
-	
-	rf_setup.RF_DR_LOW = 0; 
-	rf_setup.RF_DR_HIGH = 1;
-	rf_setup.RF_PWR = 3; // 0 dBm
-	
-	nrf24_package.Write.RF_SETUP(device_ptr, rf_setup, &status); // Set RF settings
 
 }
 private void PowerDown(NrfSpiDevice_ptr device_ptr)
@@ -745,14 +738,15 @@ private void PowerDown(NrfSpiDevice_ptr device_ptr)
 	
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
-private void EnterTransmitMode(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel)
+private void EnterTransmitMode(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG config = { 0 };
 	NrfReg_CONFIG bits_to_change = { 0 };
 	NrfReg_RF_CH rf_ch = { 0 };
 	NrfReg_TX_ADDR_LONG tx_addr = { 0 };
-	
+	NrfReg_RF_SETUP rf_setup = { 0 };
+
 	tx_addr.value[0] = address[0];
 	tx_addr.value[1] = address[1];
 	tx_addr.value[2] = address[2];
@@ -775,6 +769,14 @@ private void EnterTransmitMode(NrfSpiDevice_ptr device_ptr, uint8_t address[5], 
 	
 	nrf24_package.Update.STATUS(device_ptr, status, status);
 	
+	// Set power
+	
+	rf_setup.RF_DR_LOW = 0; 
+	rf_setup.RF_DR_HIGH = 1;
+	rf_setup.RF_PWR = power;
+	
+	nrf24_package.Write.RF_SETUP(device_ptr, rf_setup, &status); // Set RF settings
+	
 	// Set mode to TX
 
 	bits_to_change.PWR_UP = 1;
@@ -784,7 +786,7 @@ private void EnterTransmitMode(NrfSpiDevice_ptr device_ptr, uint8_t address[5], 
 	config.PRIM_RX = 0;
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
-
+	
 }
 private void PowerUpRx(NrfSpiDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size)
 {
