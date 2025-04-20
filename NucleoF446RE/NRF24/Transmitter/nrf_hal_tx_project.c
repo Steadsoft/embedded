@@ -100,6 +100,8 @@ int main(void)
 	SPI_HandleTypeDef spi = { 0 }; 
 	uint32_t state = 0;
 	uint8_t buffer[32] = { 0 };
+	uint8_t * text = "I AM A MESSAGE WITH LENGTH OF 32";
+	
 	uint8_t tx_addr[] = { 0xE7, 0xE7, 0xE7, 0xE7, 0xE7}; // this is just the default system reset value for the TX_ADDR reg
 
 	HAL_Init();
@@ -116,11 +118,11 @@ int main(void)
 		
 	nrf24_package.Action.Initialize(&device);
 	
-	nrf24_package.Action.EnterTransmitMode(&device, tx_addr, 100, MIN);
+	nrf24_package.Action.EnterTransmitMode(&device, tx_addr, 100, LOW);
 
 	while (1)
 	{
-		nrf24_package.Action.SendPayload(&device, buffer, 32);
+		nrf24_package.Action.SendPayload(&device, text, 32);
 		
 		HAL_Delay(1000);
 	}
