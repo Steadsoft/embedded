@@ -134,10 +134,10 @@ int main(void)
 		if (msg_received)
 		{
 			msg_received = 0;
-			pulse_led(100);
+			pulse_led(50);
 		}
 		
-		HAL_Delay(10);
+		HAL_Delay(1);
 	}
 
 	return(0);
