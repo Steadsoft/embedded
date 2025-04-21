@@ -51,4 +51,11 @@
 
 #if !defined(nrf24_package_implementer)
 	#include <nrf24_package.externs.h>
+#else
+	void __attribute__((weak)) ApplicationFaultHandler(char * LibName, char * LibMessage);
+	void __attribute__((weak, naked)) ApplicationFaultHandler(char * LibName, char * LibMessage)
+	{
+		__asm("bkpt 255");
+		__asm("bx lr");
+	}
 #endif

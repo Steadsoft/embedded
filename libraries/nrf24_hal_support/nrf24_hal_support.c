@@ -56,6 +56,8 @@ private void enable_clock_from_spi(SPI_TypeDef * spi)
 	case SPI4_BASE:
 		__SPI4_CLK_ENABLE();
 		break;
+	default:	
+		ApplicationFaultHandler(LIBNAME,"Invalid SPI argument.");
 	}
 }
 
@@ -294,3 +296,4 @@ private void write_bytes(NrfDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t cou
 	if (ptr->status != HAL_OK)
 		pulse_led_forever(100);
 }
+

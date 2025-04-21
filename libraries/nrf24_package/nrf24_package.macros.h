@@ -5,6 +5,7 @@
 
 
 #if defined(nrf24_package_implementer)
+	#define LIBNAME "nrf24_package"
 	#define private static
     #define public 
 	#define E7 0xE7

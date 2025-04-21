@@ -122,7 +122,7 @@ int main(void)
 	spi_setup.miso_pin = PB14;
 	spi_setup.mosi_pin = PB15;
 	spi_setup.pin_alt  = GPIO_AF5_SPI2;
-	spi_setup.spi      = SPI2;
+	spi_setup.spi      = SPI2;;
 	
 	nrf24_hal_support.Configure(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
 	
@@ -141,13 +141,19 @@ int main(void)
 		if (msg_received)
 		{
 			msg_received = 0;
-			pulse_led(50);
+			pulse_led(10);
 		}
 		
 		HAL_Delay(1);
 	}
 
 	return(0);
+}
+
+void ApplicationFaultHandler(char * LibName)
+{
+	uint8_t data;
+	data = 1;
 }
 
 void EXTI0_IRQHandler(void)
