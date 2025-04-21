@@ -708,9 +708,6 @@
     <ClCompile Include="..\..\..\libraries\nrf24_hal_support\nrf24_hal_support.c">
       <Filter>Source files</Filter>
     </ClCompile>
-    <ClCompile Include="nrf_hal_project_testing.c">
-      <Filter>Source files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <LinkerScript Include="STM32F446RE_flash.lds" />

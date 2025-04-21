@@ -86,7 +86,6 @@
     <ClCompile Include="nrf_hal_tx_project.c" />
     <ClCompile Include="..\..\..\libraries\nrf24_package\nrf24_package.c" />
     <ClCompile Include="..\..\..\libraries\nrf24_hal_support\nrf24_hal_support.c" />
-    <ClCompile Include="nrf_hal_project_testing.c" />
     <ClCompile Include="system_stm32f4xx.c" />
     <None Include="stm32.props" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\StartupFiles\startup_stm32f446xx.c" />
