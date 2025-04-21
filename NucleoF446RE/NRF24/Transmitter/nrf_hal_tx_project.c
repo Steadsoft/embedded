@@ -94,6 +94,8 @@ int main(void)
 	NrfReg_STATUS status;
 	NrfReg_STATUS status_mask_irq = { 0 };
 	NrfReg_STATUS status_irq = { 0 };
+	NrfSpiSetup spi_setup = { 0 };
+
 	SPI_HandleTypeDef spi = { 0 }; 
 	uint32_t state = 0;
 	uint8_t buffer[32] = { 0 };
@@ -107,7 +109,13 @@ int main(void)
 	
 	/// Perform all IO related initialization
 	
-	nrf24_hal_support.Configure(SPI1, TIM1, PA0, EXTI0_IRQn, PA1, PA4, &device, fault_handler); 
+	spi_setup.miso_pin = PA6;
+	spi_setup.mosi_pin = PA7;
+	spi_setup.sck_pin  = PA5;
+	spi_setup.pin_alt  = GPIO_AF5_SPI1;
+	spi_setup.spi      = SPI1;
+	
+	nrf24_hal_support.Configure(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PA4, &device, fault_handler); 
 	
 	/// Force all register into their hardware reset state.
 	

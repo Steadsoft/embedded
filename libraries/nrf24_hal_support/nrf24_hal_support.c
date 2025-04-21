@@ -18,7 +18,7 @@ private void spi_set_ce_hi(NrfDevice_ptr);
 private void spi_set_csn_lo(NrfDevice_ptr);
 private void spi_set_csn_hi(NrfDevice_ptr);
 private void exchange_bytes(NrfDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count);
-private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler);
+private void configure(NrfSpiSetup_ptr spi_setup, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler);
 private void pulse_led_forever(uint32_t interval);
 private void read_bytes(NrfDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count);
 private void write_bytes(NrfDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
@@ -37,6 +37,27 @@ public nrf24_hal_support_struct nrf24_hal_support =
 	.WriteBytes = write_bytes,
 	.flash_led_forever = pulse_led_forever
 };
+
+private void enable_clock_from_spi(SPI_TypeDef * spi)
+{
+	// Enable the SPI clock for the pin
+	
+	switch ((uint32_t)spi)
+	{
+	case SPI1_BASE:
+		__SPI1_CLK_ENABLE();
+		break;
+	case SPI2_BASE: 
+		__SPI2_CLK_ENABLE();
+		break;
+	case SPI3_BASE:
+		__SPI3_CLK_ENABLE();
+		break;
+	case SPI4_BASE:
+		__SPI4_CLK_ENABLE();
+		break;
+	}
+}
 
 private void enable_clock_from_pin(uint64_t pin)
 {
@@ -96,7 +117,7 @@ private void pulse_led_forever(uint32_t interval)
 }
 // Configure the SPI and associated GPIO pins based on the supplied SPI base address.
 // The int pin, ce pin and cs pin are assumed to be on the same IO port as the specified SPI.
-private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler)
+private void configure(NrfSpiSetup_ptr spi_setup, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler)
 {
 	HAL_StatusTypeDef status;
 	GPIO_InitTypeDef  GPIO_InitStruct_ctrl = { 0 };
@@ -123,38 +144,28 @@ private void configure(SPI_TypeDef * spi_base, TIM_TypeDef * tim_base, uint64_t 
 	enable_clock_from_pin(int_pin);
 	enable_clock_from_pin(ce_pin);
 	enable_clock_from_pin(cs_pin);
-
-	if (spi_base == SPI1) // For now we use a fixed set of pins for the SPI based on the chosen SPI number.
-	{
-		__SPI1_CLK_ENABLE();
-		__GPIOA_CLK_ENABLE();
-		GPIO_InitStruct_spi.Pin       = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;  // SCK, MISO, MOSI
-		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI1;
-		GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
-		GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
-		GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
- 
-		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct_spi);
-	}
-	elif (spi_base == SPI2)
-	{
-		__SPI2_CLK_ENABLE();
-		__GPIOB_CLK_ENABLE();
-		GPIO_InitStruct_spi.Pin       = GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; // SCK, MISO, MOSI
-		GPIO_InitStruct_spi.Alternate = GPIO_AF5_SPI2;
-		GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
-		GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
-		GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
- 
-		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct_spi);
-	}
-	else
-	{
-		device_ptr->FaultHandler(device_ptr, INVALID_SPI_BASE);
-		return;
-	}
 	
-	device_ptr->spi.Instance = spi_base;
+	enable_clock_from_spi(spi_setup->spi);
+	
+	enable_clock_from_pin(spi_setup->mosi_pin);
+	enable_clock_from_pin(spi_setup->miso_pin);
+	enable_clock_from_pin(spi_setup->sck_pin);
+		
+	GPIO_InitStruct_spi.Alternate = spi_setup->pin_alt;
+	GPIO_InitStruct_spi.Mode      = GPIO_MODE_AF_PP;
+	GPIO_InitStruct_spi.Pull      = GPIO_PULLDOWN;
+	GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
+		
+	GPIO_InitStruct_spi.Pin = DECODE_PIN(spi_setup->sck_pin); 
+	HAL_GPIO_Init(DECODE_BASE(spi_setup->sck_pin), &GPIO_InitStruct_spi);
+		
+	GPIO_InitStruct_spi.Pin = DECODE_PIN(spi_setup->miso_pin); 
+	HAL_GPIO_Init(DECODE_BASE(spi_setup->miso_pin), &GPIO_InitStruct_spi);
+		
+	GPIO_InitStruct_spi.Pin = DECODE_PIN(spi_setup->mosi_pin); 
+	HAL_GPIO_Init(DECODE_BASE(spi_setup->mosi_pin), &GPIO_InitStruct_spi);
+	
+	device_ptr->spi.Instance = spi_setup->spi;
 	device_ptr->spi.Init.Mode = SPI_MODE_MASTER; 
 	device_ptr->spi.Init.Direction = SPI_DIRECTION_2LINES;
 	device_ptr->spi.Init.DataSize = SPI_DATASIZE_8BIT;
