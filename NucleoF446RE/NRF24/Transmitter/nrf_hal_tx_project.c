@@ -115,11 +115,11 @@ int main(void)
 		
 	nrf24_package.Action.Initialize(&device);
 	
-	nrf24_package.Action.EnterTransmitMode(&device, tx_addr, 100, MAX_POWER, MIN_RATE);
+	nrf24_package.Action.EnterTransmitMode(&device, tx_addr, 100, LOW_POWER, MIN_RATE);
 
 	while (1)
 	{
-		nrf24_package.Action.SendPayload(&device, text, 32);
+		nrf24_package.Action.SendPayload(&device, text, 32);  // Literature indicates that reducing the size of the payload can improve range.
 		
 		HAL_Delay(500);
 	}
