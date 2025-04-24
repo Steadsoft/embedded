@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SRAM", "SRAM.vcxproj", "{6E662CE6-3E07-314C-1EFA-2233E9462B29}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|VisualGDB = Debug|VisualGDB
+		Release|VisualGDB = Release|VisualGDB
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6E662CE6-3E07-314C-1EFA-2233E9462B29}.Debug|VisualGDB.ActiveCfg = Debug|VisualGDB
+		{6E662CE6-3E07-314C-1EFA-2233E9462B29}.Debug|VisualGDB.Build.0 = Debug|VisualGDB
+		{6E662CE6-3E07-314C-1EFA-2233E9462B29}.Release|VisualGDB.ActiveCfg = Release|VisualGDB
+		{6E662CE6-3E07-314C-1EFA-2233E9462B29}.Release|VisualGDB.Build.0 = Release|VisualGDB
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4C2AF23E-4295-43A9-9AB8-C7B3CA71ABC5}
+	EndGlobalSection
+EndGlobal
