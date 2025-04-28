@@ -38,7 +38,7 @@ int faults = 0;
 volatile uint32_t tx_ds_interrupt_count = 0;
 volatile uint32_t transmit_count = 0;
 
-volatile uint8_t tx_completed = 0;
+volatile uint32_t tx_completed = 0;
 
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
 
@@ -49,6 +49,8 @@ int get_board_id();
 void spin_100_uS();
 void spin_20_uS();
 void spin_500_uS();
+void spin_1000_uS();
+void spin_2000_uS();
 
 void TM_NRF24L01_PowerUpTx(NrfDevice_ptr device_ptr);
 
@@ -79,6 +81,22 @@ void spin_500_uS()
 	}
 }
 
+void spin_1000_uS()
+{
+	for (int X = 0; X < 1220; X++)
+	{
+		;
+	}
+}
+
+void spin_2000_uS()
+{
+	for (int X = 0; X < 1220; X++)
+	{
+		;
+	}
+}
+
 NrfDevice device = { 0 }; 
 
 int arr[4][3] = { { 2, 3, 1 }, { 19, 12, 7 }, { 10, 9, 8 }, { 3, 11, 5 } };
@@ -95,12 +113,13 @@ int main(void)
 	NrfReg_STATUS status_mask_irq = { 0 };
 	NrfReg_STATUS status_irq = { 0 };
 	NrfSpiSetup spi_setup = { 0 };
-
+	uint32_t spins = 0;
 	SPI_HandleTypeDef spi = { 0 }; 
 	uint32_t state = 0;
 	uint8_t buffer[32] = { 0 };
 	uint8_t * text = "I AM A MESSAGE WITH LENGTH OF 32";
-	
+	NrfReg_FIFO_STATUS fifo;
+
 	uint8_t tx_addr[] = { 0xE7, 0xE7, 0xE7, 0xE7, 0xE7}; // this is just the default system reset value for the TX_ADDR reg
 
 	HAL_Init();
@@ -123,19 +142,44 @@ int main(void)
 		
 	nrf24_package.Action.Initialize(&device);
 	
-	nrf24_package.Action.EnterTransmitMode(&device, tx_addr, 100, LOW_POWER, MIN_RATE);
+	nrf24_package.Action.PowerUp(&device);
 
 	while (1)
 	{
-		nrf24_package.Action.SendPayload(&device, text, 32);  // Literature indicates that reducing the size of the payload can improve range.
+		nrf24_package.Action.SetTransmitMode(&device, tx_addr, 110, LOW_POWER, MIN_RATE);
+
+		nrf24_package.Action.SendPayload(&device, text, 32); // Literature indicates that reducing the size of the payload can improve range.
+		
+		spins = 0;
+		
+		while (tx_completed == 0)
+		{
+			spins++;
+		}
+		
+		tx_completed = 0;
 		
 		HAL_Delay(500);
+		
+		nrf24_package.Action.SetTransmitMode(&device, tx_addr, 100, LOW_POWER, MIN_RATE);
+		
+		nrf24_package.Action.SendPayload(&device, text, 32); // Literature indicates that reducing the size of the payload can improve range.
+		
+		spins = 0;
+		
+		while (tx_completed == 0)
+		{
+			spins++;
+		}
+		
+		tx_completed = 0;
+		
+		HAL_Delay(500);
+		
 	}
 
 	return(0);
 }
-
-
 
 void EXTI0_IRQHandler(void)
 {
@@ -153,15 +197,12 @@ void EXTI0_IRQHandler(void)
 	{
 		status_irq.RX_DR = 0;
 		status_irq.MAX_RT = 0;
-		nrf24_package.Write.STATUS(&device, status_irq, &status_irq);
+		nrf24_package.Update.STATUS(&device, status_irq, status_irq);
 		tx_completed = 1;
 	}
 } 
-
 
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code)
 {
 	faults++;
 }
-
-
