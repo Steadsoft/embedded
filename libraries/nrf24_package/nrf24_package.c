@@ -114,10 +114,11 @@ private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr
 private void Initialize(NrfDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void R_RX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-private void EnterTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate);
+private void SetTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate);
 private void PowerUpRx(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate);
 private void PulseCE(NrfDevice_ptr device_ptr);
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
+private void PowerupDevice(NrfDevice_ptr device_ptr);
 
 // Declare the global library interface with same name as library
 
@@ -184,9 +185,10 @@ public nrf24_package_struct nrf24_package =
 	{ 
 		// This is a misnomer, but we will use this to power up the device in RX mode.
 		.PowerDown = PowerDown,
+		.PowerUp = PowerupDevice,
 		.PowerOnReset = SetToPowerOnResetState,
 		.Initialize = Initialize,
-		.EnterTransmitMode = EnterTransmitMode,
+		.SetTransmitMode = SetTransmitMode,
 		.EnterReceiveMode = PowerUpRx,
 		.PulseCE = PulseCE,
 		.SendPayload = SendPayload
@@ -738,7 +740,7 @@ private void PowerDown(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
-private void EnterTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate)
+private void SetTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG config = { 0 };
@@ -802,8 +804,19 @@ private void EnterTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	config.PRIM_RX = 0;
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
+}
+private void PowerupDevice(NrfDevice_ptr device_ptr)
+{
+	NrfReg_STATUS status;
+	NrfReg_CONFIG config = { 0 };
+	NrfReg_CONFIG bits_to_change = { 0 };
+
+	bits_to_change.PWR_UP = 1;
+	config.PWR_UP = 1;
 	
-	HAL_Delay(2);
+	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
+	
+	HAL_Delay(2); // 1.5 mS min delay after powerup.
 	
 }
 private void PowerUpRx(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate)
