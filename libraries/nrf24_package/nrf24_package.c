@@ -803,6 +803,8 @@ private void EnterTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 	
+	HAL_Delay(2);
+	
 }
 private void PowerUpRx(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate)
 {
