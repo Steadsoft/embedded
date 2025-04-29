@@ -5,9 +5,9 @@
 #include <nrf24_hal_support.library.h>
 #include <nrf24_package.library.h>
 
-#define ATOMIC_FLAG_OFF (atomic_flag){0};
-# define ROUNDUP(N,ALIGN)	        (((N) +  ((ALIGN)-1)) & ~((ALIGN)-1))
-//#include <cmsis_gcc.h>
+#define SPI_CS GPIO_PIN_4
+#define NRF_CE GPIO_PIN_1
+#define NRF_IR GPIO_PIN_0
 
 // SEE: http://blog.gorski.pm/stm32-unique-id
 
@@ -16,9 +16,6 @@ extern "C"
 #endif
 	
 	
-#define SPI_CS GPIO_PIN_4
-#define NRF_CE GPIO_PIN_1
-#define NRF_IR GPIO_PIN_0
 	
 	
 #define elif else if	
@@ -28,74 +25,16 @@ void SysTick_Handler(void)
 	HAL_IncTick();
 	HAL_SYSTICK_IRQHandler();
 }
-typedef struct
-{
-	unsigned long fields[3];
-} BoardId;
 
 int faults = 0;
 
-volatile uint32_t tx_ds_interrupt_count = 0;
-volatile uint32_t transmit_count = 0;
-
-volatile uint32_t tx_completed = 0;
 
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
 
-
-void initialize_nrf24_device(NrfDevice_ptr device_ptr);
-void TM_NRF24L01_PowerUpRx(NrfDevice_ptr device_ptr);
 int get_board_id();
-void spin_100_uS();
-void spin_20_uS();
-void spin_500_uS();
-void spin_1000_uS();
-void spin_2000_uS();
 
-void TM_NRF24L01_PowerUpTx(NrfDevice_ptr device_ptr);
-
-void TM_NRF24L01_Transmit(NrfDevice_ptr device_ptr, uint8_t * data, uint8_t len);
 void EXTI0_IRQPostHandler(NrfDevice_ptr device_ptr);
 
-void spin_20_uS()
-{
-	for (int X = 0; X < 25; X++)
-	{
-		;
-	}
-}
-
-void spin_100_uS()
-{
-	for (int X = 0; X < 122; X++)
-	{
-		;
-	}
-}
-
-void spin_500_uS()
-{
-	for (int X = 0; X < 610; X++)
-	{
-		;
-	}
-}
-
-void spin_1000_uS()
-{
-	for (int X = 0; X < 1220; X++)
-	{
-		;
-	}
-}
-
-void spin_2000_uS()
-{
-	for (int X = 0; X < 1220; X++)
-	{
-		;
-	}
-}
 
 NrfDevice device = { 0 }; 
 
@@ -105,27 +44,16 @@ int msgs_tx = 0;
 
 int main(void)
 {
-	NrfReg_ALL_REGISTERS everything_before = { 0 };
-	NrfReg_ALL_REGISTERS everything_after = { 0 };
-	NrfReg_CONFIG cfg = { 0 };
-	NrfReg_SETUP_AW aw = { 0 };
-	NrfReg_STATUS status;
-	NrfReg_STATUS status_mask_irq = { 0 };
-	NrfReg_STATUS status_irq = { 0 };
 	NrfSpiSetup spi_setup = { 0 };
-	uint32_t spins = 0;
-	SPI_HandleTypeDef spi = { 0 }; 
-	uint32_t state = 0;
 	uint8_t buffer[32] = { 0 };
-	uint8_t * text = "I AM A MESSAGE WITH LENGTH OF 32";
-	NrfReg_FIFO_STATUS fifo;
+	uint8_t * payload = "I AM A MESSAGE WITH LENGTH OF 32";
 
-	uint8_t tx_addr[] = { 0xE7, 0xE7, 0xE7, 0xE7, 0xE7}; // this is just the default system reset value for the TX_ADDR reg
-
-	HAL_Init();
+	uint8_t address[] = { 0xE7, 0xE7, 0xE7, 0xE7, 0xE7}; // this is just the default system reset value for the TX_ADDR reg
 	
 	for (int X = 0; X < 32; X++) buffer[X] = 0xAA + X;
 	
+	HAL_Init();
+		
 	/// Perform all IO related initialization
 	
 	spi_setup.miso_pin = PA6;
@@ -134,60 +62,38 @@ int main(void)
 	spi_setup.pin_alt  = GPIO_AF5_SPI1;
 	spi_setup.spi      = SPI1;
 	
-	nrf24_hal_support.Configure(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PA4, &device, fault_handler); 
+	nrf24_hal_support.ConfigureDevice(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PA4, &device, fault_handler); 
 	
-	/// Force all register into their hardware reset state.
+	/// Force all registers into their hardware reset state.
 	
-	nrf24_package.Action.PowerOnReset(&device);
-		
-	nrf24_package.Action.Initialize(&device);
-	
-	nrf24_package.Action.PowerUp(&device);
+	nrf24_package.Action.ResetDevice(&device);
+	nrf24_package.Action.InitializeDevice(&device);
+	nrf24_package.Action.PowerUpDevice(&device);
 
 	while (1)
 	{
-		nrf24_package.Action.SetTransmitMode(&device, tx_addr, 110, LOW_POWER, MIN_RATE);
-
-		nrf24_package.Action.SendPayload(&device, text, 32); // Literature indicates that reducing the size of the payload can improve range.
+		nrf24_package.Action.ConfigureTransmitter(&device, address, 110, LOW_POWER, MIN_RATE);
+		nrf24_package.Action.SendPayload(&device, payload, 32); // Literature indicates that reducing the size of the payload can improve range.
+		nrf24_package.Action.WaitForTxInterrupt(&device,2000);		
 		
-		spins = 0;
+		HAL_Delay(250);
 		
-		while (tx_completed == 0)
-		{
-			spins++;
-		}
+		nrf24_package.Action.ConfigureTransmitter(&device, address, 100, LOW_POWER, MIN_RATE);
+		nrf24_package.Action.SendPayload(&device, payload, 32); // Literature indicates that reducing the size of the payload can improve range.
+		nrf24_package.Action.WaitForTxInterrupt(&device,2000);		
 		
-		tx_completed = 0;
-		
-		HAL_Delay(500);
-		
-		nrf24_package.Action.SetTransmitMode(&device, tx_addr, 100, LOW_POWER, MIN_RATE);
-		
-		nrf24_package.Action.SendPayload(&device, text, 32); // Literature indicates that reducing the size of the payload can improve range.
-		
-		spins = 0;
-		
-		while (tx_completed == 0)
-		{
-			spins++;
-		}
-		
-		tx_completed = 0;
-		
-		HAL_Delay(500);
-		
+		HAL_Delay(250);
 	}
 
 	return(0);
 }
+
 
 void EXTI0_IRQHandler(void)
 {
 	NrfReg_STATUS status_irq;
 	
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
-	
-	tx_ds_interrupt_count++;
 	
 	nrf24_package.Read.STATUS(&device, &status_irq); // sends a NOP to read status
 
@@ -198,11 +104,16 @@ void EXTI0_IRQHandler(void)
 		status_irq.RX_DR = 0;
 		status_irq.MAX_RT = 0;
 		nrf24_package.Update.STATUS(&device, status_irq, status_irq);
-		tx_completed = 1;
+		nrf24_package.Action.ConfirmTxInterrupt(&device);
 	}
 } 
 
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code)
+{
+	faults++;
+}
+
+void __attribute__((weak)) ApplicationFaultHandler(char * LibName, char * LibMessage)
 {
 	faults++;
 }

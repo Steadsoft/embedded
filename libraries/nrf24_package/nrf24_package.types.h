@@ -367,7 +367,7 @@ struct nrf_update_interface
 // these are abstract composite operations
 struct nrf_action_interface
 {
-	void(* PowerOnReset)(NrfDevice_ptr); // Sets all device registers to the same values they have after powering off/on.
+	void(* ResetDevice)(NrfDevice_ptr); // Sets all device registers to the same values they have after powering off/on.
 	/*
 	 * @brief Initializes the NRF registers prior to setting up TX or RX operation.
 	 * @param device_ptr Pointer to the configured NRF device structure that contains the SPI and GPIO control structures.
@@ -377,7 +377,7 @@ struct nrf_action_interface
 	void(* ConfigureTransmitter)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate);
 	void(* ConfigureReceiver)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate);
 	void(* PowerDown)(NrfDevice_ptr);
-	void(* PowerUp)(NrfDevice_ptr);
+	void(* PowerUpDevice)(NrfDevice_ptr);
 	void(* PulseCE)(NrfDevice_ptr device_ptr);
 	void(* SendPayload)(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
 	void(* WaitForTxInterrupt)(NrfDevice_ptr device_ptr, int32_t max_spins);

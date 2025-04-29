@@ -39,6 +39,7 @@ struct nrf_interrupt
 {
 	volatile uint32_t complete;
 	uint32_t spins;
+	uint32_t count;
 };
 
 

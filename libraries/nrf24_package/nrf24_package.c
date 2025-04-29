@@ -106,7 +106,7 @@ private void ReadSingleByteRegister(NrfDevice * device_ptr, uint8_t Register, ui
 private void WriteSingleByteRegister(NrfDevice_ptr device_ptr, uint8_t Register, uint8_t Value, NrfReg_STATUS_ptr NrfStatus);
 private void ReadMultiBytesRegister(NrfDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesRead, NrfReg_STATUS_ptr NrfStatu);
 private void WriteMultiBytesRegister(NrfDevice_ptr device_ptr, uint8_t Register, uint8_t Value[], uint8_t * BytesWritten, NrfReg_STATUS_ptr NrfStatus);
-private void SetToPowerOnResetState(NrfDevice_ptr device_ptr);
+private void ResetDevice(NrfDevice_ptr device_ptr);
 private void PowerDown(NrfDevice_ptr device_ptr);
 private void FLUSH_TX(NrfDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void FLUSH_RX(NrfDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
@@ -118,7 +118,7 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], 
 private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate);
 private void PulseCE(NrfDevice_ptr device_ptr);
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
-private void PowerupDevice(NrfDevice_ptr device_ptr);
+private void PowerUpDevice(NrfDevice_ptr device_ptr);
 private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max_spins);
 private void confirm_interrupt(volatile NrfInterrupt_ptr state_ptr);
 
@@ -192,8 +192,8 @@ public const nrf24_package_struct nrf24_package =
 	{ 
 		// This is a misnomer, but we will use this to power up the device in RX mode.
 		.PowerDown = PowerDown,
-		.PowerUp = PowerupDevice,
-		.PowerOnReset = SetToPowerOnResetState,
+		.PowerUpDevice = PowerUpDevice,
+		.ResetDevice = ResetDevice,
 		.InitializeDevice = InitializeDevice,
 		.ConfigureTransmitter = ConfigureTransmitter,
 		.ConfigureReceiver = ConfigureReceiver,
@@ -599,7 +599,7 @@ private void WriteMultiBytesRegister(NrfDevice_ptr device_ptr, uint8_t Register,
 // Set all regsiters to the same values they get set to, when the device is powered off/on
 // This function does not actually cycle the power, only simulate it in the sense that
 // the device registers are in the same state as if it had been power cycled.
-private void SetToPowerOnResetState(NrfDevice_ptr device_ptr)
+private void ResetDevice(NrfDevice_ptr device_ptr)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG configuration = { 0 };
@@ -760,6 +760,11 @@ private void InitializeDevice(NrfDevice_ptr device_ptr)
 	
 	device_ptr->tx_interrupt.complete = 0;
 	device_ptr->tx_interrupt.spins = 0;
+	device_ptr->tx_interrupt.count = 0;
+	
+	device_ptr->rx_interrupt.complete = 0;
+	device_ptr->rx_interrupt.spins = 0;
+	device_ptr->rx_interrupt.count = 0;
 
 }
 private void PowerDown(NrfDevice_ptr device_ptr)
@@ -838,7 +843,7 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], 
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 }
-private void PowerupDevice(NrfDevice_ptr device_ptr)
+private void PowerUpDevice(NrfDevice_ptr device_ptr)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG config = { 0 };
@@ -1016,6 +1021,7 @@ private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max
 				ApplicationFaultHandler(LIBNAME, "missing interrupt");
 	}
 	
+	state_ptr->count++;
 	state_ptr->complete = 0;
 }
 
