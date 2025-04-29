@@ -25,7 +25,7 @@ private void write_bytes(NrfDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t cou
 private void enable_clock_from_pin(uint64_t pin);
 
 // Declare the global library interface with same name as library
-public nrf24_hal_support_struct nrf24_hal_support =
+public const nrf24_hal_support_struct nrf24_hal_support =
 {
 	.ConfigureDevice = ConfigureDevice,
 	.Deactivate = spi_set_ce_lo,

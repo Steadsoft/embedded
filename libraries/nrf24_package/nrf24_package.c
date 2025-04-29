@@ -9,7 +9,7 @@
 #include <nrf24_hal_support.library.h>
 #include <nrf24_package.library.h>
 
-public nrf24_register_names Nrf24Register = // We use this because we fan then qualify members for readability
+public const nrf24_register_names Nrf24Register = // We use this because we fan then qualify members for readability
 { 
 	.CONFIG = 0x00,
 	.EN_AA = 0x01,
@@ -38,7 +38,7 @@ public nrf24_register_names Nrf24Register = // We use this because we fan then q
 	.DYNPD = 0x1C,
 	.FEATURE = 0x1D
 };
-public nrf24_command_names NrfCommand = // We use this because we fan then qualify members for readability
+public const nrf24_command_names NrfCommand = // We use this because we fan then qualify members for readability
 { 
 	.R_REGISTER = 0x00,
 	.W_REGISTER = 0x20,
@@ -119,12 +119,17 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 private void PulseCE(NrfDevice_ptr device_ptr);
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
 private void PowerupDevice(NrfDevice_ptr device_ptr);
-private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr);
-private void WaitForTxInterrupt(NrfDevice_ptr);
+private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max_spins);
+private void confirm_interrupt(volatile NrfInterrupt_ptr state_ptr);
+
+private void WaitForTxInterrupt(NrfDevice_ptr, int32_t);
+private void ConfirmTxInterrupt(NrfDevice_ptr);
+private void WaitForRxInterrupt(NrfDevice_ptr, int32_t);
+private void ConfirmRxInterrupt(NrfDevice_ptr);
 
 // Declare the global library interface with same name as library
 
-public nrf24_package_struct nrf24_package =
+public const nrf24_package_struct nrf24_package =
 { 
 	.Read = 
 	{     
@@ -194,7 +199,11 @@ public nrf24_package_struct nrf24_package =
 		.ConfigureReceiver = ConfigureReceiver,
 		.PulseCE = PulseCE,
 		.SendPayload = SendPayload,
-		.WaitForTxInterrupt = WaitForTxInterrupt
+		.WaitForTxInterrupt = WaitForTxInterrupt,
+		.ConfirmTxInterrupt = ConfirmTxInterrupt,
+		.WaitForRxInterrupt = WaitForRxInterrupt,
+		.ConfirmRxInterrupt = ConfirmRxInterrupt
+
 	},
 	.Command =
 	{ 
@@ -212,9 +221,24 @@ public nrf24_package_struct nrf24_package =
 
 // Implementation 
 
-private void WaitForTxInterrupt(NrfDevice_ptr device_ptr)
+private void ConfirmTxInterrupt(NrfDevice_ptr device_ptr)
 {
-	wait_for_interrupt(&(device_ptr->tx_interrupt));
+	confirm_interrupt(&(device_ptr->tx_interrupt));
+}
+
+private void ConfirmRxInterrupt(NrfDevice_ptr device_ptr)
+{
+	confirm_interrupt(&(device_ptr->rx_interrupt));
+}
+
+private void WaitForRxInterrupt(NrfDevice_ptr device_ptr, int32_t max_spins)
+{
+	wait_for_interrupt(&(device_ptr->rx_interrupt), max_spins);
+}
+
+private void WaitForTxInterrupt(NrfDevice_ptr device_ptr, int32_t max_spins)
+{
+	wait_for_interrupt(&(device_ptr->tx_interrupt), max_spins);
 }
 
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size)
@@ -979,16 +1003,23 @@ private void R_RX_PAYLOAD(NrfDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t 
 	
 }
 
-private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr)
+private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max_spins)
 {
 	state_ptr->spins = 0;
 	
 	while (state_ptr->complete == 0)
 	{
 		state_ptr->spins++;
+		
+		if (state_ptr->spins >= 0)
+			if (state_ptr->spins >= max_spins)
+				ApplicationFaultHandler(LIBNAME, "missing interrupt");
 	}
 	
 	state_ptr->complete = 0;
 }
 
-
+private void confirm_interrupt(volatile NrfInterrupt_ptr state_ptr)
+{
+	state_ptr->complete = 1;
+}
