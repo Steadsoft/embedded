@@ -111,14 +111,16 @@ private void PowerDown(NrfDevice_ptr device_ptr);
 private void FLUSH_TX(NrfDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void FLUSH_RX(NrfDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-private void Initialize(NrfDevice_ptr device_ptr);
+private void InitializeDevice(NrfDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void R_RX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-private void SetTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate);
-private void PowerUpRx(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate);
+private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate);
+private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate);
 private void PulseCE(NrfDevice_ptr device_ptr);
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
 private void PowerupDevice(NrfDevice_ptr device_ptr);
+private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr);
+private void WaitForTxInterrupt(NrfDevice_ptr);
 
 // Declare the global library interface with same name as library
 
@@ -187,11 +189,12 @@ public nrf24_package_struct nrf24_package =
 		.PowerDown = PowerDown,
 		.PowerUp = PowerupDevice,
 		.PowerOnReset = SetToPowerOnResetState,
-		.Initialize = Initialize,
-		.SetTransmitMode = SetTransmitMode,
-		.EnterReceiveMode = PowerUpRx,
+		.InitializeDevice = InitializeDevice,
+		.ConfigureTransmitter = ConfigureTransmitter,
+		.ConfigureReceiver = ConfigureReceiver,
 		.PulseCE = PulseCE,
-		.SendPayload = SendPayload
+		.SendPayload = SendPayload,
+		.WaitForTxInterrupt = WaitForTxInterrupt
 	},
 	.Command =
 	{ 
@@ -208,6 +211,11 @@ public nrf24_package_struct nrf24_package =
 };
 
 // Implementation 
+
+private void WaitForTxInterrupt(NrfDevice_ptr device_ptr)
+{
+	wait_for_interrupt(&(device_ptr->tx_interrupt));
+}
 
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size)
 {
@@ -689,7 +697,7 @@ private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr
 	ReadDynpdRegister(device_ptr, &(Value->Dynpd), NrfStatus);
 	ReadFeatureRegister(device_ptr, &(Value->Feature), NrfStatus);
 }
-private void Initialize(NrfDevice_ptr device_ptr)
+private void InitializeDevice(NrfDevice_ptr device_ptr)
 {
 	// Do generic configuration that is independent of whether we are 
 	// transmitting or receiving. 
@@ -725,6 +733,9 @@ private void Initialize(NrfDevice_ptr device_ptr)
 	rf_ch.RF_CH	= 0; // default to 2400 MHz
 	
 	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status); // Set RF channel.
+	
+	device_ptr->tx_interrupt.complete = 0;
+	device_ptr->tx_interrupt.spins = 0;
 
 }
 private void PowerDown(NrfDevice_ptr device_ptr)
@@ -740,7 +751,7 @@ private void PowerDown(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
-private void SetTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate)
+private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG config = { 0 };
@@ -797,10 +808,8 @@ private void SetTransmitMode(NrfDevice_ptr device_ptr, uint8_t address[5], uint8
 	
 	// Set mode to TX
 
-	bits_to_change.PWR_UP = 1;
 	bits_to_change.PRIM_RX = 1; 
 	
-	config.PWR_UP = 1;
 	config.PRIM_RX = 0;
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
@@ -819,7 +828,7 @@ private void PowerupDevice(NrfDevice_ptr device_ptr)
 	HAL_Delay(2); // 1.5 mS min delay after powerup.
 	
 }
-private void PowerUpRx(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate)
+private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate)
 {
 	NrfReg_STATUS status;
 	NrfReg_RF_CH rf_ch = { 0 };
@@ -969,4 +978,17 @@ private void R_RX_PAYLOAD(NrfDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t 
 	nrf24_hal_support.Deselect(device_ptr);
 	
 }
+
+private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr)
+{
+	state_ptr->spins = 0;
+	
+	while (state_ptr->complete == 0)
+	{
+		state_ptr->spins++;
+	}
+	
+	state_ptr->complete = 0;
+}
+
 

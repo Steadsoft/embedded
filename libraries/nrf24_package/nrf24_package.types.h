@@ -373,14 +373,15 @@ struct nrf_action_interface
 	 * @param device_ptr Pointer to the configured NRF device structure that contains the SPI and GPIO control structures.
 	 * 
 	 */
-	void(* Initialize)(NrfDevice_ptr device_ptr);
-	void(* SetTransmitMode)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate);
-	void(* EnterReceiveMode)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate);
+	void(* InitializeDevice)(NrfDevice_ptr device_ptr);
+	void(* ConfigureTransmitter)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate);
+	void(* ConfigureReceiver)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate);
 	void(* PowerDown)(NrfDevice_ptr);
 	void(* PowerUp)(NrfDevice_ptr);
 	void(* PulseCE)(NrfDevice_ptr device_ptr);
 	void(* SendPayload)(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
-
+	void(* WaitForTxInterrupt)(NrfDevice_ptr device_ptr);
+	
 };
 
 // These represent the documented commands
