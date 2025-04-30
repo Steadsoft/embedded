@@ -2,6 +2,8 @@
 #define nrf24_package_implementer
 
 // Include all required platform headers.
+#include <stdbool.h>
+
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
 
@@ -115,7 +117,7 @@ private void InitializeDevice(NrfDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void R_RX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate);
-private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate);
+private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t channel, uint8_t payload_size, uint8_t rate);
 private void PulseCE(NrfDevice_ptr device_ptr);
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
 private void PowerUpDevice(NrfDevice_ptr device_ptr);
@@ -857,7 +859,7 @@ private void PowerUpDevice(NrfDevice_ptr device_ptr)
 	HAL_Delay(2); // 1.5 mS min delay after powerup.
 	
 }
-private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, uint8_t channel, uint8_t payload_size, uint8_t rate)
+private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t channel, uint8_t payload_size, uint8_t rate)
 {
 	NrfReg_STATUS status;
 	NrfReg_RF_CH rf_ch = { 0 };
@@ -867,7 +869,8 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	NrfReg_EN_RXADDR en_rx_addr = { 0 };
 	NrfReg_RX_PW rx_pw = { 0 };
 	NrfReg_RF_SETUP rf_setup = { 0 }, rf_setup_mask = { 0 };
-
+	NrfReg_EN_AA enaa = { 0 }, enaa_mask = { 0 };
+	
 	rx_addr.value[0] = address[0];
 	rx_addr.value[1] = address[1];
 	rx_addr.value[2] = address[2];
@@ -960,6 +963,61 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	rf_setup_mask.RF_DR_LOW = 1;
 
 	nrf24_package.Update.RF_SETUP(device_ptr, rf_setup, rf_setup_mask, &status); // Set RF settings
+	
+	if (auto_ack)
+	{
+		
+		switch(pipe)
+		{
+		case 0:
+			enaa.ENAA_P0 = 1;
+			break;
+		case 1: 
+			enaa.ENAA_P1 = 1;
+			break;
+		case 2: 
+			enaa.ENAA_P2 = 1;
+			break;
+		case 3: 
+			enaa.ENAA_P3 = 1;
+			break;
+		case 4: 
+			enaa.ENAA_P4 = 1;
+			break;
+		case 5: 
+			enaa.ENAA_P5 = 1;
+			break;
+		}
+		
+		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa, &status); // we canjust use enaa as the mask here.
+		
+	}
+	else
+	{
+		switch (pipe)
+		{
+		case 0:
+			enaa_mask.ENAA_P0 = 1;
+			break;
+		case 1: 
+			enaa_mask.ENAA_P1 = 1;
+			break;
+		case 2: 
+			enaa_mask.ENAA_P2 = 1;
+			break;
+		case 3: 
+			enaa_mask.ENAA_P3 = 1;
+			break;
+		case 4: 
+			enaa_mask.ENAA_P4 = 1;
+			break;
+		case 5: 
+			enaa_mask.ENAA_P5 = 1;
+			break;
+		}
+		
+		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa_mask, &status);
+	}
 	
 	nrf24_hal_support.Activate(device_ptr);
 

@@ -53,7 +53,7 @@ int main(void)
 	
 	nrf24_package.Action.ResetDevice(&device);
 	nrf24_package.Action.InitializeDevice(&device);
-	nrf24_package.Action.ConfigureReceiver(&device, address, 1, 100, 32, MIN_RATE); 
+	nrf24_package.Action.ConfigureReceiver(&device, address, 1, false, 100, 32, MIN_RATE); 
 	
 	while (1)
 	{
