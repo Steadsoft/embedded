@@ -15,9 +15,6 @@
 extern "C"
 #endif
 	
-	
-	
-	
 #define elif else if	
 	
 void SysTick_Handler(void)
@@ -30,8 +27,6 @@ int faults = 0;
 
 
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
-
-int get_board_id();
 
 void EXTI0_IRQPostHandler(NrfDevice_ptr device_ptr);
 

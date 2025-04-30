@@ -24,7 +24,7 @@ int faults = 0;
 
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
 void pulse_led(uint32_t interval);
-void GPIOA_Pin5_Init(void);
+void board_led_init(void);
 
 NrfDevice device = { 0 }; 
 
@@ -37,9 +37,9 @@ int main(void)
 
 	HAL_Init();
 	
-	GPIOA_Pin5_Init();
+	board_led_init();
 	
-	// Perform all IO related initialization
+	/// Perform all IO related initialization
 	
 	spi_setup.sck_pin  = PB13;
 	spi_setup.miso_pin = PB14;
@@ -49,12 +49,10 @@ int main(void)
 	
 	nrf24_hal_support.ConfigureDevice(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
 	
-	// Force all register into their hardware reset state.
+	/// Force all registers into their hardware reset state.
 	
 	nrf24_package.Action.ResetDevice(&device);
-		
 	nrf24_package.Action.InitializeDevice(&device);
-	
 	nrf24_package.Action.ConfigureReceiver(&device, address, 1, 100, 32, MIN_RATE); 
 	
 	while (1)
@@ -65,12 +63,6 @@ int main(void)
 	}
 
 	return(0);
-}
-
-void ApplicationFaultHandler(char * LibName)
-{
-	uint8_t data;
-	data = 1;
 }
 
 void EXTI0_IRQHandler(void)
@@ -97,7 +89,7 @@ void pulse_led(uint32_t interval)
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 }
 
-void GPIOA_Pin5_Init(void)
+void board_led_init(void)
 {
 	// Enable the GPIOA clock
 	__HAL_RCC_GPIOA_CLK_ENABLE();
@@ -116,6 +108,11 @@ void GPIOA_Pin5_Init(void)
 }
 
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code)
+{
+	faults++;
+}
+
+void __attribute__((weak)) ApplicationFaultHandler(char * LibName, char * LibMessage)
 {
 	faults++;
 }
