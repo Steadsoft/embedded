@@ -8,6 +8,7 @@
 #define SPI_CS GPIO_PIN_4
 #define NRF_CE GPIO_PIN_1
 
+
 // SEE: http://blog.gorski.pm/stm32-unique-id
 
 #ifdef __cplusplus
@@ -30,9 +31,9 @@ NrfDevice device = { 0 };
 
 int main(void)
 {
+	NrfSpiSetup spi_setup = NUCLEO_F446RE;
 	NrfReg_STATUS status;
-	NrfSpiSetup spi_setup = { 0 };
-	uint8_t address[] = { 0xE7, 0xE7, 0xE7, 0xE7, 0xE7 }; // this is just the default system reset value for the RX_ADDR_P0 reg
+	uint8_t E7E7E7E7E7[] = FIVE(E7);  // this is just the default system reset value for the RX_ADDR_P0 reg
 	uint8_t buffer[32];
 
 	HAL_Init();
@@ -41,19 +42,13 @@ int main(void)
 	
 	/// Perform all IO related initialization
 	
-	spi_setup.sck_pin  = PB13;
-	spi_setup.miso_pin = PB14;
-	spi_setup.mosi_pin = PB15;
-	spi_setup.pin_alt  = GPIO_AF5_SPI2;
-	spi_setup.spi      = SPI2;;
-	
 	nrf24_hal_support.ConfigureDevice(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
 	
 	/// Force all registers into their hardware reset state.
 	
 	nrf24_package.Action.ResetDevice(&device);
 	nrf24_package.Action.InitializeDevice(&device);
-	nrf24_package.Action.ConfigureReceiver(&device, address, 1, false, 100, 32, MIN_RATE); 
+	nrf24_package.Action.ConfigureReceiver(&device, E7E7E7E7E7, 1, false, 100, 32, MIN_RATE); 
 	
 	while (1)
 	{

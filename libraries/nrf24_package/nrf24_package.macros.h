@@ -32,3 +32,14 @@
 #define MIN_RATE 1 // 250 kbps
 #define MED_RATE 0 // 1 Mbps
 #define MAX_RATE 2 // 2 Mbps
+
+#define NUCLEO_F446RE			\
+{								\
+	.sck_pin  = PB13,			\
+	.miso_pin = PB14,			\
+	.mosi_pin = PB15,			\
+	.pin_alt  = GPIO_AF5_SPI2,	\
+	.spi      = SPI2			\
+}
+
+#define FIVE(X) {0x##X, 0x##X, 0x##X, 0x##X, 0x##X}

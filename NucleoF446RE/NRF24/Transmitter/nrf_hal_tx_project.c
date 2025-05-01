@@ -43,7 +43,7 @@ int main(void)
 	uint8_t buffer[32] = { 0 };
 	uint8_t * payload = "I AM A MESSAGE WITH LENGTH OF 32";
 
-	uint8_t address[] = { 0xE7, 0xE7, 0xE7, 0xE7, 0xE7}; // this is just the default system reset value for the TX_ADDR reg
+	uint8_t E7E7E7E7E7[] = FIVE(E7); // this is just the default system reset value for the TX_ADDR reg
 	
 	for (int X = 0; X < 32; X++) buffer[X] = 0xAA + X;
 	
@@ -67,13 +67,13 @@ int main(void)
 
 	while (1)
 	{
-		nrf24_package.Action.ConfigureTransmitter(&device, address, 110, LOW_POWER, MIN_RATE);
+		nrf24_package.Action.ConfigureTransmitter(&device, E7E7E7E7E7, 100, false, LOW_POWER, MIN_RATE);
 		nrf24_package.Action.SendPayload(&device, payload, 32); // Literature indicates that reducing the size of the payload can improve range.
 		nrf24_package.Action.WaitForTxInterrupt(&device,2000);		
 		
 		HAL_Delay(250);
 		
-		nrf24_package.Action.ConfigureTransmitter(&device, address, 100, LOW_POWER, MIN_RATE);
+		nrf24_package.Action.ConfigureTransmitter(&device, E7E7E7E7E7, 110, false, LOW_POWER, MIN_RATE);
 		nrf24_package.Action.SendPayload(&device, payload, 32); // Literature indicates that reducing the size of the payload can improve range.
 		nrf24_package.Action.WaitForTxInterrupt(&device,2000);		
 		

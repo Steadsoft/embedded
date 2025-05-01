@@ -116,7 +116,7 @@ private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr
 private void InitializeDevice(NrfDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void R_RX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate);
+private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, bool auto_ack, uint8_t power, uint8_t rate);
 private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t channel, uint8_t payload_size, uint8_t rate);
 private void PulseCE(NrfDevice_ptr device_ptr);
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
@@ -625,7 +625,7 @@ private void ResetDevice(NrfDevice_ptr device_ptr)
 	NrfReg_DYNPD dynpd = { 0 };
 	NrfReg_FEATURE feature = { 0 };
 	
-	configuration.EN_CRC = 1;
+	configuration.EN_CRC = 0;
 	
 	en_aa.ENAA_P0 = 1;
 	en_aa.ENAA_P1 = 1;
@@ -782,7 +782,7 @@ private void PowerDown(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
-private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, uint8_t power, uint8_t rate)
+private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, bool auto_ack, uint8_t power, uint8_t rate)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG config = { 0 };
@@ -790,7 +790,9 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], 
 	NrfReg_RF_CH rf_ch = { 0 };
 	NrfReg_TX_ADDR_LONG tx_addr = { 0 };
 	NrfReg_RF_SETUP rf_setup = { 0 };
-
+	NrfReg_EN_AA enaa = { 0 }, enaa_mask = { 0 };
+	NrfReg_SETUP_RETR retr = { 0 };
+	
 	tx_addr.value[0] = address[0];
 	tx_addr.value[1] = address[1];
 	tx_addr.value[2] = address[2];
@@ -843,7 +845,27 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], 
 	
 	config.PRIM_RX = 0;
 	
+	if (auto_ack)
+	{
+		bits_to_change.EN_CRC = 1;
+		config.EN_CRC = 1;
+	}
+
+	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
+	
+	if (auto_ack)
+	{
+		enaa.ENAA_P0 = 1;
+//		enaa.ENAA_P1 = 1;
+//		enaa.ENAA_P2 = 1;
+//		enaa.ENAA_P3 = 1;
+//		enaa.ENAA_P4 = 1;
+//		enaa.ENAA_P5 = 1;
+		
+		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa, &status); // we canjust use enaa as the mask here.
+	}
+
 }
 private void PowerUpDevice(NrfDevice_ptr device_ptr)
 {
@@ -870,6 +892,7 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	NrfReg_RX_PW rx_pw = { 0 };
 	NrfReg_RF_SETUP rf_setup = { 0 }, rf_setup_mask = { 0 };
 	NrfReg_EN_AA enaa = { 0 }, enaa_mask = { 0 };
+	NrfReg_ALL_REGISTERS bef = { 0 }, aft = { 0 };
 	
 	rx_addr.value[0] = address[0];
 	rx_addr.value[1] = address[1];
@@ -939,6 +962,12 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	config.MASK_TX_DS = 1;
 	config.MASK_RX_DR = 0;
 	
+	if (auto_ack)
+	{
+		bits_to_change.EN_CRC = 1;
+		config.EN_CRC = 1;
+	}
+	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 	
 	// Set rate
@@ -967,30 +996,16 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	if (auto_ack)
 	{
 		
-		switch(pipe)
-		{
-		case 0:
-			enaa.ENAA_P0 = 1;
-			break;
-		case 1: 
-			enaa.ENAA_P1 = 1;
-			break;
-		case 2: 
-			enaa.ENAA_P2 = 1;
-			break;
-		case 3: 
-			enaa.ENAA_P3 = 1;
-			break;
-		case 4: 
-			enaa.ENAA_P4 = 1;
-			break;
-		case 5: 
-			enaa.ENAA_P5 = 1;
-			break;
-		}
+		enaa.ENAA_P0 = 1;
+		enaa.ENAA_P1 = 1;
+		enaa.ENAA_P2 = 1;
+		enaa.ENAA_P3 = 1;
+		enaa.ENAA_P4 = 1;
+		enaa.ENAA_P5 = 1;
 		
+		nrf24_package.Read.ALL_REGISTERS(device_ptr, &bef, &status);
 		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa, &status); // we canjust use enaa as the mask here.
-		
+		nrf24_package.Read.ALL_REGISTERS(device_ptr, &bef, &status);
 	}
 	else
 	{
