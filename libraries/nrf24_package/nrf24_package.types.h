@@ -274,32 +274,32 @@ struct NrfReg_FEATURE_struct
 
 struct NrfReg_ALL_REGISTERS_struct
 {
-	NrfReg_CONFIG Config;
-	NrfReg_EN_AA  EnAa;
-	NrfReg_EN_RXADDR EnRxAddr;
-	NrfReg_SETUP_AW SetupAw;
-	NrfReg_SETUP_RETR SetupRetr;
-	NrfReg_RF_CH RfCh;
-	NrfReg_RF_SETUP RfSetup;
-	NrfReg_STATUS Status;
-	NrfReg_OBSERVE_TX ObserveTx;
-	NrfReg_RPD Rpd;
-	NrfReg_RX_ADDR_LONG RxAddrP0;
-	NrfReg_RX_ADDR_LONG RxAddrP1;
-	NrfReg_RX_ADDR_SHORT RxAddrP2;
-	NrfReg_RX_ADDR_SHORT RxAddrP3;
-	NrfReg_RX_ADDR_SHORT RxAddrP4;
-	NrfReg_RX_ADDR_SHORT RxAddrP5;
-	NrfReg_TX_ADDR_LONG  TxAddr;
-	NrfReg_RX_PW RxPwP0;
-	NrfReg_RX_PW RxPwP1;
-	NrfReg_RX_PW RxPwP2;
-	NrfReg_RX_PW RxPwP3;
-	NrfReg_RX_PW RxPwP4;
-	NrfReg_RX_PW RxPwP5;
-	NrfReg_FIFO_STATUS FifoStatus;
-	NrfReg_DYNPD Dynpd;
-	NrfReg_FEATURE Feature;
+	NrfReg_CONFIG CONFIG;
+	NrfReg_EN_AA  EN_AA;
+	NrfReg_EN_RXADDR EN_RXADDR;
+	NrfReg_SETUP_AW SETUP_AW;
+	NrfReg_SETUP_RETR SETUP_RETR;
+	NrfReg_RF_CH RF_CH;
+	NrfReg_RF_SETUP RF_SETUP;
+	NrfReg_STATUS STATUS;
+	NrfReg_OBSERVE_TX OBSERVE_TX;
+	NrfReg_RPD RPD;
+	NrfReg_RX_ADDR_LONG RX_ADDR_P0;
+	NrfReg_RX_ADDR_LONG RX_ADDR_P1;
+	NrfReg_RX_ADDR_SHORT RX_ADDR_P2;
+	NrfReg_RX_ADDR_SHORT RX_ADDR_P3;
+	NrfReg_RX_ADDR_SHORT RX_ADDR_P4;
+	NrfReg_RX_ADDR_SHORT RX_ADDR_P5;
+	NrfReg_TX_ADDR_LONG  TX_ADDR;
+	NrfReg_RX_PW RX_PW_P0;
+	NrfReg_RX_PW RX_PW_P1;
+	NrfReg_RX_PW RX_PW_P2;
+	NrfReg_RX_PW RX_PW_P3;
+	NrfReg_RX_PW RX_PW_P4;
+	NrfReg_RX_PW RX_PW_P5;
+	NrfReg_FIFO_STATUS FIFO_STATUS;
+	NrfReg_DYNPD DYNPD;
+	NrfReg_FEATURE FEATURE;
 	
 };
 struct nrf_write_interface

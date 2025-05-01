@@ -33,8 +33,9 @@ int main(void)
 {
 	NrfSpiSetup spi_setup = NUCLEO_F446RE;
 	NrfReg_STATUS status;
-	uint8_t E7E7E7E7E7[] = FIVE(E7);  // this is just the default system reset value for the RX_ADDR_P0 reg
+	uint8_t E5E5E5E5E5[] = FIVE(E5); // this is just the default system reset value for the TX_ADDR reg
 	uint8_t buffer[32];
+	NrfReg_ALL_REGISTERS all = { 0 };
 
 	HAL_Init();
 	
@@ -48,8 +49,10 @@ int main(void)
 	
 	nrf24_package.Action.ResetDevice(&device);
 	nrf24_package.Action.InitializeDevice(&device);
-	nrf24_package.Action.ConfigureReceiver(&device, E7E7E7E7E7, 1, false, 100, 32, MIN_RATE); 
+	nrf24_package.Action.ConfigureReceiver(&device, E5E5E5E5E5, 0, true, 45, 8, MAX_RATE); 
 	
+	nrf24_package.Read.ALL_REGISTERS(&device, &all, &status);
+
 	while (1)
 	{
 		nrf24_package.Action.WaitForRxInterrupt(&device, -1);

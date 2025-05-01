@@ -461,7 +461,8 @@ private void ReadTxAddrRegister(NrfDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_pt
 
 private void WriteTxAddrRegister(NrfDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	WriteSingleByteRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_VALUE(Value), NrfStatus);
+	uint8_t bytes_written;
+	WriteMultiBytesRegister(device_ptr, Nrf24Register.TX_ADDR, Value.value, &bytes_written, NrfStatus);
 }
 private void ReadRxPwRegister(NrfDevice_ptr device_ptr, NrfReg_RX_PW_ptr Value, uint8_t Pipe, NrfReg_STATUS_ptr NrfStatus)
 {
@@ -644,7 +645,7 @@ private void ResetDevice(NrfDevice_ptr device_ptr)
 	rf_ch.RF_CH = 2;
 	
 	rf_setup.RF_DR_HIGH = 1;
-	rf_setup.RF_PWR = 3;
+	rf_setup.RF_PWR = 1;
 	
 	rx_addr_short_p2.value = C3;
 	rx_addr_short_p3.value = C4;
@@ -696,32 +697,32 @@ private void ResetDevice(NrfDevice_ptr device_ptr)
 }
 private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus)
 {
-	ReadConfigRegister(device_ptr, &(Value->Config), NrfStatus);
-	ReadEnAaRegister(device_ptr, &(Value->EnAa), NrfStatus);
-	ReadEnRxAddrRegister(device_ptr, &(Value->EnRxAddr), NrfStatus);
-	ReadSetupAwRegister(device_ptr, &(Value->SetupAw), NrfStatus);
-	ReadSetupRetrRegister(device_ptr, &(Value->SetupRetr), NrfStatus);
-	ReadRfChannelRegister(device_ptr, &(Value->RfCh), NrfStatus);
-	ReadRfSetupRegister(device_ptr, &(Value->RfSetup), NrfStatus);
-	ReadStatusRegister(device_ptr, &(Value->Status));
-	ReadObserveTxRegister(device_ptr, &(Value->ObserveTx), NrfStatus);
-	ReadRpdRegister(device_ptr, &(Value->Rpd), NrfStatus);
-	ReadLongRxAddrRegister(device_ptr, &(Value->RxAddrP0), 0, NrfStatus);
-	ReadLongRxAddrRegister(device_ptr, &(Value->RxAddrP1), 1, NrfStatus);
-	ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP2), 2, NrfStatus);
-	ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP3), 3, NrfStatus);
-	ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP4), 4, NrfStatus);
-	ReadShortRxAddrRegister(device_ptr, &(Value->RxAddrP5), 5, NrfStatus);
-	ReadTxAddrRegister(device_ptr, &(Value->TxAddr), NrfStatus);
-	ReadRxPwRegister(device_ptr, &(Value->RxPwP0), 0, NrfStatus);
-	ReadRxPwRegister(device_ptr, &(Value->RxPwP1), 1, NrfStatus);
-	ReadRxPwRegister(device_ptr, &(Value->RxPwP2), 2, NrfStatus);
-	ReadRxPwRegister(device_ptr, &(Value->RxPwP3), 3, NrfStatus);
-	ReadRxPwRegister(device_ptr, &(Value->RxPwP4), 4, NrfStatus);
-	ReadRxPwRegister(device_ptr, &(Value->RxPwP5), 5, NrfStatus);
-	ReadFifoStatusRegister(device_ptr, &(Value->FifoStatus), NrfStatus);
-	ReadDynpdRegister(device_ptr, &(Value->Dynpd), NrfStatus);
-	ReadFeatureRegister(device_ptr, &(Value->Feature), NrfStatus);
+	ReadConfigRegister(device_ptr, &(Value->CONFIG), NrfStatus);
+	ReadEnAaRegister(device_ptr, &(Value->EN_AA), NrfStatus);
+	ReadEnRxAddrRegister(device_ptr, &(Value->EN_RXADDR), NrfStatus);
+	ReadSetupAwRegister(device_ptr, &(Value->SETUP_AW), NrfStatus);
+	ReadSetupRetrRegister(device_ptr, &(Value->SETUP_RETR), NrfStatus);
+	ReadRfChannelRegister(device_ptr, &(Value->RF_CH), NrfStatus);
+	ReadRfSetupRegister(device_ptr, &(Value->RF_SETUP), NrfStatus);
+	ReadStatusRegister(device_ptr, &(Value->STATUS));
+	ReadObserveTxRegister(device_ptr, &(Value->OBSERVE_TX), NrfStatus);
+	ReadRpdRegister(device_ptr, &(Value->RPD), NrfStatus);
+	ReadLongRxAddrRegister(device_ptr, &(Value->RX_ADDR_P0), 0, NrfStatus);
+	ReadLongRxAddrRegister(device_ptr, &(Value->RX_ADDR_P1), 1, NrfStatus);
+	ReadShortRxAddrRegister(device_ptr, &(Value->RX_ADDR_P2), 2, NrfStatus);
+	ReadShortRxAddrRegister(device_ptr, &(Value->RX_ADDR_P3), 3, NrfStatus);
+	ReadShortRxAddrRegister(device_ptr, &(Value->RX_ADDR_P4), 4, NrfStatus);
+	ReadShortRxAddrRegister(device_ptr, &(Value->RX_ADDR_P5), 5, NrfStatus);
+	ReadTxAddrRegister(device_ptr, &(Value->TX_ADDR), NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RX_PW_P0), 0, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RX_PW_P1), 1, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RX_PW_P2), 2, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RX_PW_P3), 3, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RX_PW_P4), 4, NrfStatus);
+	ReadRxPwRegister(device_ptr, &(Value->RX_PW_P5), 5, NrfStatus);
+	ReadFifoStatusRegister(device_ptr, &(Value->FIFO_STATUS), NrfStatus);
+	ReadDynpdRegister(device_ptr, &(Value->DYNPD), NrfStatus);
+	ReadFeatureRegister(device_ptr, &(Value->FEATURE), NrfStatus);
 }
 private void InitializeDevice(NrfDevice_ptr device_ptr)
 {
@@ -793,6 +794,7 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], 
 	NrfReg_EN_AA enaa = { 0 }, enaa_mask = { 0 };
 	NrfReg_SETUP_RETR retr = { 0 };
 	
+
 	tx_addr.value[0] = address[0];
 	tx_addr.value[1] = address[1];
 	tx_addr.value[2] = address[2];
@@ -848,23 +850,54 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], 
 	if (auto_ack)
 	{
 		bits_to_change.EN_CRC = 1;
+		bits_to_change.CRCO = 1;
+		
+		config.CRCO = 1;
 		config.EN_CRC = 1;
 	}
-
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 	
 	if (auto_ack)
 	{
-		enaa.ENAA_P0 = 1;
-//		enaa.ENAA_P1 = 1;
-//		enaa.ENAA_P2 = 1;
-//		enaa.ENAA_P3 = 1;
-//		enaa.ENAA_P4 = 1;
-//		enaa.ENAA_P5 = 1;
-		
-		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa, &status); // we canjust use enaa as the mask here.
+		retr.ARD = 15;
+		retr.ARC = 10;
 	}
+	else
+	{
+		retr.ARD = 0;
+		retr.ARC = 0;
+	}
+	
+	nrf24_package.Write.SETUP_RETR(device_ptr, retr, &status); // Set auto-retransmit settings
+	
+	enaa_mask.ENAA_P0 = 1;
+	enaa_mask.ENAA_P1 = 0;
+	enaa_mask.ENAA_P2 = 0;
+	enaa_mask.ENAA_P3 = 0;
+	enaa_mask.ENAA_P4 = 0;
+	enaa_mask.ENAA_P5 = 0;
+	
+	if (auto_ack)
+	{
+		enaa.ENAA_P0 = 1;
+		enaa.ENAA_P1 = 1;
+		enaa.ENAA_P2 = 1;
+		enaa.ENAA_P3 = 1;
+		enaa.ENAA_P4 = 1;
+		enaa.ENAA_P5 = 1;
+	}
+	else
+	{
+		enaa.ENAA_P0 = 0;
+		enaa.ENAA_P1 = 0;
+		enaa.ENAA_P2 = 0;
+		enaa.ENAA_P3 = 0;
+		enaa.ENAA_P4 = 0;
+		enaa.ENAA_P5 = 0;
+	}
+	
+	nrf24_package.Update.EN_AA(device_ptr, enaa, enaa_mask, &status);
 
 }
 private void PowerUpDevice(NrfDevice_ptr device_ptr)
@@ -965,6 +998,9 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	if (auto_ack)
 	{
 		bits_to_change.EN_CRC = 1;
+		bits_to_change.CRCO = 1;
+		
+		config.CRCO = 1;
 		config.EN_CRC = 1;
 	}
 	
@@ -993,6 +1029,13 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 
 	nrf24_package.Update.RF_SETUP(device_ptr, rf_setup, rf_setup_mask, &status); // Set RF settings
 	
+	enaa_mask.ENAA_P0 = 1;
+	enaa_mask.ENAA_P1 = 0;
+	enaa_mask.ENAA_P2 = 0;
+	enaa_mask.ENAA_P3 = 0;
+	enaa_mask.ENAA_P4 = 0;
+	enaa_mask.ENAA_P5 = 0;
+	
 	if (auto_ack)
 	{
 		
@@ -1004,32 +1047,17 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 		enaa.ENAA_P5 = 1;
 		
 		nrf24_package.Read.ALL_REGISTERS(device_ptr, &bef, &status);
-		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa, &status); // we canjust use enaa as the mask here.
+		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa_mask, &status); // we canjust use enaa as the mask here.
 		nrf24_package.Read.ALL_REGISTERS(device_ptr, &bef, &status);
 	}
 	else
 	{
-		switch (pipe)
-		{
-		case 0:
-			enaa_mask.ENAA_P0 = 1;
-			break;
-		case 1: 
-			enaa_mask.ENAA_P1 = 1;
-			break;
-		case 2: 
-			enaa_mask.ENAA_P2 = 1;
-			break;
-		case 3: 
-			enaa_mask.ENAA_P3 = 1;
-			break;
-		case 4: 
-			enaa_mask.ENAA_P4 = 1;
-			break;
-		case 5: 
-			enaa_mask.ENAA_P5 = 1;
-			break;
-		}
+		enaa.ENAA_P0 = 0;
+		enaa.ENAA_P1 = 0;
+		enaa.ENAA_P2 = 0;
+		enaa.ENAA_P3 = 0;
+		enaa.ENAA_P4 = 0;
+		enaa.ENAA_P5 = 0;
 		
 		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa_mask, &status);
 	}

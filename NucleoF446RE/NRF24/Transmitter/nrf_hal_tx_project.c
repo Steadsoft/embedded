@@ -40,10 +40,11 @@ int msgs_tx = 0;
 int main(void)
 {
 	NrfSpiSetup spi_setup = { 0 };
+	NrfReg_STATUS status;
 	uint8_t buffer[32] = { 0 };
 	uint8_t * payload = "I AM A MESSAGE WITH LENGTH OF 32";
-
-	uint8_t E7E7E7E7E7[] = FIVE(E7); // this is just the default system reset value for the TX_ADDR reg
+	NrfReg_ALL_REGISTERS all = { 0 };
+	uint8_t E5E5E5E5E5[] = FIVE(E5); // this is just the default system reset value for the TX_ADDR reg
 	
 	for (int X = 0; X < 32; X++) buffer[X] = 0xAA + X;
 	
@@ -65,17 +66,21 @@ int main(void)
 	nrf24_package.Action.InitializeDevice(&device);
 	nrf24_package.Action.PowerUpDevice(&device);
 
+	nrf24_package.Action.ConfigureTransmitter(&device, E5E5E5E5E5, 45, true, LOW_POWER, MAX_RATE);
+	
 	while (1)
 	{
-		nrf24_package.Action.ConfigureTransmitter(&device, E7E7E7E7E7, 100, false, LOW_POWER, MIN_RATE);
-		nrf24_package.Action.SendPayload(&device, payload, 32); // Literature indicates that reducing the size of the payload can improve range.
+		
+		nrf24_package.Read.ALL_REGISTERS(&device, &all, &status);
+		
+		nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
 		nrf24_package.Action.WaitForTxInterrupt(&device,2000);		
 		
 		HAL_Delay(250);
 		
-		nrf24_package.Action.ConfigureTransmitter(&device, E7E7E7E7E7, 110, false, LOW_POWER, MIN_RATE);
-		nrf24_package.Action.SendPayload(&device, payload, 32); // Literature indicates that reducing the size of the payload can improve range.
-		nrf24_package.Action.WaitForTxInterrupt(&device,2000);		
+//		nrf24_package.Action.ConfigureTransmitter(&device, E7E7E7E7E7, 110, true, LOW_POWER, MIN_RATE);
+//		nrf24_package.Action.SendPayload(&device, payload, 32); // Literature indicates that reducing the size of the payload can improve range.
+//		nrf24_package.Action.WaitForTxInterrupt(&device,2000);		
 		
 		HAL_Delay(250);
 	}
@@ -87,19 +92,29 @@ int main(void)
 void EXTI0_IRQHandler(void)
 {
 	NrfReg_STATUS status_irq;
-	
+	uint32_t counter = 0;
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 	
 	nrf24_package.Read.STATUS(&device, &status_irq); // sends a NOP to read status
 
 	// If the interrupt for TX complete, clear just that bit
 	
-	if (status_irq.TX_DS)
+	if (status_irq.MAX_RT == 0)
+		counter++;
+	
+	if (status_irq.TX_DS || status_irq.MAX_RT)
 	{
 		status_irq.RX_DR = 0;
-		status_irq.MAX_RT = 0;
 		nrf24_package.Update.STATUS(&device, status_irq, status_irq);
 		nrf24_package.Action.ConfirmTxInterrupt(&device);
+	}
+	
+	// If we've had successive MAX_RT failures we must flush the FIFO before any
+	// further transmissions will work.
+	
+	if (status_irq.TX_FULL)
+	{
+		nrf24_package.Command.FLUSH_TX(&device, &status_irq);
 	}
 } 
 
