@@ -380,7 +380,7 @@ struct nrf_action_interface
 	void(* PowerUpDevice)(NrfDevice_ptr);
 	void(* PulseCE)(NrfDevice_ptr device_ptr);
 	void(* SendPayload)(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
-	void(* WaitForTxInterrupt)(NrfDevice_ptr device_ptr, int32_t max_spins);
+	void(* SpinForTxInterrupt)(NrfDevice_ptr device_ptr, int32_t max_spins);
 	void(* WaitForRxInterrupt)(NrfDevice_ptr device_ptr, int32_t max_spins);
 	void(* ConfirmTxInterrupt)(NrfDevice_ptr device_ptr);
 	void(* ConfirmRxInterrupt)(NrfDevice_ptr device_ptr);

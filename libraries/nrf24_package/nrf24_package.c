@@ -124,7 +124,7 @@ private void PowerUpDevice(NrfDevice_ptr device_ptr);
 private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max_spins);
 private void confirm_interrupt(volatile NrfInterrupt_ptr state_ptr);
 
-private void WaitForTxInterrupt(NrfDevice_ptr, int32_t);
+private void SpinForTxInterrupt(NrfDevice_ptr, int32_t);
 private void ConfirmTxInterrupt(NrfDevice_ptr);
 private void WaitForRxInterrupt(NrfDevice_ptr, int32_t);
 private void ConfirmRxInterrupt(NrfDevice_ptr);
@@ -201,7 +201,7 @@ public const nrf24_package_struct nrf24_package =
 		.ConfigureReceiver = ConfigureReceiver,
 		.PulseCE = PulseCE,
 		.SendPayload = SendPayload,
-		.WaitForTxInterrupt = WaitForTxInterrupt,
+		.SpinForTxInterrupt = SpinForTxInterrupt,
 		.ConfirmTxInterrupt = ConfirmTxInterrupt,
 		.WaitForRxInterrupt = WaitForRxInterrupt,
 		.ConfirmRxInterrupt = ConfirmRxInterrupt
@@ -238,7 +238,7 @@ private void WaitForRxInterrupt(NrfDevice_ptr device_ptr, int32_t max_spins)
 	wait_for_interrupt(&(device_ptr->rx_interrupt), max_spins);
 }
 
-private void WaitForTxInterrupt(NrfDevice_ptr device_ptr, int32_t max_spins)
+private void SpinForTxInterrupt(NrfDevice_ptr device_ptr, int32_t max_spins)
 {
 	wait_for_interrupt(&(device_ptr->tx_interrupt), max_spins);
 }
@@ -645,7 +645,7 @@ private void ResetDevice(NrfDevice_ptr device_ptr)
 	rf_ch.RF_CH = 2;
 	
 	rf_setup.RF_DR_HIGH = 1;
-	rf_setup.RF_PWR = 1;
+	rf_setup.RF_PWR = 2;
 	
 	rx_addr_short_p2.value = C3;
 	rx_addr_short_p3.value = C4;
@@ -738,6 +738,7 @@ private void InitializeDevice(NrfDevice_ptr device_ptr)
 	NrfReg_CONFIG config = { 0 };
 	NrfReg_SETUP_AW setup_aw = { 0 };
 	NrfReg_RF_CH rf_ch = { 0 };
+	NrfReg_FEATURE ftr = { 0 };
 	
 	if (!device_ptr->configured) 
 	{
@@ -761,13 +762,21 @@ private void InitializeDevice(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status); // Set RF channel.
 	
+	ftr.EN_DYN_ACK = 1;
+	
+	nrf24_package.Write.FEATURE(device_ptr, ftr, &status);
+	
 	device_ptr->tx_interrupt.complete = 0;
 	device_ptr->tx_interrupt.spins = 0;
 	device_ptr->tx_interrupt.count = 0;
+	device_ptr->tx_interrupt.max_so_far = 0;
 	
 	device_ptr->rx_interrupt.complete = 0;
 	device_ptr->rx_interrupt.spins = 0;
 	device_ptr->rx_interrupt.count = 0;
+	device_ptr->rx_interrupt.max_so_far = 0;
+	
+	
 
 }
 private void PowerDown(NrfDevice_ptr device_ptr)
@@ -793,7 +802,13 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], 
 	NrfReg_RF_SETUP rf_setup = { 0 };
 	NrfReg_EN_AA enaa = { 0 }, enaa_mask = { 0 };
 	NrfReg_SETUP_RETR retr = { 0 };
+	NrfReg_EN_RXADDR rxaddr = { 0 };
 	
+	if (auto_ack) // SEE: https://devzone.nordicsemi.com/f/nordic-q-a/7177/nrf24l01-not-receiving-ack
+	{
+		rxaddr.ERX_P0 = 1;
+		nrf24_package.Write.EN_RXADDR(device_ptr, rxaddr, &status);
+	}
 
 	tx_addr.value[0] = address[0];
 	tx_addr.value[1] = address[1];
@@ -1121,6 +1136,9 @@ private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max
 			if (state_ptr->spins >= max_spins)
 				ApplicationFaultHandler(LIBNAME, "missing interrupt");
 	}
+	
+	if (state_ptr->spins > state_ptr->max_so_far)
+		state_ptr->max_so_far = state_ptr->spins;
 	
 	state_ptr->count++;
 	state_ptr->complete = 0;
