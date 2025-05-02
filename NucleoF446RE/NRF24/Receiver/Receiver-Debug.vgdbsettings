@@ -101,7 +101,7 @@
     <DebugMethod>
       <ID>com.sysprogs.arm.openocd</ID>
       <InterfaceID>stlink-v2-1</InterfaceID>
-      <InterfaceSerialNumber>0670FF3433524B3043102929</InterfaceSerialNumber>
+      <InterfaceSerialNumber>0667FF323532534157124550</InterfaceSerialNumber>
       <Configuration xsi:type="com.visualgdb.edp.openocd.settings">
         <CommandLine>-f interface/stlink-v2-1.cfg -f target/stm32f4x.cfg -c init -c "reset init"</CommandLine>
         <ExtraParameters>
