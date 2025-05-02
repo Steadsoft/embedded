@@ -25,6 +25,9 @@ void SysTick_Handler(void)
 
 int faults = 0;
 
+void pulse_led(uint32_t interval);
+void board_led_init(void);
+
 
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
 
@@ -39,26 +42,23 @@ int msgs_tx = 0;
 
 int main(void)
 {
-	NrfSpiSetup spi_setup = { 0 };
+	NrfSpiSetup spi_setup = NUCLEO_F446RE;
 	NrfReg_STATUS status;
 	uint8_t buffer[32] = { 0 };
 	uint8_t * payload = "I AM A MESSAGE WITH LENGTH OF 32";
 	NrfReg_ALL_REGISTERS all = { 0 };
-	uint8_t E5E5E5E5E5[] = FIVE(E5); // this is just the default system reset value for the TX_ADDR reg
+	uint8_t E5E5E5E5E5[] = { 'R', 'A', 'D', 'I', 'O' }; //FIVE(E5); // this is just the default system reset value for the TX_ADDR reg
 	
 	for (int X = 0; X < 32; X++) buffer[X] = 0xAA + X;
 	
 	HAL_Init();
+	
+	board_led_init();
+
 		
 	/// Perform all IO related initialization
 	
-	spi_setup.miso_pin = PA6;
-	spi_setup.mosi_pin = PA7;
-	spi_setup.sck_pin  = PA5;
-	spi_setup.pin_alt  = GPIO_AF5_SPI1;
-	spi_setup.spi      = SPI1;
-	
-	nrf24_hal_support.ConfigureDevice(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PA4, &device, fault_handler); 
+	nrf24_hal_support.ConfigureDevice(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
 	
 	/// Force all registers into their hardware reset state.
 	
@@ -66,23 +66,24 @@ int main(void)
 	nrf24_package.Action.InitializeDevice(&device);
 	nrf24_package.Action.PowerUpDevice(&device);
 
-	nrf24_package.Action.ConfigureTransmitter(&device, E5E5E5E5E5, 45, true, LOW_POWER, MAX_RATE);
+	nrf24_package.Action.ConfigureTransmitter(&device, E5E5E5E5E5, 45, false, HIGH_POWER, MED_RATE);
+	
+    nrf24_package.Read.ALL_REGISTERS(&device, &all, &status);
 	
 	while (1)
 	{
-		
-		nrf24_package.Read.ALL_REGISTERS(&device, &all, &status);
-		
 		nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
-		nrf24_package.Action.WaitForTxInterrupt(&device,2000);		
+		nrf24_package.Action.SpinForTxInterrupt(&device,50000);
 		
-		HAL_Delay(250);
+		pulse_led(1);
+		
+		HAL_Delay(50);
 		
 //		nrf24_package.Action.ConfigureTransmitter(&device, E7E7E7E7E7, 110, true, LOW_POWER, MIN_RATE);
 //		nrf24_package.Action.SendPayload(&device, payload, 32); // Literature indicates that reducing the size of the payload can improve range.
 //		nrf24_package.Action.WaitForTxInterrupt(&device,2000);		
 		
-		HAL_Delay(250);
+		//HAL_Delay(250);
 	}
 
 	return(0);
@@ -96,26 +97,33 @@ void EXTI0_IRQHandler(void)
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 	
 	nrf24_package.Read.STATUS(&device, &status_irq); // sends a NOP to read status
+	
+	if ((status_irq.MAX_RT | status_irq.RX_DR | status_irq.TX_DS) == 0) // spurious interrupt unrelated to device itself.
+	{
+		return;
+	}
 
 	// If the interrupt for TX complete, clear just that bit
 	
-	if (status_irq.MAX_RT == 0)
+	if (status_irq.MAX_RT == 1)
+	{
+		nrf24_package.Command.FLUSH_TX(&device, &status_irq);
+	}
+	else
+	{
 		counter++;
+	}
 	
 	if (status_irq.TX_DS || status_irq.MAX_RT)
 	{
 		status_irq.RX_DR = 0;
 		nrf24_package.Update.STATUS(&device, status_irq, status_irq);
-		nrf24_package.Action.ConfirmTxInterrupt(&device);
 	}
 	
 	// If we've had successive MAX_RT failures we must flush the FIFO before any
 	// further transmissions will work.
 	
-	if (status_irq.TX_FULL)
-	{
-		nrf24_package.Command.FLUSH_TX(&device, &status_irq);
-	}
+	nrf24_package.Action.ConfirmTxInterrupt(&device);
 } 
 
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code)
@@ -126,4 +134,29 @@ static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code)
 void __attribute__((weak)) ApplicationFaultHandler(char * LibName, char * LibMessage)
 {
 	faults++;
+}
+
+void board_led_init(void)
+{
+	// Enable the GPIOA clock
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+
+	// Define a GPIO_InitTypeDef structure for configuration
+	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+	// Configure pin 5 as output
+	GPIO_InitStruct.Pin = GPIO_PIN_5;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; // Push-pull output
+	GPIO_InitStruct.Pull = GPIO_NOPULL; // No pull-up or pull-down resistor
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; // Low frequency for LED
+
+	// Initialize the GPIOA pin
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
+
+void pulse_led(uint32_t interval)
+{
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+	HAL_Delay(interval);	
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 }
