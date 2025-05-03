@@ -117,7 +117,8 @@ private void InitializeDevice(NrfDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void R_RX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, bool auto_ack, uint8_t power, uint8_t rate);
-private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t channel, uint8_t payload_size, uint8_t rate);
+private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t payload_size);
+private void ConfigureRadio(NrfDevice_ptr device_ptr, uint8_t channel, uint8_t power, uint8_t rate, bool auto_ack);
 private void PulseCE(NrfDevice_ptr device_ptr);
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
 private void PowerUpDevice(NrfDevice_ptr device_ptr);
@@ -199,6 +200,7 @@ public const nrf24_package_struct nrf24_package =
 		.InitializeDevice = InitializeDevice,
 		.ConfigureTransmitter = ConfigureTransmitter,
 		.ConfigureReceiver = ConfigureReceiver,
+		.ConfigureRadio = ConfigureRadio,
 		.PulseCE = PulseCE,
 		.SendPayload = SendPayload,
 		.SpinForTxInterrupt = SpinForTxInterrupt,
@@ -929,16 +931,50 @@ private void PowerUpDevice(NrfDevice_ptr device_ptr)
 	HAL_Delay(2); // 1.5 mS min delay after powerup.
 	
 }
-private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t channel, uint8_t payload_size, uint8_t rate)
+
+private void ConfigureRadio(NrfDevice_ptr device_ptr, uint8_t channel, uint8_t power, uint8_t rate, bool auto_ack)
 {
 	NrfReg_STATUS status;
 	NrfReg_RF_CH rf_ch = { 0 };
+	NrfReg_RF_SETUP rf_setup = { 0 }, rf_setup_mask = { 0 };
+	
+	rf_setup_mask.RF_DR_HIGH = 1;
+	rf_setup_mask.RF_DR_LOW = 1;
+	rf_setup_mask.RF_PWR = 3;
+	
+	rf_ch.RF_CH = channel; 
+
+	switch (rate)
+	{
+	case MIN_RATE:
+		rf_setup.RF_DR_LOW = 1; 
+		rf_setup.RF_DR_HIGH = 0;
+		break;
+	case MAX_RATE: 
+		rf_setup.RF_DR_LOW = 0; 
+		rf_setup.RF_DR_HIGH = 1;
+		break;
+	case MED_RATE:
+		rf_setup.RF_DR_LOW = 0; 
+		rf_setup.RF_DR_HIGH = 0;
+		break;
+	}
+	
+	rf_setup.RF_PWR = power;
+	
+	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status);
+	nrf24_package.Update.RF_SETUP(device_ptr, rf_setup, rf_setup_mask, &status); // Set RF settings
+
+}
+
+private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t payload_size)
+{
+	NrfReg_STATUS status;
 	NrfReg_RX_ADDR_LONG rx_addr = { 0 };
 	NrfReg_CONFIG bits_to_change = { 0 };
 	NrfReg_CONFIG config = { 0 };
 	NrfReg_EN_RXADDR en_rx_addr = { 0 };
 	NrfReg_RX_PW rx_pw = { 0 };
-	NrfReg_RF_SETUP rf_setup = { 0 }, rf_setup_mask = { 0 };
 	NrfReg_EN_AA enaa = { 0 }, enaa_mask = { 0 };
 	NrfReg_ALL_REGISTERS bef = { 0 }, aft = { 0 };
 	
@@ -948,9 +984,6 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	rx_addr.value[3] = address[3];
 	rx_addr.value[4] = address[4];
 
-	rf_ch.RF_CH = channel; 
-	
-	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status);
 	nrf24_package.Write.RX_ADDR_LONG(device_ptr, rx_addr, pipe, &status);
 	
 	// Clear interrupts
@@ -996,7 +1029,6 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	
 	// Set mode to RX
 
-	bits_to_change.PWR_UP = 1;
 	bits_to_change.PRIM_RX = 1; 
 	bits_to_change.MASK_MAX_RT = 1;
 	bits_to_change.MASK_TX_DS = 1;
@@ -1004,7 +1036,6 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	
 	// Enable on the RX interrupt.
 	
-	config.PWR_UP = 1;
 	config.PRIM_RX = 1;
 	config.MASK_MAX_RT = 1;
 	config.MASK_TX_DS = 1;
@@ -1023,26 +1054,6 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	
 	// Set rate
 	
-	switch (rate)
-	{
-	case MIN_RATE:
-		rf_setup.RF_DR_LOW = 1; 
-		rf_setup.RF_DR_HIGH = 0;
-		break;
-	case MAX_RATE: 
-		rf_setup.RF_DR_LOW = 0; 
-		rf_setup.RF_DR_HIGH = 1;
-		break;
-	case MED_RATE:
-		rf_setup.RF_DR_LOW = 0; 
-		rf_setup.RF_DR_HIGH = 0;
-		break;
-	}
-	
-	rf_setup_mask.RF_DR_HIGH = 1;
-	rf_setup_mask.RF_DR_LOW = 1;
-
-	nrf24_package.Update.RF_SETUP(device_ptr, rf_setup, rf_setup_mask, &status); // Set RF settings
 	
 	enaa_mask.ENAA_P0 = 1;
 	enaa_mask.ENAA_P1 = 0;

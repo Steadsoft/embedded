@@ -375,7 +375,8 @@ struct nrf_action_interface
 	 */
 	void(* InitializeDevice)(NrfDevice_ptr device_ptr);
 	void(* ConfigureTransmitter)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t channel, bool auto_ack, uint8_t power, uint8_t rate);
-	void(* ConfigureReceiver)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t channel, uint8_t payload_size, uint8_t rate);
+	void(* ConfigureReceiver)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack,  uint8_t payload_sizee);
+	void(* ConfigureRadio)(NrfDevice_ptr device_ptr, uint8_t channel, uint8_t power, uint8_t rate, bool auto_ack);
 	void(* PowerDown)(NrfDevice_ptr);
 	void(* PowerUpDevice)(NrfDevice_ptr);
 	void(* PulseCE)(NrfDevice_ptr device_ptr);
