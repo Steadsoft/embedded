@@ -116,11 +116,11 @@ private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr
 private void InitializeDevice(NrfDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void R_RX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], bool auto_ack);
+private void ConfigureTransmitter(NrfDevice_ptr device_ptr, bool auto_ack);
 private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t payload_size);
 private void ConfigureRadio(NrfDevice_ptr device_ptr, uint8_t channel, uint8_t power, uint8_t rate, bool auto_ack);
 private void PulseCE(NrfDevice_ptr device_ptr);
-private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
+private void SendPayload(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t * buffer, uint8_t size);
 private void PowerUpDevice(NrfDevice_ptr device_ptr);
 private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max_spins);
 private void confirm_interrupt(volatile NrfInterrupt_ptr state_ptr);
@@ -245,16 +245,25 @@ private void SpinForTxInterrupt(NrfDevice_ptr device_ptr, int32_t max_spins)
 	wait_for_interrupt(&(device_ptr->tx_interrupt), max_spins);
 }
 
-private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size)
+private void SendPayload(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t * buffer, uint8_t size)
 {
 	NrfReg_STATUS status;
-	
+	NrfReg_TX_ADDR_LONG tx_addr = { 0 };
+
 	if (size == 0 || size > 32)
 	{
 		device_ptr->FaultHandler(device_ptr, INVALID_PAYLOAD_SIZE);
 		return;
 	}
 	
+	tx_addr.value[0] = address[0];
+	tx_addr.value[1] = address[1];
+	tx_addr.value[2] = address[2];
+	tx_addr.value[3] = address[3];
+	tx_addr.value[4] = address[4];
+
+	nrf24_package.Write.TX_ADDR_LONG(device_ptr, tx_addr, &status);
+
 	nrf24_package.Command.W_TX_PAYLOAD(device_ptr, buffer, size, &status);
 	
 	// We must now pulse CE high for > 10 uS for RF transmision to begin. See Page 23 of chip manual.
@@ -794,7 +803,7 @@ private void PowerDown(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
-private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], bool auto_ack)
+private void ConfigureTransmitter(NrfDevice_ptr device_ptr, bool auto_ack)
 {
 	NrfReg_STATUS status;
 	NrfReg_CONFIG config = { 0 };
@@ -811,14 +820,6 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, uint8_t address[5], 
 		nrf24_package.Write.EN_RXADDR(device_ptr, rxaddr, &status);
 	}
 
-	tx_addr.value[0] = address[0];
-	tx_addr.value[1] = address[1];
-	tx_addr.value[2] = address[2];
-	tx_addr.value[3] = address[3];
-	tx_addr.value[4] = address[4];
-
-	nrf24_package.Write.TX_ADDR_LONG(device_ptr, tx_addr, &status);
-	
 	// Clear interrupts
 	
 	status.RX_DR = 1;

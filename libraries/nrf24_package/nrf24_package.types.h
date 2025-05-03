@@ -374,13 +374,13 @@ struct nrf_action_interface
 	 * 
 	 */
 	void(* InitializeDevice)(NrfDevice_ptr device_ptr);
-	void(* ConfigureTransmitter)(NrfDevice_ptr device_ptr, uint8_t address[5], bool auto_ack);
+	void(* ConfigureTransmitter)(NrfDevice_ptr device_ptr, bool auto_ack);
 	void(* ConfigureReceiver)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack,  uint8_t payload_sizee);
 	void(* ConfigureRadio)(NrfDevice_ptr device_ptr, uint8_t channel, uint8_t power, uint8_t rate, bool auto_ack);
 	void(* PowerDown)(NrfDevice_ptr);
 	void(* PowerUpDevice)(NrfDevice_ptr);
 	void(* PulseCE)(NrfDevice_ptr device_ptr);
-	void(* SendPayload)(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
+	void(* SendPayload)(NrfDevice_ptr device_ptr, uint8_t address[], uint8_t * buffer, uint8_t size);
 	void(* SpinForTxInterrupt)(NrfDevice_ptr device_ptr, int32_t max_spins);
 	void(* WaitForRxInterrupt)(NrfDevice_ptr device_ptr, int32_t max_spins);
 	void(* ConfirmTxInterrupt)(NrfDevice_ptr device_ptr);

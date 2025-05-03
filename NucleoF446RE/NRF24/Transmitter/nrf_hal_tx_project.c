@@ -67,7 +67,7 @@ int main(void)
 	
 	nrf24_package.Action.ConfigureRadio(&device, 45, HIGH_POWER, MED_RATE, false);
 
-	nrf24_package.Action.ConfigureTransmitter(&device, E5E5E5E5E5, false);
+	nrf24_package.Action.ConfigureTransmitter(&device, false);
 	
 	nrf24_package.Action.PowerUpDevice(&device);
 
@@ -75,7 +75,7 @@ int main(void)
 	
 	while (1)
 	{
-		nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
+		nrf24_package.Action.SendPayload(&device, E5E5E5E5E5, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
 		nrf24_package.Action.SpinForTxInterrupt(&device,50000);
 		
 		pulse_led(1);
