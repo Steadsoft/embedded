@@ -41,15 +41,26 @@ int main(void)
 	
 	board_led_init();
 	
-	/// Perform all IO related initialization
+	/// Perform all hardware related initialization before doing anything else to the device
 	
-	nrf24_hal_support.ConfigureDevice(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
+	nrf24_hal_support.ConfigureHardware(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
 	
 	/// Force all registers into their hardware reset state.
 	
 	nrf24_package.Action.ResetDevice(&device);
 	nrf24_package.Action.InitializeDevice(&device);
-	nrf24_package.Action.ConfigureReceiver(&device, E5E5E5E5E5, 0, false, 45, 8, MED_RATE); 
+	
+	/// Set the RF related settings
+	
+	nrf24_package.Action.ConfigureRadio(&device, 45, HIGH_POWER, MED_RATE, false);
+	
+	/// Set receiver oriented settings
+	
+	nrf24_package.Action.ConfigureReceiver(&device, E5E5E5E5E5, 0, false, 8); 
+	
+	/// Power up the device.
+	
+	nrf24_package.Action.PowerUpDevice(&device);
 	
 	nrf24_package.Read.ALL_REGISTERS(&device, &all, &status);
 

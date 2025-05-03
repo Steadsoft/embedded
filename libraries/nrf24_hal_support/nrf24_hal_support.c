@@ -18,7 +18,7 @@ private void spi_set_ce_hi(NrfDevice_ptr);
 private void spi_set_csn_lo(NrfDevice_ptr);
 private void spi_set_csn_hi(NrfDevice_ptr);
 private void exchange_bytes(NrfDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count);
-private void ConfigureDevice(NrfSpiSetup_ptr spi_setup, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_type, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler);
+private void ConfigureHardware(NrfSpiSetup_ptr spi_setup, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_type, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler);
 private void pulse_led_forever(uint32_t interval);
 private void read_bytes(NrfDevice_ptr ptr, uint8_t bytes_in_ptr[], uint8_t count);
 private void write_bytes(NrfDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t count);
@@ -27,7 +27,7 @@ private void enable_clock_from_pin(uint64_t pin);
 // Declare the global library interface with same name as library
 public const nrf24_hal_support_struct nrf24_hal_support =
 {
-	.ConfigureDevice = ConfigureDevice,
+	.ConfigureHardware = ConfigureHardware,
 	.Deactivate = spi_set_ce_lo,
 	.Activate = spi_set_ce_hi,
 	.Select = spi_set_csn_lo,
@@ -121,7 +121,7 @@ private void pulse_led_forever(uint32_t interval)
 }
 // Configure the SPI and associated GPIO pins based on the supplied SPI base address.
 // The int pin, ce pin and cs pin are assumed to be on the same IO port as the specified SPI.
-private void ConfigureDevice(NrfSpiSetup_ptr spi_setup, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_type, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler)
+private void ConfigureHardware(NrfSpiSetup_ptr spi_setup, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_type, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler)
 {
 	HAL_StatusTypeDef status;
 	GPIO_InitTypeDef  GPIO_InitStruct_ctrl = { 0 };

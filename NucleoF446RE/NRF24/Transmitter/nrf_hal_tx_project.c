@@ -58,16 +58,19 @@ int main(void)
 		
 	/// Perform all IO related initialization
 	
-	nrf24_hal_support.ConfigureDevice(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
+	nrf24_hal_support.ConfigureHardware(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
 	
 	/// Force all registers into their hardware reset state.
 	
 	nrf24_package.Action.ResetDevice(&device);
 	nrf24_package.Action.InitializeDevice(&device);
+	
+	nrf24_package.Action.ConfigureRadio(&device, 45, HIGH_POWER, MED_RATE, false);
+
+	nrf24_package.Action.ConfigureTransmitter(&device, E5E5E5E5E5, false);
+	
 	nrf24_package.Action.PowerUpDevice(&device);
 
-	nrf24_package.Action.ConfigureTransmitter(&device, E5E5E5E5E5, 45, false, HIGH_POWER, MED_RATE);
-	
     nrf24_package.Read.ALL_REGISTERS(&device, &all, &status);
 	
 	while (1)
