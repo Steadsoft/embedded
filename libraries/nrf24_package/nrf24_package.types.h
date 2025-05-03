@@ -385,6 +385,7 @@ struct nrf_action_interface
 	void(* WaitForRxInterrupt)(NrfDevice_ptr device_ptr, int32_t max_spins);
 	void(* ConfirmTxInterrupt)(NrfDevice_ptr device_ptr);
 	void(* ConfirmRxInterrupt)(NrfDevice_ptr device_ptr);
+	void(* GetDefaultAddress)(uint8_t address[5]);
 };
 
 // These represent the documented commands

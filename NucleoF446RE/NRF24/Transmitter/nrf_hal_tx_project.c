@@ -28,7 +28,7 @@ int faults = 0;
 void pulse_led(uint32_t interval);
 void board_led_init(void);
 
-
+uint32_t  getUniqueID();
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
 
 void EXTI0_IRQPostHandler(NrfDevice_ptr device_ptr);
@@ -47,11 +47,17 @@ int main(void)
 	uint8_t buffer[32] = { 0 };
 	uint8_t * payload = "I AM A MESSAGE WITH LENGTH OF 32";
 	NrfReg_ALL_REGISTERS all = { 0 };
-	uint8_t E5E5E5E5E5[] = { 'R', 'A', 'D', 'I', 'O' }; //FIVE(E5); // this is just the default system reset value for the TX_ADDR reg
+	uint8_t radio_01[] = { 0x19, 0x51, 0x38, 0x31, 0x00 }; 
+	uint8_t radio_02[] = { 0x0F, 0x50, 0x33, 0x46, 0x00 }; 
+
+	uint32_t id;
 	
 	for (int X = 0; X < 32; X++) buffer[X] = 0xAA + X;
 	
 	HAL_Init();
+	
+	
+	id = getUniqueID();
 	
 	board_led_init();
 
@@ -75,18 +81,19 @@ int main(void)
 	
 	while (1)
 	{
-		nrf24_package.Action.SendPayload(&device, E5E5E5E5E5, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
+		nrf24_package.Action.SendPayload(&device, radio_01, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
 		nrf24_package.Action.SpinForTxInterrupt(&device,50000);
 		
 		pulse_led(1);
 		
 		HAL_Delay(50);
 		
-//		nrf24_package.Action.ConfigureTransmitter(&device, E7E7E7E7E7, 110, true, LOW_POWER, MIN_RATE);
-//		nrf24_package.Action.SendPayload(&device, payload, 32); // Literature indicates that reducing the size of the payload can improve range.
-//		nrf24_package.Action.WaitForTxInterrupt(&device,2000);		
+		nrf24_package.Action.SendPayload(&device, radio_02, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
+		nrf24_package.Action.SpinForTxInterrupt(&device, 50000);
 		
-		//HAL_Delay(250);
+		pulse_led(1);
+		
+		HAL_Delay(50);
 	}
 
 	return(0);
@@ -162,4 +169,16 @@ void pulse_led(uint32_t interval)
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 	HAL_Delay(interval);	
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+}
+
+
+
+
+uint32_t getUniqueID() {
+	uint32_t id1 = *(uint32_t*)0x1FFF7A10; // First 32 bits
+	uint32_t id2 = *(uint32_t*)0x1FFF7A14; // Second 32 bits
+	uint32_t id3 = *(uint32_t*)0x1FFF7A18; // Last 32 bits
+	
+	return id2;
+
 }

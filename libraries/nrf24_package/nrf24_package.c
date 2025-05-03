@@ -130,6 +130,8 @@ private void ConfirmTxInterrupt(NrfDevice_ptr);
 private void WaitForRxInterrupt(NrfDevice_ptr, int32_t);
 private void ConfirmRxInterrupt(NrfDevice_ptr);
 
+private void GetDefaultAddress(uint8_t address[5]);
+
 // Declare the global library interface with same name as library
 
 public const nrf24_package_struct nrf24_package =
@@ -206,7 +208,8 @@ public const nrf24_package_struct nrf24_package =
 		.SpinForTxInterrupt = SpinForTxInterrupt,
 		.ConfirmTxInterrupt = ConfirmTxInterrupt,
 		.WaitForRxInterrupt = WaitForRxInterrupt,
-		.ConfirmRxInterrupt = ConfirmRxInterrupt
+		.ConfirmRxInterrupt = ConfirmRxInterrupt,
+		.GetDefaultAddress = GetDefaultAddress
 
 	},
 	.Command =
@@ -224,6 +227,20 @@ public const nrf24_package_struct nrf24_package =
 };
 
 // Implementation 
+
+private void GetDefaultAddress(uint8_t address[5])
+{
+	uint32_t id1 = *(uint32_t*)0x1FFF7A10; // First 32 bits
+	uint32_t id2 = *(uint32_t*)0x1FFF7A14; // Second 32 bits
+	uint32_t id3 = *(uint32_t*)0x1FFF7A18; // Last 32 bits
+
+	address[4] = 0;
+	address[3] = (id2 & 0xFF000000) >> 24;
+	address[2] = (id2 & 0x00FF0000) >> 16;
+	address[1] = (id2 & 0x0000FF00) >> 8;
+	address[0] = (id2 & 0x000000FF) >> 0;
+}
+
 
 private void ConfirmTxInterrupt(NrfDevice_ptr device_ptr)
 {

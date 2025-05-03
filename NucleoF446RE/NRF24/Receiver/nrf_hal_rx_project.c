@@ -26,6 +26,7 @@ int faults = 0;
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
 void pulse_led(uint32_t interval);
 void board_led_init(void);
+uint32_t  getUniqueID();
 
 NrfDevice device = { 0 }; 
 
@@ -33,9 +34,10 @@ int main(void)
 {
 	NrfSpiSetup spi_setup = NUCLEO_F446RE;
 	NrfReg_STATUS status;
-	uint8_t E5E5E5E5E5[] = { 'R','A','D','I','O' }; //FIVE(E5); // this is just the default system reset value for the TX_ADDR reg
+	uint8_t this_board[5];
 	uint8_t buffer[32];
 	NrfReg_ALL_REGISTERS all = { 0 };
+	uint32_t id;
 
 	HAL_Init();
 	
@@ -56,7 +58,9 @@ int main(void)
 	
 	/// Set receiver oriented settings
 	
-	nrf24_package.Action.ConfigureReceiver(&device, E5E5E5E5E5, 0, false, 8); 
+	nrf24_package.Action.GetDefaultAddress(this_board);
+	
+	nrf24_package.Action.ConfigureReceiver(&device, this_board, 0, false, 8); 
 	
 	/// Power up the device.
 	
@@ -124,4 +128,13 @@ static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code)
 void __attribute__((weak)) ApplicationFaultHandler(char * LibName, char * LibMessage)
 {
 	faults++;
+}
+
+uint32_t getUniqueID() {
+	uint32_t id1 = *(uint32_t*)0x1FFF7A10; // First 32 bits
+	uint32_t id2 = *(uint32_t*)0x1FFF7A14; // Second 32 bits
+	uint32_t id3 = *(uint32_t*)0x1FFF7A18; // Last 32 bits
+	
+	return id2;
+
 }
