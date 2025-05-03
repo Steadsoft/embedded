@@ -33,13 +33,23 @@
 #define MED_RATE 0 // 1 Mbps
 #define MAX_RATE 2 // 2 Mbps
 
-#define NUCLEO_F446RE			\
+#define NRF_SPI_NUCLEO_F446RE	\
 {								\
+	.pin_alt  = GPIO_AF5_SPI2,	\
+	.cs_pin   = PB12,           \
 	.sck_pin  = PB13,			\
 	.miso_pin = PB14,			\
 	.mosi_pin = PB15,			\
-	.pin_alt  = GPIO_AF5_SPI2,	\
 	.spi      = SPI2			\
 }
+
+#define NRF_AUX_NUCLEO_F446RE		\
+{									\
+	.timer			= TIM1,			\
+	.nrf_int_type	= EXTI0_IRQn,   \
+	.nrf_int_pin	= PA0,			\
+	.nrf_ce_pin		= PA1,			\
+}
+
 
 #define FIVE(X) {0x##X, 0x##X, 0x##X, 0x##X, 0x##X}

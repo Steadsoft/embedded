@@ -32,7 +32,8 @@ NrfDevice device = { 0 };
 
 int main(void)
 {
-	NrfSpiSetup spi_setup = NUCLEO_F446RE;
+	NrfSpiSetup spi_settings = NRF_SPI_NUCLEO_F446RE;
+	NrfAuxSetup aux_settings = NRF_AUX_NUCLEO_F446RE;
 	NrfReg_STATUS status;
 	uint8_t this_board[5];
 	uint8_t buffer[32];
@@ -45,7 +46,7 @@ int main(void)
 	
 	/// Perform all hardware related initialization before doing anything else to the device
 	
-	nrf24_hal_support.ConfigureHardware(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
+	nrf24_hal_support.ConfigureHardware(&device, &spi_settings, &aux_settings, fault_handler); 
 	
 	/// Force all registers into their hardware reset state.
 	

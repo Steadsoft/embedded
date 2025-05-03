@@ -4,6 +4,8 @@ typedef struct nrf_io_interface NrfIoInterface, * NrfIoInterface_ptr;
 typedef struct nrf_io_callbacks NrfIoCallbacks, * NrfIoCallbacks_ptr;
 typedef struct nrf_device NrfDevice, * NrfDevice_ptr;
 typedef struct nrf_spi_setup NrfSpiSetup, * NrfSpiSetup_ptr;
+typedef struct nrf_aux_setup NrfAuxSetup, * NrfAuxSetup_ptr;
+
 typedef enum nrf_error_code NrfErrorCode;
 typedef void(*nrf_fault_handler)(NrfDevice_ptr device_ptr, NrfErrorCode code);
 typedef struct nrf_interrupt NrfInterrupt, * NrfInterrupt_ptr;

@@ -12,7 +12,7 @@ struct nrf24_hal_support_interface
 	 * @param cs_pin The GPIO pin number for the CSN (Chip Select Not) line.
 	 * @param device_ptr The returned configured device instance. 
 	*/
-	void(*ConfigureHardware)(NrfSpiSetup_ptr spi_setup, TIM_TypeDef * tim_base, uint64_t int_pin, uint32_t ext_int_id, uint64_t ce_pin, uint64_t cs_pin, NrfDevice_ptr device_ptr, nrf_fault_handler handler);
+	void(*ConfigureHardware)(NrfDevice_ptr device_ptr, NrfSpiSetup_ptr spi_setup, NrfAuxSetup_ptr, nrf_fault_handler handler);
 	/** 
 	 Sets the NRF device's CE pin to low
 	 */
@@ -69,6 +69,14 @@ struct nrf_spi_setup
 	uint64_t miso_pin;
 	uint64_t sck_pin;
 	SPI_TypeDef  * spi;
+};
+
+struct nrf_aux_setup
+{
+	TIM_TypeDef * timer;
+	IRQn_Type nrf_int_type;
+	uint64_t nrf_int_pin;
+	uint64_t nrf_ce_pin;
 };
 
 

@@ -42,7 +42,8 @@ int msgs_tx = 0;
 
 int main(void)
 {
-	NrfSpiSetup spi_setup = NUCLEO_F446RE;
+	NrfSpiSetup spi_setttings = NRF_SPI_NUCLEO_F446RE;
+	NrfAuxSetup aux_settings = NRF_AUX_NUCLEO_F446RE;
 	NrfReg_STATUS status;
 	uint8_t buffer[32] = { 0 };
 	uint8_t * payload = "I AM A MESSAGE WITH LENGTH OF 32";
@@ -64,7 +65,7 @@ int main(void)
 		
 	/// Perform all IO related initialization
 	
-	nrf24_hal_support.ConfigureHardware(&spi_setup, TIM1, PA0, EXTI0_IRQn, PA1, PB12, &device, fault_handler); 
+	nrf24_hal_support.ConfigureHardware(&device, &spi_setttings, &aux_settings, fault_handler); 
 	
 	/// Force all registers into their hardware reset state.
 	
@@ -86,14 +87,14 @@ int main(void)
 		
 		pulse_led(1);
 		
-		HAL_Delay(50);
+		HAL_Delay(20);
 		
 		nrf24_package.Action.SendPayload(&device, radio_02, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
 		nrf24_package.Action.SpinForTxInterrupt(&device, 50000);
 		
 		pulse_led(1);
 		
-		HAL_Delay(50);
+		HAL_Delay(20);
 	}
 
 	return(0);
