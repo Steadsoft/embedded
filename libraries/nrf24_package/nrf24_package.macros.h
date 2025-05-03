@@ -33,6 +33,9 @@
 #define MED_RATE 0 // 1 Mbps
 #define MAX_RATE 2 // 2 Mbps
 
+#define PIPE(X) (X)
+#define CHANNEL(X) (X)
+
 #define NRF_SPI_NUCLEO_F446RE	\
 {								\
 	.pin_alt  = GPIO_AF5_SPI2,	\

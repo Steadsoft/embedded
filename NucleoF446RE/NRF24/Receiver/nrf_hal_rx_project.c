@@ -26,7 +26,6 @@ int faults = 0;
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
 void pulse_led(uint32_t interval);
 void board_led_init(void);
-uint32_t  getUniqueID();
 
 NrfDevice device = { 0 }; 
 
@@ -35,11 +34,11 @@ int main(void)
 	NrfSpiSetup spi_settings = NRF_SPI_NUCLEO_F446RE;
 	NrfAuxSetup aux_settings = NRF_AUX_NUCLEO_F446RE;
 	NrfReg_STATUS status;
-	uint8_t this_board[5];
+	uint8_t this_boards_address[5];
 	uint8_t buffer[32];
 	NrfReg_ALL_REGISTERS all = { 0 };
-	uint32_t id;
-
+	uint8_t payload_size = 8;
+	
 	HAL_Init();
 	
 	board_led_init();
@@ -48,31 +47,29 @@ int main(void)
 	
 	nrf24_hal_support.ConfigureHardware(&device, &spi_settings, &aux_settings, fault_handler); 
 	
-	/// Force all registers into their hardware reset state.
+	/// Force all registers into their hardware reset state and set initiall values
 	
 	nrf24_package.Action.ResetDevice(&device);
 	nrf24_package.Action.InitializeDevice(&device);
 	
 	/// Set the RF related settings
 	
-	nrf24_package.Action.ConfigureRadio(&device, 45, HIGH_POWER, MED_RATE, false);
+	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(45), HIGH_POWER, MED_RATE, false);
 	
 	/// Set receiver oriented settings
 	
-	nrf24_package.Action.GetDefaultAddress(this_board);
+	nrf24_package.Action.GetDefaultAddress(this_boards_address);
 	
-	nrf24_package.Action.ConfigureReceiver(&device, this_board, 0, false, 8); 
+	nrf24_package.Action.ConfigureReceiver(&device, this_boards_address, PIPE(0), false, payload_size); 
 	
 	/// Power up the device.
 	
 	nrf24_package.Action.PowerUpDevice(&device);
 	
-	nrf24_package.Read.ALL_REGISTERS(&device, &all, &status);
-
 	while (1)
 	{
 		nrf24_package.Action.WaitForRxInterrupt(&device, -1);
-		nrf24_package.Command.R_RX_PAYLOAD(&device, buffer, 8, &status);
+		nrf24_package.Command.R_RX_PAYLOAD(&device, buffer, payload_size, &status);
 		pulse_led(1);
 	}
 
@@ -131,11 +128,3 @@ void __attribute__((weak)) ApplicationFaultHandler(char * LibName, char * LibMes
 	faults++;
 }
 
-uint32_t getUniqueID() {
-	uint32_t id1 = *(uint32_t*)0x1FFF7A10; // First 32 bits
-	uint32_t id2 = *(uint32_t*)0x1FFF7A14; // Second 32 bits
-	uint32_t id3 = *(uint32_t*)0x1FFF7A18; // Last 32 bits
-	
-	return id2;
-
-}

@@ -28,7 +28,6 @@ int faults = 0;
 void pulse_led(uint32_t interval);
 void board_led_init(void);
 
-uint32_t  getUniqueID();
 static void fault_handler(NrfDevice_ptr device_ptr, NrfErrorCode code);
 
 void EXTI0_IRQPostHandler(NrfDevice_ptr device_ptr);
@@ -57,11 +56,7 @@ int main(void)
 	
 	HAL_Init();
 	
-	
-	id = getUniqueID();
-	
 	board_led_init();
-
 		
 	/// Perform all IO related initialization
 	
@@ -72,14 +67,12 @@ int main(void)
 	nrf24_package.Action.ResetDevice(&device);
 	nrf24_package.Action.InitializeDevice(&device);
 	
-	nrf24_package.Action.ConfigureRadio(&device, 45, HIGH_POWER, MED_RATE, false);
+	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(45), HIGH_POWER, MED_RATE, false);
 
 	nrf24_package.Action.ConfigureTransmitter(&device, false);
 	
 	nrf24_package.Action.PowerUpDevice(&device);
 
-    nrf24_package.Read.ALL_REGISTERS(&device, &all, &status);
-	
 	while (1)
 	{
 		nrf24_package.Action.SendPayload(&device, radio_01, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
@@ -87,14 +80,14 @@ int main(void)
 		
 		pulse_led(1);
 		
-		HAL_Delay(20);
+		HAL_Delay(50);
 		
 		nrf24_package.Action.SendPayload(&device, radio_02, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
 		nrf24_package.Action.SpinForTxInterrupt(&device, 50000);
 		
 		pulse_led(1);
 		
-		HAL_Delay(20);
+		HAL_Delay(50);
 	}
 
 	return(0);
@@ -170,16 +163,4 @@ void pulse_led(uint32_t interval)
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 	HAL_Delay(interval);	
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-}
-
-
-
-
-uint32_t getUniqueID() {
-	uint32_t id1 = *(uint32_t*)0x1FFF7A10; // First 32 bits
-	uint32_t id2 = *(uint32_t*)0x1FFF7A14; // Second 32 bits
-	uint32_t id3 = *(uint32_t*)0x1FFF7A18; // Last 32 bits
-	
-	return id2;
-
 }
