@@ -1,6 +1,7 @@
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <malloc.h>
+#include <stdio.h>
 #include <stm32f4xx_hal.h>
 #include <nrf24_hal_support.library.h>
 #include <nrf24_package.library.h>
@@ -72,22 +73,29 @@ int main(void)
 	nrf24_package.Action.ConfigureTransmitter(&device, false);
 	
 	nrf24_package.Action.PowerUpDevice(&device);
-
+	
+	nrf24_package.Action.DumpRegisters(&device);
+	
 	while (1)
 	{
-		nrf24_package.Action.SendPayload(&device, radio_01, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
-		nrf24_package.Action.SpinForTxInterrupt(&device,50000);
+		for (int C = 0; C < 100; C++)
+		{
+			nrf24_package.Action.SendPayload(&device, radio_01, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
+			nrf24_package.Action.SpinForTxInterrupt(&device,50000);
 		
-		pulse_led(1);
+			pulse_led(1);
 		
-		HAL_Delay(50);
+			HAL_Delay(50);
 		
-		nrf24_package.Action.SendPayload(&device, radio_02, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
-		nrf24_package.Action.SpinForTxInterrupt(&device, 50000);
+			nrf24_package.Action.SendPayload(&device, radio_02, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
+			nrf24_package.Action.SpinForTxInterrupt(&device, 50000);
 		
-		pulse_led(1);
+			pulse_led(1);
 		
-		HAL_Delay(50);
+			HAL_Delay(50);
+		}
+		
+		HAL_Delay(30000);
 	}
 
 	return(0);

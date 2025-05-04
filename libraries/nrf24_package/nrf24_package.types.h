@@ -108,7 +108,7 @@ Remember that the address is transmitted every time you send a packet so having 
 to transmit can be beneficial in some applications but the robustness of having more bytes 
 may be useful in other applications.
 */
-struct NrfReg_SETUP_AW_struct
+struct	NrfReg_SETUP_AW_struct
 {
 	uint8_t AW : 2;
 	uint8_t RESERVED : 6;
@@ -151,7 +151,7 @@ struct NrfReg_SETUP_RETR_struct
  same frequency. Also needless to say you get 126 RF channels to chose from. 
  000000 is not acceptable, hence why you dont have 127. 
 */
-struct NrfReg_RF_CH_struct
+struct	NrfReg_RF_CH_struct
 {
 	uint8_t RF_CH : 7;
 	uint8_t RESERVED : 1;
@@ -386,6 +386,7 @@ struct nrf_action_interface
 	void(* ConfirmTxInterrupt)(NrfDevice_ptr device_ptr);
 	void(* ConfirmRxInterrupt)(NrfDevice_ptr device_ptr);
 	void(* GetDefaultAddress)(uint8_t address[5]);
+	void(* DumpRegisters)(NrfDevice_ptr device_ptr);
 };
 
 // These represent the documented commands

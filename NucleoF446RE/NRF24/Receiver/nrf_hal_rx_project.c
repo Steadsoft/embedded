@@ -66,6 +66,9 @@ int main(void)
 	
 	nrf24_package.Action.PowerUpDevice(&device);
 	
+	nrf24_package.Action.DumpRegisters(&device);
+
+	
 	while (1)
 	{
 		nrf24_package.Action.WaitForRxInterrupt(&device, -1);

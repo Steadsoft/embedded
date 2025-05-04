@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include <stdint.h>
+#include <stdio.h>
 #include <stm32f4xx_hal.h>
 
 // Include all required library headers
@@ -131,6 +132,7 @@ private void WaitForRxInterrupt(NrfDevice_ptr, int32_t);
 private void ConfirmRxInterrupt(NrfDevice_ptr);
 
 private void GetDefaultAddress(uint8_t address[5]);
+private void DumpRegisters(NrfDevice_ptr device_ptr);
 
 // Declare the global library interface with same name as library
 
@@ -209,7 +211,8 @@ public const nrf24_package_struct nrf24_package =
 		.ConfirmTxInterrupt = ConfirmTxInterrupt,
 		.WaitForRxInterrupt = WaitForRxInterrupt,
 		.ConfirmRxInterrupt = ConfirmRxInterrupt,
-		.GetDefaultAddress = GetDefaultAddress
+		.GetDefaultAddress = GetDefaultAddress,
+		.DumpRegisters = DumpRegisters
 
 	},
 	.Command =
@@ -228,6 +231,159 @@ public const nrf24_package_struct nrf24_package =
 
 // Implementation 
 
+
+private void DumpRegisters(NrfDevice_ptr device_ptr)
+{
+	NrfReg_ALL_REGISTERS all = { 0 };
+	NrfReg_STATUS status;
+
+	nrf24_package.Read.ALL_REGISTERS(device_ptr, &all, &status);
+
+	printf("NRF REGISTER DUMP\n");
+	printf(" CONFIG\n");
+	printf("  RESERVED    = %d\n", all.CONFIG.RESERVED);
+	printf("  MASK_RX_DR  = %d\n", all.CONFIG.MASK_RX_DR);
+	printf("  MASK_TX_DS  = %d\n", all.CONFIG.MASK_TX_DS);
+	printf("  MASK_MAX_RT = %d\n", all.CONFIG.MASK_MAX_RT);
+	printf("  EN_CRC      = %d\n", all.CONFIG.EN_CRC);
+	printf("  CRCO        = %d\n", all.CONFIG.CRCO);
+	printf("  PWR_UP      = %d\n", all.CONFIG.PWR_UP);
+	printf("  PRIM_RX     = %d\n", all.CONFIG.PRIM_RX);
+	printf("\n");
+	
+	printf(" EN_AA\n");
+	printf("  RESERVED    = %d\n", all.EN_AA.RESERVED);
+	printf("  ENAA_P5     = %d\n", all.EN_AA.ENAA_P5);
+	printf("  ENAA_P4     = %d\n", all.EN_AA.ENAA_P4);
+	printf("  ENAA_P3     = %d\n", all.EN_AA.ENAA_P3);
+	printf("  ENAA_P2     = %d\n", all.EN_AA.ENAA_P2);
+	printf("  ENAA_P1     = %d\n", all.EN_AA.ENAA_P1);
+	printf("  ENAA_P0     = %d\n", all.EN_AA.ENAA_P0);
+	printf("\n");
+
+	printf(" EN_RXADDR\n");
+	printf("  RESERVED    = %d\n", all.EN_RXADDR.RESERVED);
+	printf("  ERX_P5      = %d\n", all.EN_RXADDR.ERX_P5);
+	printf("  ERX_P4      = %d\n", all.EN_RXADDR.ERX_P4);
+	printf("  ERX_P3      = %d\n", all.EN_RXADDR.ERX_P3);
+	printf("  ERX_P2      = %d\n", all.EN_RXADDR.ERX_P2);
+	printf("  ERX_P1      = %d\n", all.EN_RXADDR.ERX_P1);
+	printf("  ERX_P0      = %d\n", all.EN_RXADDR.ERX_P0);
+	printf("\n");
+
+	printf(" SETUP_AW\n");
+	printf("  RESERVED    = %d\n", all.SETUP_AW.RESERVED);
+	printf("  AW          = %d\n", all.SETUP_AW.AW);
+	printf("\n");
+
+	printf(" SETUP_RETR\n");
+	printf("  ARD         = %d\n", all.SETUP_RETR.ARD);
+	printf("  ARC         = %d\n", all.SETUP_RETR.ARC);
+	printf("\n");
+
+	printf(" RF_CH\n");
+	printf("  RESERVED    = %d\n", all.RF_CH.RESERVED);
+	printf("  RF_CH       = %d\n", all.RF_CH.RF_CH);
+	printf("\n");
+
+	printf(" RF_SETUP\n");
+	printf("  CONT_WAVE   = %d\n", all.RF_SETUP.CONT_WAVE);
+	printf("  RESERVED    = %d\n", all.RF_SETUP.RESERVED);
+	printf("  RF_DR_LOW   = %d\n", all.RF_SETUP.RF_DR_LOW);
+	printf("  PLL_LOCK    = %d\n", all.RF_SETUP.PLL_LOCK);
+	printf("  RF_DR_HIGH  = %d\n", all.RF_SETUP.RF_DR_HIGH);
+	printf("  RF_PWR      = %d\n", all.RF_SETUP.RF_PWR);
+	printf("  OBSOLETE    = %d\n", all.RF_SETUP.OBSOLETE);
+	printf("\n");
+
+	printf(" STATUS\n");
+	printf("  RESERVED    = %d\n", all.STATUS.RESERVED);
+	printf("  RX_DR       = %d\n", all.STATUS.RX_DR);
+	printf("  TX_DS       = %d\n", all.STATUS.TX_DS);
+	printf("  MAX_RT      = %d\n", all.STATUS.MAX_RT);
+	printf("  RX_P_NO     = %d\n", all.STATUS.RX_P_NO);
+	printf("  TX_FULL     = %d\n", all.STATUS.TX_FULL);
+	printf("\n");
+
+	printf(" OBSERVE_TX\n");
+	printf("  PLOS_CNT    = %d\n", all.OBSERVE_TX.PLOS_CNT);
+	printf("  ARC_CNT     = %d\n", all.OBSERVE_TX.ARC_CNT);
+	printf("\n");
+
+	printf(" RPD\n");
+	printf("  RESERVED    = %d\n", all.RPD.RESERVED);
+	printf("  RPD         = %d\n", all.RPD.RPD);
+	printf("\n");
+
+	printf(" RX_ADDR_P0   = %02X %02X %02X %02X %02X\n", all.RX_ADDR_P0.value[0], all.RX_ADDR_P0.value[1], all.RX_ADDR_P0.value[2], all.RX_ADDR_P0.value[3], all.RX_ADDR_P0.value[4]);
+	printf(" RX_ADDR_P1   = %02X %02X %02X %02X %02X\n", all.RX_ADDR_P1.value[0], all.RX_ADDR_P1.value[1], all.RX_ADDR_P1.value[2], all.RX_ADDR_P1.value[3], all.RX_ADDR_P1.value[4]);
+	printf(" RX_ADDR_P2   = %02X\n", all.RX_ADDR_P2.value);
+	printf(" RX_ADDR_P3   = %02X\n", all.RX_ADDR_P3.value);
+	printf(" RX_ADDR_P4   = %02X\n", all.RX_ADDR_P4.value);
+	printf(" RX_ADDR_P5   = %02X\n", all.RX_ADDR_P5.value);
+	printf("\n");
+
+	printf(" TX_ADDR      = %02X %02X %02X %02X %02X\n", all.TX_ADDR.value[0], all.TX_ADDR.value[1], all.TX_ADDR.value[2], all.TX_ADDR.value[3], all.TX_ADDR.value[4]);
+	printf("\n");
+
+	printf(" RX_PW_0\n");
+	printf("  RESERVED    = %d\n", all.RX_PW_P0.RESERVED);
+	printf("  RX_PW_P0    = %d\n", all.RX_PW_P0.RX_PW_LEN);
+	printf("\n");
+
+	printf(" RX_PW_1\n");
+	printf("  RESERVED    = %d\n", all.RX_PW_P1.RESERVED);
+	printf("  RX_PW_P1    = %d\n", all.RX_PW_P1.RX_PW_LEN);
+	printf("\n");
+	
+	printf(" RX_PW_2\n");
+	printf("  RESERVED    = %d\n", all.RX_PW_P2.RESERVED);
+	printf("  RX_PW_P2    = %d\n", all.RX_PW_P2.RX_PW_LEN);
+	printf("\n");
+	
+	printf(" RX_PW_3\n");
+	printf("  RESERVED    = %d\n", all.RX_PW_P3.RESERVED);
+	printf("  RX_PW_P3    = %d\n", all.RX_PW_P3.RX_PW_LEN);
+	printf("\n");
+	
+	printf(" RX_PW_4\n");
+	printf("  RESERVED    = %d\n", all.RX_PW_P4.RESERVED);
+	printf("  RX_PW_P4    = %d\n", all.RX_PW_P4.RX_PW_LEN);
+	printf("\n");
+	
+	printf(" RX_PW_5\n");
+	printf("  RESERVED    = %d\n", all.RX_PW_P5.RESERVED);
+	printf("  RX_PW_P5    = %d\n", all.RX_PW_P5.RX_PW_LEN);
+	printf("\n");
+
+	printf(" FIFO_STATUS\n");
+	printf("  RESERVED    = %d\n", all.FIFO_STATUS.RESERVED0);
+	printf("  TX_REUSE    = %d\n", all.FIFO_STATUS.TX_REUSE);
+	printf("  TX_FULL     = %d\n", all.FIFO_STATUS.TX_FULL);
+	printf("  TX_EMPTY    = %d\n", all.FIFO_STATUS.TX_EMPTY);
+	printf("  RESERVED    = %d\n", all.FIFO_STATUS.RESERVED1);
+	printf("  RX_FULL     = %d\n", all.FIFO_STATUS.RX_FULL);
+	printf("  RX_EMPTY    = %d\n", all.FIFO_STATUS.RX_EMPTY);
+	printf("\n");
+	
+	printf(" DYNPD\n");
+	printf("  RESERVED    = %d\n", all.DYNPD.RESERVED);
+	printf("  DPL_P5      = %d\n", all.DYNPD.DPL_P5);
+	printf("  DPL_P4      = %d\n", all.DYNPD.DPL_P4);
+	printf("  DPL_P3      = %d\n", all.DYNPD.DPL_P3);
+	printf("  DPL_P2      = %d\n", all.DYNPD.DPL_P2);
+	printf("  DPL_P1      = %d\n", all.DYNPD.DPL_P1);
+	printf("  DPL_P0      = %d\n", all.DYNPD.DPL_P0);
+	printf("\n");
+
+	printf(" FEATURE\n");
+	printf("  RESERVED    = %d\n", all.FEATURE.RESERVED);
+	printf("  EN_DPL      = %d\n", all.FEATURE.EN_DPL);
+	printf("  EN_ACK_PAY  = %d\n", all.FEATURE.EN_ACK_PAY);
+	printf("  EN_DYN_ACK  = %d\n", all.FEATURE.EN_DYN_ACK);
+	printf("\n");
+
+}
 private void GetDefaultAddress(uint8_t address[5])
 {
 	uint32_t id1 = *(uint32_t*)0x1FFF7A10; // First 32 bits
