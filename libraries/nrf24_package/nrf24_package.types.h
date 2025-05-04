@@ -380,13 +380,18 @@ struct nrf_action_interface
 	void(* PowerDown)(NrfDevice_ptr);
 	void(* PowerUpDevice)(NrfDevice_ptr);
 	void(* PulseCE)(NrfDevice_ptr device_ptr);
-	void(* SendPayload)(NrfDevice_ptr device_ptr, uint8_t address[], uint8_t * buffer, uint8_t size);
+	void(* SendPayload)(NrfDevice_ptr device_ptr,  uint8_t * buffer, uint8_t size);
 	void(* SpinForTxInterrupt)(NrfDevice_ptr device_ptr, int32_t max_spins);
 	void(* WaitForRxInterrupt)(NrfDevice_ptr device_ptr, int32_t max_spins);
 	void(* ConfirmTxInterrupt)(NrfDevice_ptr device_ptr);
 	void(* ConfirmRxInterrupt)(NrfDevice_ptr device_ptr);
 	void(* GetDefaultAddress)(uint8_t address[5]);
 	void(* DumpRegisters)(NrfDevice_ptr device_ptr);
+	void(* SetTransmitAddress)(NrfDevice_ptr device_ptr, uint8_t address[5]);
+	void(* SetReceiveAddressLong)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe); // pipes 0 and 1
+	void(* SetReceiveAddressShort)(NrfDevice_ptr device_ptr, uint8_t address, uint8_t pipe); // pipes 2,3,4 and 5
+	void(* SetAutoAck)(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
+	void(* SetPipeStatus)(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
 };
 
 // These represent the documented commands

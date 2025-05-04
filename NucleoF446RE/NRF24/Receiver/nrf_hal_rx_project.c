@@ -35,6 +35,7 @@ int main(void)
 	NrfAuxSetup aux_settings = NRF_AUX_NUCLEO_F446RE;
 	NrfReg_STATUS status;
 	uint8_t this_boards_address[5];
+	uint8_t ack_address[5] = { 0x33, 0x33, 0x33, 0x33, 0x33 };
 	uint8_t buffer[32];
 	NrfReg_ALL_REGISTERS all = { 0 };
 	uint8_t payload_size = 8;
@@ -60,7 +61,17 @@ int main(void)
 	
 	nrf24_package.Action.GetDefaultAddress(this_boards_address);
 	
-	nrf24_package.Action.ConfigureReceiver(&device, this_boards_address, PIPE(0), false, payload_size); 
+	nrf24_package.Action.ConfigureReceiver(&device, ack_address, PIPE(0), false, payload_size); 
+	nrf24_package.Action.ConfigureReceiver(&device, this_boards_address, PIPE(1), false, payload_size); 
+
+	nrf24_package.Action.SetReceiveAddressLong(&device, ack_address, PIPE(0));
+	nrf24_package.Action.SetAutoAck(&device, PIPE(0), true);
+	nrf24_package.Action.SetPipeStatus(&device, PIPE(0), true);
+
+	
+	nrf24_package.Action.SetReceiveAddressLong(&device, this_boards_address, PIPE(1));
+	nrf24_package.Action.SetAutoAck(&device, PIPE(1), true);
+	nrf24_package.Action.SetPipeStatus(&device, PIPE(1), true);
 	
 	/// Power up the device.
 	

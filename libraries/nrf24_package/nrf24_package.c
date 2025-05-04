@@ -121,7 +121,7 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, bool auto_ack);
 private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t payload_size);
 private void ConfigureRadio(NrfDevice_ptr device_ptr, uint8_t channel, uint8_t power, uint8_t rate, bool auto_ack);
 private void PulseCE(NrfDevice_ptr device_ptr);
-private void SendPayload(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t * buffer, uint8_t size);
+private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
 private void PowerUpDevice(NrfDevice_ptr device_ptr);
 private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max_spins);
 private void confirm_interrupt(volatile NrfInterrupt_ptr state_ptr);
@@ -133,6 +133,11 @@ private void ConfirmRxInterrupt(NrfDevice_ptr);
 
 private void GetDefaultAddress(uint8_t address[5]);
 private void DumpRegisters(NrfDevice_ptr device_ptr);
+private void SetTransmitAddress(NrfDevice_ptr device_ptr, uint8_t address[5]);
+private void SetReceiveAddressLong(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe); // pipes 0 and 1
+private void SetReceiveAddressShort(NrfDevice_ptr device_ptr, uint8_t address, uint8_t pipe); // pipes 2,3,4 and 5
+private void SetAutoAck(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
+private void SetPipeStatus(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
 
 // Declare the global library interface with same name as library
 
@@ -212,7 +217,12 @@ public const nrf24_package_struct nrf24_package =
 		.WaitForRxInterrupt = WaitForRxInterrupt,
 		.ConfirmRxInterrupt = ConfirmRxInterrupt,
 		.GetDefaultAddress = GetDefaultAddress,
-		.DumpRegisters = DumpRegisters
+		.DumpRegisters = DumpRegisters,
+		.SetTransmitAddress = SetTransmitAddress,
+		.SetReceiveAddressLong = SetReceiveAddressLong,
+		.SetReceiveAddressShort = SetReceiveAddressShort,
+		.SetAutoAck = SetAutoAck,
+		.SetPipeStatus = SetPipeStatus,
 
 	},
 	.Command =
@@ -231,6 +241,118 @@ public const nrf24_package_struct nrf24_package =
 
 // Implementation 
 
+private void SetReceiveAddressLong(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe)
+{
+	NrfReg_STATUS status;
+	NrfReg_RX_ADDR_LONG rx_addr = { 0 };
+	
+	rx_addr.value[0] = address[0];
+	rx_addr.value[1] = address[1];
+	rx_addr.value[2] = address[2];
+	rx_addr.value[3] = address[3];
+	rx_addr.value[4] = address[4];
+	nrf24_package.Write.RX_ADDR_LONG(device_ptr, rx_addr, pipe, &status);
+}
+
+private void SetReceiveAddressShort(NrfDevice_ptr device_ptr, uint8_t address, uint8_t pipe)
+{
+	NrfReg_STATUS status;
+	NrfReg_RX_ADDR_SHORT rx_addr = { 0 };
+	
+	rx_addr.value = address;
+	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, rx_addr, pipe, &status);
+}
+
+private void SetAutoAck(NrfDevice_ptr device_ptr, uint8_t pipe, bool state)
+{
+	NrfReg_STATUS status;
+	NrfReg_EN_AA en_aa = { 0 };
+	NrfReg_EN_AA mask = { 0 };
+	
+	switch (pipe)
+	{
+		
+	case 0:
+		en_aa.ENAA_P0 = state;	
+		mask.ENAA_P0 = 1;
+		break;
+	case 1:
+		en_aa.ENAA_P1 = state;	
+		mask.ENAA_P1 = 1;
+		break;
+	case 2:
+		en_aa.ENAA_P2 = state;	
+		mask.ENAA_P2 = 1;
+		break;
+	case 3:
+		en_aa.ENAA_P3 = state;	
+		mask.ENAA_P3 = 1;
+		break;
+	case 4:
+		en_aa.ENAA_P4 = state;	
+		mask.ENAA_P4 = 1;
+		break;
+	case 5:
+		en_aa.ENAA_P5 = state;	
+		mask.ENAA_P5 = 1;
+		break;
+	}
+	
+	nrf24_package.Update.EN_AA(device_ptr, en_aa,mask, &status);
+}
+
+private void SetPipeStatus(NrfDevice_ptr device_ptr, uint8_t pipe, bool state)
+{
+	NrfReg_STATUS status;
+	NrfReg_EN_RXADDR en_rxaddr = { 0 };
+	NrfReg_EN_RXADDR mask = { 0 };
+	
+	switch (pipe)
+	{
+		
+	case 0:
+		en_rxaddr.ERX_P0 = state;	
+		mask.ERX_P0 = 1;
+		break;
+	case 1:
+		en_rxaddr.ERX_P1 = state;	
+		mask.ERX_P1 = 1;
+		break;
+	case 2:
+		en_rxaddr.ERX_P2 = state;	
+		mask.ERX_P2 = 1;
+		break;
+	case 3:
+		en_rxaddr.ERX_P3 = state;	
+		mask.ERX_P3 = 1;
+		break;
+	case 4:
+		en_rxaddr.ERX_P4 = state;	
+		mask.ERX_P4 = 1;
+		break;
+	case 5:
+		en_rxaddr.ERX_P5 = state;	
+		mask.ERX_P5 = 1;
+		break;
+	}
+	
+	nrf24_package.Update.EN_RXADDR(device_ptr, en_rxaddr, mask, &status);
+}
+
+private void SetTransmitAddress(NrfDevice_ptr device_ptr, uint8_t address[5])
+{
+	NrfReg_STATUS status;
+	NrfReg_TX_ADDR_LONG tx_addr = { 0 };
+	
+	tx_addr.value[0] = address[0];
+	tx_addr.value[1] = address[1];
+	tx_addr.value[2] = address[2];
+	tx_addr.value[3] = address[3];
+	tx_addr.value[4] = address[4];
+
+	nrf24_package.Write.TX_ADDR_LONG(device_ptr, tx_addr, &status);
+
+}
 
 private void DumpRegisters(NrfDevice_ptr device_ptr)
 {
@@ -239,8 +361,8 @@ private void DumpRegisters(NrfDevice_ptr device_ptr)
 
 	nrf24_package.Read.ALL_REGISTERS(device_ptr, &all, &status);
 
-	printf("NRF REGISTER DUMP\n");
-	printf(" CONFIG\n");
+	printf("NRF24L01+ REGISTER DUMP\n");
+	printf(" CONFIG (%02X)\n",all.CONFIG);
 	printf("  RESERVED    = %d\n", all.CONFIG.RESERVED);
 	printf("  MASK_RX_DR  = %d\n", all.CONFIG.MASK_RX_DR);
 	printf("  MASK_TX_DS  = %d\n", all.CONFIG.MASK_TX_DS);
@@ -251,7 +373,7 @@ private void DumpRegisters(NrfDevice_ptr device_ptr)
 	printf("  PRIM_RX     = %d\n", all.CONFIG.PRIM_RX);
 	printf("\n");
 	
-	printf(" EN_AA\n");
+	printf(" EN_AA (%02X)\n",all.EN_AA);
 	printf("  RESERVED    = %d\n", all.EN_AA.RESERVED);
 	printf("  ENAA_P5     = %d\n", all.EN_AA.ENAA_P5);
 	printf("  ENAA_P4     = %d\n", all.EN_AA.ENAA_P4);
@@ -261,7 +383,7 @@ private void DumpRegisters(NrfDevice_ptr device_ptr)
 	printf("  ENAA_P0     = %d\n", all.EN_AA.ENAA_P0);
 	printf("\n");
 
-	printf(" EN_RXADDR\n");
+	printf(" EN_RXADDR (%02X)\n",all.EN_RXADDR);
 	printf("  RESERVED    = %d\n", all.EN_RXADDR.RESERVED);
 	printf("  ERX_P5      = %d\n", all.EN_RXADDR.ERX_P5);
 	printf("  ERX_P4      = %d\n", all.EN_RXADDR.ERX_P4);
@@ -271,22 +393,22 @@ private void DumpRegisters(NrfDevice_ptr device_ptr)
 	printf("  ERX_P0      = %d\n", all.EN_RXADDR.ERX_P0);
 	printf("\n");
 
-	printf(" SETUP_AW\n");
+	printf(" SETUP_AW (%02X)\n",all.SETUP_AW);
 	printf("  RESERVED    = %d\n", all.SETUP_AW.RESERVED);
 	printf("  AW          = %d\n", all.SETUP_AW.AW);
 	printf("\n");
 
-	printf(" SETUP_RETR\n");
+	printf(" SETUP_RETR (%02X)\n", all.SETUP_RETR);
 	printf("  ARD         = %d\n", all.SETUP_RETR.ARD);
 	printf("  ARC         = %d\n", all.SETUP_RETR.ARC);
 	printf("\n");
 
-	printf(" RF_CH\n");
+	printf(" RF_CH (%02X)\n", all.RF_CH);
 	printf("  RESERVED    = %d\n", all.RF_CH.RESERVED);
 	printf("  RF_CH       = %d\n", all.RF_CH.RF_CH);
 	printf("\n");
 
-	printf(" RF_SETUP\n");
+	printf(" RF_SETUP (%02X)\n",all.RF_SETUP);
 	printf("  CONT_WAVE   = %d\n", all.RF_SETUP.CONT_WAVE);
 	printf("  RESERVED    = %d\n", all.RF_SETUP.RESERVED);
 	printf("  RF_DR_LOW   = %d\n", all.RF_SETUP.RF_DR_LOW);
@@ -296,7 +418,7 @@ private void DumpRegisters(NrfDevice_ptr device_ptr)
 	printf("  OBSOLETE    = %d\n", all.RF_SETUP.OBSOLETE);
 	printf("\n");
 
-	printf(" STATUS\n");
+	printf(" STATUS (%02X)\n",all.STATUS);
 	printf("  RESERVED    = %d\n", all.STATUS.RESERVED);
 	printf("  RX_DR       = %d\n", all.STATUS.RX_DR);
 	printf("  TX_DS       = %d\n", all.STATUS.TX_DS);
@@ -305,58 +427,58 @@ private void DumpRegisters(NrfDevice_ptr device_ptr)
 	printf("  TX_FULL     = %d\n", all.STATUS.TX_FULL);
 	printf("\n");
 
-	printf(" OBSERVE_TX\n");
+	printf(" OBSERVE_TX (%02X)\n",all.OBSERVE_TX);
 	printf("  PLOS_CNT    = %d\n", all.OBSERVE_TX.PLOS_CNT);
 	printf("  ARC_CNT     = %d\n", all.OBSERVE_TX.ARC_CNT);
 	printf("\n");
 
-	printf(" RPD\n");
+	printf(" RPD (%02X)\n",all.RPD);
 	printf("  RESERVED    = %d\n", all.RPD.RESERVED);
 	printf("  RPD         = %d\n", all.RPD.RPD);
 	printf("\n");
 
-	printf(" RX_ADDR_P0   = %02X %02X %02X %02X %02X\n", all.RX_ADDR_P0.value[0], all.RX_ADDR_P0.value[1], all.RX_ADDR_P0.value[2], all.RX_ADDR_P0.value[3], all.RX_ADDR_P0.value[4]);
-	printf(" RX_ADDR_P1   = %02X %02X %02X %02X %02X\n", all.RX_ADDR_P1.value[0], all.RX_ADDR_P1.value[1], all.RX_ADDR_P1.value[2], all.RX_ADDR_P1.value[3], all.RX_ADDR_P1.value[4]);
-	printf(" RX_ADDR_P2   = %02X\n", all.RX_ADDR_P2.value);
-	printf(" RX_ADDR_P3   = %02X\n", all.RX_ADDR_P3.value);
-	printf(" RX_ADDR_P4   = %02X\n", all.RX_ADDR_P4.value);
-	printf(" RX_ADDR_P5   = %02X\n", all.RX_ADDR_P5.value);
+	printf(" RX_ADDR_P0   =  %02X  %02X  %02X  %02X  %02X\n", all.RX_ADDR_P0.value[0], all.RX_ADDR_P0.value[1], all.RX_ADDR_P0.value[2], all.RX_ADDR_P0.value[3], all.RX_ADDR_P0.value[4]);
+	printf(" RX_ADDR_P1   =  %02X  %02X  %02X  %02X  %02X\n", all.RX_ADDR_P1.value[0], all.RX_ADDR_P1.value[1], all.RX_ADDR_P1.value[2], all.RX_ADDR_P1.value[3], all.RX_ADDR_P1.value[4]);
+	printf(" RX_ADDR_P2   = [%02X  %02X  %02X  %02X] %02X\n", all.RX_ADDR_P1.value[0], all.RX_ADDR_P1.value[1], all.RX_ADDR_P1.value[2], all.RX_ADDR_P1.value[3], all.RX_ADDR_P2.value);
+	printf(" RX_ADDR_P3   = [%02X  %02X  %02X  %02X] %02X\n", all.RX_ADDR_P1.value[0], all.RX_ADDR_P1.value[1], all.RX_ADDR_P1.value[2], all.RX_ADDR_P1.value[3], all.RX_ADDR_P3.value);
+	printf(" RX_ADDR_P4   = [%02X  %02X  %02X  %02X] %02X\n", all.RX_ADDR_P1.value[0], all.RX_ADDR_P1.value[1], all.RX_ADDR_P1.value[2], all.RX_ADDR_P1.value[3], all.RX_ADDR_P4.value);
+	printf(" RX_ADDR_P5   = [%02X  %02X  %02X  %02X] %02X\n", all.RX_ADDR_P1.value[0], all.RX_ADDR_P1.value[1], all.RX_ADDR_P1.value[2], all.RX_ADDR_P1.value[3], all.RX_ADDR_P5.value);
 	printf("\n");
 
 	printf(" TX_ADDR      = %02X %02X %02X %02X %02X\n", all.TX_ADDR.value[0], all.TX_ADDR.value[1], all.TX_ADDR.value[2], all.TX_ADDR.value[3], all.TX_ADDR.value[4]);
 	printf("\n");
 
-	printf(" RX_PW_0\n");
+	printf(" RX_PW_0 (%02X)\n",all.RX_PW_P0);
 	printf("  RESERVED    = %d\n", all.RX_PW_P0.RESERVED);
 	printf("  RX_PW_P0    = %d\n", all.RX_PW_P0.RX_PW_LEN);
 	printf("\n");
 
-	printf(" RX_PW_1\n");
+	printf(" RX_PW_1 (%02X)\n", all.RX_PW_P1);
 	printf("  RESERVED    = %d\n", all.RX_PW_P1.RESERVED);
 	printf("  RX_PW_P1    = %d\n", all.RX_PW_P1.RX_PW_LEN);
 	printf("\n");
 	
-	printf(" RX_PW_2\n");
+	printf(" RX_PW_2 (%02X)\n", all.RX_PW_P2);
 	printf("  RESERVED    = %d\n", all.RX_PW_P2.RESERVED);
 	printf("  RX_PW_P2    = %d\n", all.RX_PW_P2.RX_PW_LEN);
 	printf("\n");
 	
-	printf(" RX_PW_3\n");
+	printf(" RX_PW_3 (%02X)\n", all.RX_PW_P3);
 	printf("  RESERVED    = %d\n", all.RX_PW_P3.RESERVED);
 	printf("  RX_PW_P3    = %d\n", all.RX_PW_P3.RX_PW_LEN);
 	printf("\n");
 	
-	printf(" RX_PW_4\n");
+	printf(" RX_PW_4 (%02X)\n", all.RX_PW_P4);
 	printf("  RESERVED    = %d\n", all.RX_PW_P4.RESERVED);
 	printf("  RX_PW_P4    = %d\n", all.RX_PW_P4.RX_PW_LEN);
 	printf("\n");
 	
-	printf(" RX_PW_5\n");
+	printf(" RX_PW_5 (%02X)\n", all.RX_PW_P5);
 	printf("  RESERVED    = %d\n", all.RX_PW_P5.RESERVED);
 	printf("  RX_PW_P5    = %d\n", all.RX_PW_P5.RX_PW_LEN);
 	printf("\n");
 
-	printf(" FIFO_STATUS\n");
+	printf(" FIFO_STATUS (%02X)\n", all.FIFO_STATUS);
 	printf("  RESERVED    = %d\n", all.FIFO_STATUS.RESERVED0);
 	printf("  TX_REUSE    = %d\n", all.FIFO_STATUS.TX_REUSE);
 	printf("  TX_FULL     = %d\n", all.FIFO_STATUS.TX_FULL);
@@ -366,7 +488,7 @@ private void DumpRegisters(NrfDevice_ptr device_ptr)
 	printf("  RX_EMPTY    = %d\n", all.FIFO_STATUS.RX_EMPTY);
 	printf("\n");
 	
-	printf(" DYNPD\n");
+	printf(" DYNPD (%02X)\n", all.DYNPD);
 	printf("  RESERVED    = %d\n", all.DYNPD.RESERVED);
 	printf("  DPL_P5      = %d\n", all.DYNPD.DPL_P5);
 	printf("  DPL_P4      = %d\n", all.DYNPD.DPL_P4);
@@ -376,7 +498,7 @@ private void DumpRegisters(NrfDevice_ptr device_ptr)
 	printf("  DPL_P0      = %d\n", all.DYNPD.DPL_P0);
 	printf("\n");
 
-	printf(" FEATURE\n");
+	printf(" FEATURE (%02X)\n", all.FEATURE);
 	printf("  RESERVED    = %d\n", all.FEATURE.RESERVED);
 	printf("  EN_DPL      = %d\n", all.FEATURE.EN_DPL);
 	printf("  EN_ACK_PAY  = %d\n", all.FEATURE.EN_ACK_PAY);
@@ -418,10 +540,9 @@ private void SpinForTxInterrupt(NrfDevice_ptr device_ptr, int32_t max_spins)
 	wait_for_interrupt(&(device_ptr->tx_interrupt), max_spins);
 }
 
-private void SendPayload(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t * buffer, uint8_t size)
+private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size)
 {
 	NrfReg_STATUS status;
-	NrfReg_TX_ADDR_LONG tx_addr = { 0 };
 
 	if (size == 0 || size > 32)
 	{
@@ -429,13 +550,6 @@ private void SendPayload(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t *
 		return;
 	}
 	
-	tx_addr.value[0] = address[0];
-	tx_addr.value[1] = address[1];
-	tx_addr.value[2] = address[2];
-	tx_addr.value[3] = address[3];
-	tx_addr.value[4] = address[4];
-
-	nrf24_package.Write.TX_ADDR_LONG(device_ptr, tx_addr, &status);
 
 	nrf24_package.Command.W_TX_PAYLOAD(device_ptr, buffer, size, &status);
 	
@@ -946,9 +1060,36 @@ private void InitializeDevice(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status); // Set RF channel.
 	
-	ftr.EN_DYN_ACK = 1;
+	ftr.EN_DYN_ACK = 0;
 	
 	nrf24_package.Write.FEATURE(device_ptr, ftr, &status);
+	
+	config.CRCO = 1;
+	config.EN_CRC = 1;
+	
+	nrf24_package.Write.CONFIG(device_ptr, config, &status); // Zeroize the config register
+
+	en_aa.ENAA_P0 = 1;
+	en_aa.ENAA_P1 = 0;
+	en_aa.ENAA_P2 = 0;
+	en_aa.ENAA_P3 = 0;
+	en_aa.ENAA_P4 = 0;
+	en_aa.ENAA_P5 = 0;
+	
+	nrf24_package.Write.EN_AA(device_ptr, en_aa, &status); // Zeroize the config register
+
+	en_rxaddr.ERX_P0 = 1;
+	en_rxaddr.ERX_P1 = 1;
+	
+	nrf24_package.Write.EN_RXADDR(device_ptr, en_rxaddr, &status); // Zeroize the config register
+	
+	setup_retr.ARC = 3;
+	setup_retr.ARD = 0;
+	
+	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status); // Zeroize the config register
+	
+	
+
 	
 	device_ptr->tx_interrupt.complete = 0;
 	device_ptr->tx_interrupt.spins = 0;
@@ -1024,46 +1165,46 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, bool auto_ack)
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 	
-	if (auto_ack)
-	{
-		retr.ARD = 15;
-		retr.ARC = 10;
-	}
-	else
-	{
-		retr.ARD = 0;
-		retr.ARC = 0;
-	}
+//	if (auto_ack)
+//	{
+//		retr.ARD = 15;
+//		retr.ARC = 10;
+//	}
+//	else
+//	{
+//		retr.ARD = 0;
+//		retr.ARC = 0;
+//	}
+//	
+//	nrf24_package.Write.SETUP_RETR(device_ptr, retr, &status); // Set auto-retransmit settings
 	
-	nrf24_package.Write.SETUP_RETR(device_ptr, retr, &status); // Set auto-retransmit settings
-	
-	enaa_mask.ENAA_P0 = 1;
-	enaa_mask.ENAA_P1 = 0;
-	enaa_mask.ENAA_P2 = 0;
-	enaa_mask.ENAA_P3 = 0;
-	enaa_mask.ENAA_P4 = 0;
-	enaa_mask.ENAA_P5 = 0;
-	
-	if (auto_ack)
-	{
-		enaa.ENAA_P0 = 1;
-		enaa.ENAA_P1 = 1;
-		enaa.ENAA_P2 = 1;
-		enaa.ENAA_P3 = 1;
-		enaa.ENAA_P4 = 1;
-		enaa.ENAA_P5 = 1;
-	}
-	else
-	{
-		enaa.ENAA_P0 = 0;
-		enaa.ENAA_P1 = 0;
-		enaa.ENAA_P2 = 0;
-		enaa.ENAA_P3 = 0;
-		enaa.ENAA_P4 = 0;
-		enaa.ENAA_P5 = 0;
-	}
-	
-	nrf24_package.Update.EN_AA(device_ptr, enaa, enaa_mask, &status);
+//	enaa_mask.ENAA_P0 = 1;
+//	enaa_mask.ENAA_P1 = 0;
+//	enaa_mask.ENAA_P2 = 0;
+//	enaa_mask.ENAA_P3 = 0;
+//	enaa_mask.ENAA_P4 = 0;
+//	enaa_mask.ENAA_P5 = 0;
+//	
+//	if (auto_ack)
+//	{
+//		enaa.ENAA_P0 = 1;
+//		enaa.ENAA_P1 = 1;
+//		enaa.ENAA_P2 = 1;
+//		enaa.ENAA_P3 = 1;
+//		enaa.ENAA_P4 = 1;
+//		enaa.ENAA_P5 = 1;
+//	}
+//	else
+//	{
+//		enaa.ENAA_P0 = 0;
+//		enaa.ENAA_P1 = 0;
+//		enaa.ENAA_P2 = 0;
+//		enaa.ENAA_P3 = 0;
+//		enaa.ENAA_P4 = 0;
+//		enaa.ENAA_P5 = 0;
+//	}
+//	
+//	nrf24_package.Update.EN_AA(device_ptr, enaa, enaa_mask, &status);
 
 }
 private void PowerUpDevice(NrfDevice_ptr device_ptr)
@@ -1204,38 +1345,38 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	// Set rate
 	
 	
-	enaa_mask.ENAA_P0 = 1;
-	enaa_mask.ENAA_P1 = 0;
-	enaa_mask.ENAA_P2 = 0;
-	enaa_mask.ENAA_P3 = 0;
-	enaa_mask.ENAA_P4 = 0;
-	enaa_mask.ENAA_P5 = 0;
-	
-	if (auto_ack)
-	{
-		
-		enaa.ENAA_P0 = 1;
-		enaa.ENAA_P1 = 1;
-		enaa.ENAA_P2 = 1;
-		enaa.ENAA_P3 = 1;
-		enaa.ENAA_P4 = 1;
-		enaa.ENAA_P5 = 1;
-		
-		nrf24_package.Read.ALL_REGISTERS(device_ptr, &bef, &status);
-		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa_mask, &status); // we canjust use enaa as the mask here.
-		nrf24_package.Read.ALL_REGISTERS(device_ptr, &bef, &status);
-	}
-	else
-	{
-		enaa.ENAA_P0 = 0;
-		enaa.ENAA_P1 = 0;
-		enaa.ENAA_P2 = 0;
-		enaa.ENAA_P3 = 0;
-		enaa.ENAA_P4 = 0;
-		enaa.ENAA_P5 = 0;
-		
-		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa_mask, &status);
-	}
+//	enaa_mask.ENAA_P0 = 1;
+//	enaa_mask.ENAA_P1 = 0;
+//	enaa_mask.ENAA_P2 = 0;
+//	enaa_mask.ENAA_P3 = 0;
+//	enaa_mask.ENAA_P4 = 0;
+//	enaa_mask.ENAA_P5 = 0;
+//	
+//	if (auto_ack)
+//	{
+//		
+//		enaa.ENAA_P0 = 1;
+//		enaa.ENAA_P1 = 1;
+//		enaa.ENAA_P2 = 1;
+//		enaa.ENAA_P3 = 1;
+//		enaa.ENAA_P4 = 1;
+//		enaa.ENAA_P5 = 1;
+//		
+//		nrf24_package.Read.ALL_REGISTERS(device_ptr, &bef, &status);
+//		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa_mask, &status); // we canjust use enaa as the mask here.
+//		nrf24_package.Read.ALL_REGISTERS(device_ptr, &bef, &status);
+//	}
+//	else
+//	{
+//		enaa.ENAA_P0 = 0;
+//		enaa.ENAA_P1 = 0;
+//		enaa.ENAA_P2 = 0;
+//		enaa.ENAA_P3 = 0;
+//		enaa.ENAA_P4 = 0;
+//		enaa.ENAA_P5 = 0;
+//		
+//		nrf24_package.Update.EN_AA(device_ptr, enaa, enaa_mask, &status);
+//	}
 	
 	nrf24_hal_support.Activate(device_ptr);
 

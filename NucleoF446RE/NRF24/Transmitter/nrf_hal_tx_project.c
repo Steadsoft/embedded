@@ -45,11 +45,13 @@ int main(void)
 	NrfSpiSetup spi_setttings = NRF_SPI_NUCLEO_F446RE;
 	NrfAuxSetup aux_settings = NRF_AUX_NUCLEO_F446RE;
 	NrfReg_STATUS status;
+	NrfReg_RX_ADDR_LONG rx;
 	uint8_t buffer[32] = { 0 };
 	uint8_t * payload = "I AM A MESSAGE WITH LENGTH OF 32";
 	NrfReg_ALL_REGISTERS all = { 0 };
 	uint8_t radio_01[] = { 0x19, 0x51, 0x38, 0x31, 0x00 }; 
 	uint8_t radio_02[] = { 0x0F, 0x50, 0x33, 0x46, 0x00 }; 
+	uint8_t ack_address[5] = { 0x33, 0x33, 0x33, 0x33, 0x33 };
 
 	uint32_t id;
 	
@@ -72,22 +74,40 @@ int main(void)
 
 	nrf24_package.Action.ConfigureTransmitter(&device, false);
 	
+	nrf24_package.Action.SetReceiveAddressLong(&device, ack_address, PIPE(0));
+	
+	nrf24_package.Action.SetAutoAck(&device, PIPE(0), true);
+	nrf24_package.Action.SetPipeStatus(&device, PIPE(0), true);
+	nrf24_package.Action.SetAutoAck(&device, PIPE(1), true);
+	nrf24_package.Action.SetPipeStatus(&device, PIPE(1), true);
+
+
 	nrf24_package.Action.PowerUpDevice(&device);
 	
-	nrf24_package.Action.DumpRegisters(&device);
+	//nrf24_package.Action.DumpRegisters(&device);
+	
+//	EnableAutoAcks(&device, pipe);
+//	EnablePipe(&device, pipe);;
+//	SetupRetransmits(arc, ard);;
+//	SetReceiveAddress
 	
 	while (1)
 	{
 		for (int C = 0; C < 100; C++)
 		{
-			nrf24_package.Action.SendPayload(&device, radio_01, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
+			nrf24_package.Action.SetTransmitAddress(&device, radio_01);
+			
+			nrf24_package.Action.DumpRegisters(&device);
+
+			nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
 			nrf24_package.Action.SpinForTxInterrupt(&device,50000);
 		
 			pulse_led(1);
 		
 			HAL_Delay(50);
 		
-			nrf24_package.Action.SendPayload(&device, radio_02, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
+			nrf24_package.Action.SetTransmitAddress(&device, radio_02);
+			nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
 			nrf24_package.Action.SpinForTxInterrupt(&device, 50000);
 		
 			pulse_led(1);
