@@ -69,12 +69,14 @@ int main(void)
 	
 	nrf24_package.Action.ResetDevice(&device);
 	nrf24_package.Action.InitializeDevice(&device);
-	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(9), HIGH_POWER, MED_RATE, false);
+	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(9), HIGH_POWER, MAX_RATE, false);
 	nrf24_package.Action.ClearInterruptFlags(&device, true, true, true); // clear all three flags
 	nrf24_package.Action.MaskInterrupts(&device, 1, 0, 0);
 	nrf24_package.Action.SetPipeState(&device, PIPE(0), true);
 	nrf24_package.Action.SetTransmitMode(&device);
 	nrf24_package.Action.SetAutoAck(&device, PIPE(0), true);
+	
+
 
 	nrf24_package.Action.PowerUpDevice(&device);
 	
@@ -86,8 +88,8 @@ int main(void)
 			nrf24_package.Action.SetReceiveAddressLong(&device, radio_01, PIPE(0));
 			nrf24_package.Action.SetTransmitAddress(&device, radio_01);
 			
-			nrf24_package.Action.DumpRegisters(&device);
-
+			//nrf24_package.Action.DumpRegisters(&device);
+//
 			nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
 			nrf24_package.Action.SpinForTxInterrupt(&device,50000);
 		
@@ -95,16 +97,16 @@ int main(void)
 		
 			HAL_Delay(50);
 		
-			nrf24_package.Action.SetTransmitAddress(&device, radio_02);
-			nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
-			nrf24_package.Action.SpinForTxInterrupt(&device, 50000);
-		
-			pulse_led(1);
-		
-			HAL_Delay(50);
+//			nrf24_package.Action.SetTransmitAddress(&device, radio_02);
+//			nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
+//			nrf24_package.Action.SpinForTxInterrupt(&device, 50000);
+//		
+//			pulse_led(1);
+//		
+//			HAL_Delay(50);
 		}
 		
-		HAL_Delay(30000);
+		HAL_Delay(5000);
 	}
 
 	return(0);
@@ -117,7 +119,7 @@ void EXTI0_IRQHandler(void)
 	uint32_t counter = 0;
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 	
-	nrf24_package.Action.DumpRegisters(&device);
+	//nrf24_package.Action.DumpRegisters(&device);
 
 	
 	nrf24_package.Read.STATUS(&device, &status_irq); // sends a NOP to read status
