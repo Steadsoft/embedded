@@ -137,7 +137,13 @@ private void SetTransmitAddress(NrfDevice_ptr device_ptr, uint8_t address[5]);
 private void SetReceiveAddressLong(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe); // pipes 0 and 1
 private void SetReceiveAddressShort(NrfDevice_ptr device_ptr, uint8_t address, uint8_t pipe); // pipes 2,3,4 and 5
 private void SetAutoAck(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
-private void SetPipeStatus(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
+private void SetPipeState(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
+private void ClearInterruptFlags(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_DS, bool MAX_RT);
+private void SetReceiveMode(NrfDevice_ptr device_ptr);
+private void SetTransmitMode(NrfDevice_ptr device_ptr);
+private void MaskInterrupts(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_DS, bool MAX_RT);
+private void SetPayloadSize(NrfDevice_ptr device_ptr, uint8_t pipe, uint8_t payload_size);
+
 
 // Declare the global library interface with same name as library
 
@@ -222,7 +228,12 @@ public const nrf24_package_struct nrf24_package =
 		.SetReceiveAddressLong = SetReceiveAddressLong,
 		.SetReceiveAddressShort = SetReceiveAddressShort,
 		.SetAutoAck = SetAutoAck,
-		.SetPipeStatus = SetPipeStatus,
+		.SetPipeState = SetPipeState,
+		.ClearInterruptFlags = ClearInterruptFlags,
+		.SetReceiveMode = SetReceiveMode,
+		.SetTransmitMode = SetTransmitMode,
+		.MaskInterrupts = MaskInterrupts,
+		.SetPayloadSize = SetPayloadSize,
 
 	},
 	.Command =
@@ -251,6 +262,7 @@ private void SetReceiveAddressLong(NrfDevice_ptr device_ptr, uint8_t address[5],
 	rx_addr.value[2] = address[2];
 	rx_addr.value[3] = address[3];
 	rx_addr.value[4] = address[4];
+	
 	nrf24_package.Write.RX_ADDR_LONG(device_ptr, rx_addr, pipe, &status);
 }
 
@@ -301,7 +313,7 @@ private void SetAutoAck(NrfDevice_ptr device_ptr, uint8_t pipe, bool state)
 	nrf24_package.Update.EN_AA(device_ptr, en_aa,mask, &status);
 }
 
-private void SetPipeStatus(NrfDevice_ptr device_ptr, uint8_t pipe, bool state)
+private void SetPipeState(NrfDevice_ptr device_ptr, uint8_t pipe, bool state)
 {
 	NrfReg_STATUS status;
 	NrfReg_EN_RXADDR en_rxaddr = { 0 };
@@ -445,7 +457,7 @@ private void DumpRegisters(NrfDevice_ptr device_ptr)
 	printf(" RX_ADDR_P5   = [%02X  %02X  %02X  %02X] %02X\n", all.RX_ADDR_P1.value[0], all.RX_ADDR_P1.value[1], all.RX_ADDR_P1.value[2], all.RX_ADDR_P1.value[3], all.RX_ADDR_P5.value);
 	printf("\n");
 
-	printf(" TX_ADDR      = %02X %02X %02X %02X %02X\n", all.TX_ADDR.value[0], all.TX_ADDR.value[1], all.TX_ADDR.value[2], all.TX_ADDR.value[3], all.TX_ADDR.value[4]);
+	printf(" TX_ADDR      =  %02X  %02X  %02X  %02X  %02X\n", all.TX_ADDR.value[0], all.TX_ADDR.value[1], all.TX_ADDR.value[2], all.TX_ADDR.value[3], all.TX_ADDR.value[4]);
 	printf("\n");
 
 	printf(" RX_PW_0 (%02X)\n",all.RX_PW_P0);
@@ -512,7 +524,7 @@ private void GetDefaultAddress(uint8_t address[5])
 	uint32_t id2 = *(uint32_t*)0x1FFF7A14; // Second 32 bits
 	uint32_t id3 = *(uint32_t*)0x1FFF7A18; // Last 32 bits
 
-	address[4] = 0;
+	address[4] = 0xAA;
 	address[3] = (id2 & 0xFF000000) >> 24;
 	address[2] = (id2 & 0x00FF0000) >> 16;
 	address[1] = (id2 & 0x0000FF00) >> 8;
@@ -938,8 +950,8 @@ private void ResetDevice(NrfDevice_ptr device_ptr)
 	
 	setup_aw.AW = 3;
 	
-	setup_retr.ARC = 3;
-	
+	setup_retr.ARC = 0x0F;
+	setup_retr.ARD = 0x0F;
 	rf_ch.RF_CH = 2;
 	
 	rf_setup.RF_DR_HIGH = 1;
@@ -1037,6 +1049,11 @@ private void InitializeDevice(NrfDevice_ptr device_ptr)
 	NrfReg_SETUP_AW setup_aw = { 0 };
 	NrfReg_RF_CH rf_ch = { 0 };
 	NrfReg_FEATURE ftr = { 0 };
+	NrfReg_RX_ADDR_LONG laddr = { 0 };
+	NrfReg_RX_ADDR_SHORT saddr = { 0 };
+	NrfReg_TX_ADDR_LONG taddr = { 0 };
+	
+	NrfReg_RX_PW width = { 0 };
 	
 	if (!device_ptr->configured) 
 	{
@@ -1083,12 +1100,27 @@ private void InitializeDevice(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Write.EN_RXADDR(device_ptr, en_rxaddr, &status); // Zeroize the config register
 	
-	setup_retr.ARC = 3;
-	setup_retr.ARD = 0;
+	setup_retr.ARC = 0x0F;
+	setup_retr.ARD = 0x0F;
 	
 	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status); // Zeroize the config register
 	
+	nrf24_package.Write.RX_ADDR_LONG(device_ptr, laddr, 0, &status);
+	nrf24_package.Write.RX_ADDR_LONG(device_ptr, laddr, 1, &status);
+	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, saddr, 2, &status);
+	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, saddr, 3, &status);
+	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, saddr, 4, &status);
+	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, saddr, 5, &status);
+
+	nrf24_package.Write.TX_ADDR_LONG(device_ptr, taddr, &status);
 	
+	width.RX_PW_LEN = 0;
+	
+	nrf24_package.Write.RX_PW(device_ptr, width, 0, &status);
+	
+	width.RX_PW_LEN = 8;
+
+	nrf24_package.Write.RX_PW(device_ptr, width, 1, &status);
 
 	
 	device_ptr->tx_interrupt.complete = 0;
@@ -1117,6 +1149,47 @@ private void PowerDown(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
+
+private void ClearInterruptFlags(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_DS, bool MAX_RT)
+{
+	NrfReg_STATUS status = { 0 };
+	
+	// These are write 1 to clear so the register value also serves as its own mask here.
+	
+	status.RX_DR = RX_DR;
+	status.TX_DS = TX_DS;
+	status.MAX_RT = MAX_RT;
+	
+	nrf24_package.Update.STATUS(device_ptr, status, status);
+	
+}
+
+private void SetReceiveMode(NrfDevice_ptr device_ptr)
+{
+	NrfReg_CONFIG config = { 0 };
+	NrfReg_CONFIG mask = { 0 };
+	NrfReg_STATUS status;
+	
+	mask.PRIM_RX = 1; 
+	config.PRIM_RX = 1;
+	
+	nrf24_package.Update.CONFIG(device_ptr, config, mask, &status);
+	nrf24_hal_support.Activate(device_ptr);
+}
+
+private void SetTransmitMode(NrfDevice_ptr device_ptr)
+{
+	NrfReg_CONFIG config = { 0 };
+	NrfReg_CONFIG mask = { 0 };
+	NrfReg_STATUS status;
+	
+	mask.PRIM_RX = 1; 
+	config.PRIM_RX = 0;
+	
+	nrf24_package.Update.CONFIG(device_ptr, config, mask, &status);
+}
+
+
 private void ConfigureTransmitter(NrfDevice_ptr device_ptr, bool auto_ack)
 {
 	NrfReg_STATUS status;
@@ -1165,46 +1238,6 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, bool auto_ack)
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 	
-//	if (auto_ack)
-//	{
-//		retr.ARD = 15;
-//		retr.ARC = 10;
-//	}
-//	else
-//	{
-//		retr.ARD = 0;
-//		retr.ARC = 0;
-//	}
-//	
-//	nrf24_package.Write.SETUP_RETR(device_ptr, retr, &status); // Set auto-retransmit settings
-	
-//	enaa_mask.ENAA_P0 = 1;
-//	enaa_mask.ENAA_P1 = 0;
-//	enaa_mask.ENAA_P2 = 0;
-//	enaa_mask.ENAA_P3 = 0;
-//	enaa_mask.ENAA_P4 = 0;
-//	enaa_mask.ENAA_P5 = 0;
-//	
-//	if (auto_ack)
-//	{
-//		enaa.ENAA_P0 = 1;
-//		enaa.ENAA_P1 = 1;
-//		enaa.ENAA_P2 = 1;
-//		enaa.ENAA_P3 = 1;
-//		enaa.ENAA_P4 = 1;
-//		enaa.ENAA_P5 = 1;
-//	}
-//	else
-//	{
-//		enaa.ENAA_P0 = 0;
-//		enaa.ENAA_P1 = 0;
-//		enaa.ENAA_P2 = 0;
-//		enaa.ENAA_P3 = 0;
-//		enaa.ENAA_P4 = 0;
-//		enaa.ENAA_P5 = 0;
-//	}
-//	
-//	nrf24_package.Update.EN_AA(device_ptr, enaa, enaa_mask, &status);
 
 }
 private void PowerUpDevice(NrfDevice_ptr device_ptr)
@@ -1256,7 +1289,32 @@ private void ConfigureRadio(NrfDevice_ptr device_ptr, uint8_t channel, uint8_t p
 	nrf24_package.Update.RF_SETUP(device_ptr, rf_setup, rf_setup_mask, &status); // Set RF settings
 
 }
+private void MaskInterrupts(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_DS, bool MAX_RT)
+{
+	NrfReg_STATUS status;
+	NrfReg_CONFIG config = { 0 };
+	NrfReg_CONFIG bits_to_change = { 0 };
+	
+	bits_to_change.MASK_MAX_RT = 1;
+	bits_to_change.MASK_TX_DS = 1;
+	bits_to_change.MASK_RX_DR = 1;
+	
+	config.MASK_MAX_RT = MAX_RT;
+	config.MASK_TX_DS = TX_DS;
+	config.MASK_RX_DR = RX_DR;
+	
+	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
+	
+}
+private void SetPayloadSize(NrfDevice_ptr device_ptr, uint8_t pipe, uint8_t payload_size)
+{
+	NrfReg_RX_PW rx_pw = { 0 };
+	NrfReg_STATUS status;
 
+	rx_pw.RX_PW_LEN = payload_size;
+	nrf24_package.Write.RX_PW(device_ptr, rx_pw, pipe, &status);
+	
+}
 private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t payload_size)
 {
 	NrfReg_STATUS status;

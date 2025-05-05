@@ -44,6 +44,8 @@ int main(void)
 	
 	board_led_init();
 	
+	nrf24_package.Action.GetDefaultAddress(this_boards_address);
+	
 	/// Perform all hardware related initialization before doing anything else to the device
 	
 	nrf24_hal_support.ConfigureHardware(&device, &spi_settings, &aux_settings, fault_handler); 
@@ -52,27 +54,15 @@ int main(void)
 	
 	nrf24_package.Action.ResetDevice(&device);
 	nrf24_package.Action.InitializeDevice(&device);
-	
-	/// Set the RF related settings
-	
-	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(45), HIGH_POWER, MED_RATE, false);
-	
-	/// Set receiver oriented settings
-	
-	nrf24_package.Action.GetDefaultAddress(this_boards_address);
-	
-	nrf24_package.Action.ConfigureReceiver(&device, ack_address, PIPE(0), false, payload_size); 
-	nrf24_package.Action.ConfigureReceiver(&device, this_boards_address, PIPE(1), false, payload_size); 
-
-	nrf24_package.Action.SetReceiveAddressLong(&device, ack_address, PIPE(0));
+	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(9), HIGH_POWER, MED_RATE, false);
+	nrf24_package.Action.ClearInterruptFlags(&device, true, true, true); // clear all three flags
+	nrf24_package.Action.MaskInterrupts(&device, 0, 1, 1);
+	nrf24_package.Action.SetPipeState(&device, PIPE(0), true);
+	nrf24_package.Action.SetReceiveMode(&device);
+	nrf24_package.Action.SetPayloadSize(&device, PIPE(0), payload_size);
+	nrf24_package.Action.SetReceiveAddressLong(&device, this_boards_address, PIPE(0));
 	nrf24_package.Action.SetAutoAck(&device, PIPE(0), true);
-	nrf24_package.Action.SetPipeStatus(&device, PIPE(0), true);
 
-	
-	nrf24_package.Action.SetReceiveAddressLong(&device, this_boards_address, PIPE(1));
-	nrf24_package.Action.SetAutoAck(&device, PIPE(1), true);
-	nrf24_package.Action.SetPipeStatus(&device, PIPE(1), true);
-	
 	/// Power up the device.
 	
 	nrf24_package.Action.PowerUpDevice(&device);

@@ -49,8 +49,8 @@ int main(void)
 	uint8_t buffer[32] = { 0 };
 	uint8_t * payload = "I AM A MESSAGE WITH LENGTH OF 32";
 	NrfReg_ALL_REGISTERS all = { 0 };
-	uint8_t radio_01[] = { 0x19, 0x51, 0x38, 0x31, 0x00 }; 
-	uint8_t radio_02[] = { 0x0F, 0x50, 0x33, 0x46, 0x00 }; 
+	uint8_t radio_01[] = { 0x19, 0x51, 0x38, 0x31, 0xAA }; 
+	uint8_t radio_02[] = { 0x0F, 0x50, 0x33, 0x46, 0xAA }; 
 	uint8_t ack_address[5] = { 0x33, 0x33, 0x33, 0x33, 0x33 };
 
 	uint32_t id;
@@ -69,32 +69,21 @@ int main(void)
 	
 	nrf24_package.Action.ResetDevice(&device);
 	nrf24_package.Action.InitializeDevice(&device);
-	
-	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(45), HIGH_POWER, MED_RATE, false);
-
-	nrf24_package.Action.ConfigureTransmitter(&device, false);
-	
-	nrf24_package.Action.SetReceiveAddressLong(&device, ack_address, PIPE(0));
-	
+	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(9), HIGH_POWER, MED_RATE, false);
+	nrf24_package.Action.ClearInterruptFlags(&device, true, true, true); // clear all three flags
+	nrf24_package.Action.MaskInterrupts(&device, 1, 0, 0);
+	nrf24_package.Action.SetPipeState(&device, PIPE(0), true);
+	nrf24_package.Action.SetTransmitMode(&device);
 	nrf24_package.Action.SetAutoAck(&device, PIPE(0), true);
-	nrf24_package.Action.SetPipeStatus(&device, PIPE(0), true);
-	nrf24_package.Action.SetAutoAck(&device, PIPE(1), true);
-	nrf24_package.Action.SetPipeStatus(&device, PIPE(1), true);
-
 
 	nrf24_package.Action.PowerUpDevice(&device);
-	
-	//nrf24_package.Action.DumpRegisters(&device);
-	
-//	EnableAutoAcks(&device, pipe);
-//	EnablePipe(&device, pipe);;
-//	SetupRetransmits(arc, ard);;
-//	SetReceiveAddress
 	
 	while (1)
 	{
 		for (int C = 0; C < 100; C++)
 		{
+			/// Set these to be the same when expecting auto acks
+			nrf24_package.Action.SetReceiveAddressLong(&device, radio_01, PIPE(0));
 			nrf24_package.Action.SetTransmitAddress(&device, radio_01);
 			
 			nrf24_package.Action.DumpRegisters(&device);
@@ -127,6 +116,9 @@ void EXTI0_IRQHandler(void)
 	NrfReg_STATUS status_irq;
 	uint32_t counter = 0;
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+	
+	nrf24_package.Action.DumpRegisters(&device);
+
 	
 	nrf24_package.Read.STATUS(&device, &status_irq); // sends a NOP to read status
 	

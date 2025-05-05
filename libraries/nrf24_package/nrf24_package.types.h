@@ -391,7 +391,12 @@ struct nrf_action_interface
 	void(* SetReceiveAddressLong)(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe); // pipes 0 and 1
 	void(* SetReceiveAddressShort)(NrfDevice_ptr device_ptr, uint8_t address, uint8_t pipe); // pipes 2,3,4 and 5
 	void(* SetAutoAck)(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
-	void(* SetPipeStatus)(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
+	void(* SetPipeState)(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
+	void(* ClearInterruptFlags)(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_DS, bool MAX_RT);
+	void(* SetReceiveMode)(NrfDevice_ptr device_ptr);
+	void(* SetTransmitMode)(NrfDevice_ptr device_ptr);
+	void(* MaskInterrupts)(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_DS, bool MAX_RT);
+	void(* SetPayloadSize)(NrfDevice_ptr device_ptr, uint8_t pipe, uint8_t payload_size);
 };
 
 // These represent the documented commands
