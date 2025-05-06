@@ -69,10 +69,7 @@ int main(void)
 	
 	nrf24_package.Action.ResetDevice(&device);
 	
-	nrf24_package.Action.DumpRegisters(&device);
-
-	
-	nrf24_package.Action.InitializeDevice(&device);
+	//nrf24_package.Action.InitializeDevice(&device);
 	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(9), HIGH_POWER, MAX_RATE, false);
 	nrf24_package.Action.ClearInterruptFlags(&device, true, true, true); // clear all three flags
 	nrf24_package.Action.MaskInterrupts(&device, 1, 0, 0);

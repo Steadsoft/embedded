@@ -114,7 +114,6 @@ private void PowerDown(NrfDevice_ptr device_ptr);
 private void FLUSH_TX(NrfDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void FLUSH_RX(NrfDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
-private void InitializeDevice(NrfDevice_ptr device_ptr);
 private void W_TX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void R_RX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void ConfigureTransmitter(NrfDevice_ptr device_ptr, bool auto_ack);
@@ -213,7 +212,6 @@ public const nrf24_package_struct nrf24_package =
 		.PowerDown = PowerDown,
 		.PowerUpDevice = PowerUpDevice,
 		.ResetDevice = ResetDevice,
-		.InitializeDevice = InitializeDevice,
 		.ConfigureTransmitter = ConfigureTransmitter,
 		.ConfigureReceiver = ConfigureReceiver,
 		.ConfigureRadio = ConfigureRadio,
@@ -1068,103 +1066,6 @@ private void SetCRC(NrfDevice_ptr device_ptr, bool enable, bool size)
 	mask.EN_CRC = 1;
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, mask, &status); // Zeroize the config register
-
-}
-private void InitializeDevice(NrfDevice_ptr device_ptr)
-{
-	// Do generic configuration that is independent of whether we are 
-	// transmitting or receiving. 
-	
-	// SEE: https://www.youtube.com/watch?v=mB7LsiscM78
-	
-	NrfReg_STATUS status = { 0 };
-	NrfReg_EN_AA en_aa = { 0 };
-	NrfReg_EN_RXADDR en_rxaddr = { 0 };
-	NrfReg_SETUP_RETR setup_retr = { 0 };
-	NrfReg_CONFIG config = { 0 };
-	NrfReg_SETUP_AW setup_aw = { 0 };
-	NrfReg_RF_CH rf_ch = { 0 };
-	NrfReg_FEATURE ftr = { 0 };
-	NrfReg_RX_ADDR_LONG laddr = { 0 };
-	NrfReg_RX_ADDR_SHORT saddr = { 0 };
-	NrfReg_TX_ADDR_LONG taddr = { 0 };
-	
-	NrfReg_RX_PW width = { 0 };
-	
-	if (!device_ptr->configured) 
-	{
-		device_ptr->FaultHandler(device_ptr, DEVICE_MUST_BE_CONFIGURED);
-		return;
-	}
-	
-	nrf24_hal_support.Deactivate(device_ptr);
-	nrf24_hal_support.Deselect(device_ptr);
-	
-	nrf24_package.Write.CONFIG(device_ptr, config, &status); // Zeroize the config register
-	nrf24_package.Write.EN_AA(device_ptr, en_aa, &status); // Zeroize the auto-ack register
-	nrf24_package.Write.EN_RXADDR(device_ptr, en_rxaddr, &status); // Zeroize the RX addresses
-
-	setup_aw.AW = 3; // 5 byte address width
-	
-	nrf24_package.Write.SETUP_AW(device_ptr, setup_aw, &status); // Set address width to 5 bytes
-	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status); // Zeroize the auto-retransmit register
-	
-	rf_ch.RF_CH	= 0; // default to 2400 MHz
-	
-	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status); // Set RF channel.
-	
-	ftr.EN_DYN_ACK = 0;
-	
-	nrf24_package.Write.FEATURE(device_ptr, ftr, &status);
-	
-	en_aa.ENAA_P0 = 1;
-	en_aa.ENAA_P1 = 0;
-	en_aa.ENAA_P2 = 0;
-	en_aa.ENAA_P3 = 0;
-	en_aa.ENAA_P4 = 0;
-	en_aa.ENAA_P5 = 0;
-	
-	nrf24_package.Write.EN_AA(device_ptr, en_aa, &status); // Zeroize the config register
-
-	en_rxaddr.ERX_P0 = 1;
-	en_rxaddr.ERX_P1 = 1;
-	
-	nrf24_package.Write.EN_RXADDR(device_ptr, en_rxaddr, &status); // Zeroize the config register
-	
-	setup_retr.ARC = 0x0F;
-	setup_retr.ARD = 0x0F;
-	
-	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status); // Zeroize the config register
-	
-	nrf24_package.Write.RX_ADDR_LONG(device_ptr, laddr, 0, &status);
-	nrf24_package.Write.RX_ADDR_LONG(device_ptr, laddr, 1, &status);
-	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, saddr, 2, &status);
-	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, saddr, 3, &status);
-	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, saddr, 4, &status);
-	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, saddr, 5, &status);
-
-	nrf24_package.Write.TX_ADDR_LONG(device_ptr, taddr, &status);
-	
-	width.RX_PW_LEN = 0;
-	
-	nrf24_package.Write.RX_PW(device_ptr, width, 0, &status);
-	
-	width.RX_PW_LEN = 8;
-
-	nrf24_package.Write.RX_PW(device_ptr, width, 1, &status);
-
-	
-	device_ptr->tx_interrupt.complete = 0;
-	device_ptr->tx_interrupt.spins = 0;
-	device_ptr->tx_interrupt.count = 0;
-	device_ptr->tx_interrupt.max_so_far = 0;
-	
-	device_ptr->rx_interrupt.complete = 0;
-	device_ptr->rx_interrupt.spins = 0;
-	device_ptr->rx_interrupt.count = 0;
-	device_ptr->rx_interrupt.max_so_far = 0;
-	
-	
 
 }
 private void PowerDown(NrfDevice_ptr device_ptr)
