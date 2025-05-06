@@ -902,7 +902,8 @@ private void WriteMultiBytesRegister(NrfDevice_ptr device_ptr, uint8_t Register,
 private void ResetDevice(NrfDevice_ptr device_ptr)
 {
 	NrfReg_STATUS status;
-	NrfReg_CONFIG configuration = { 0 };
+	NrfReg_STATUS status_mask = { 0 };
+	NrfReg_CONFIG config = { 0 };
 	NrfReg_EN_AA en_aa = { 0 };
 	NrfReg_EN_RXADDR en_rxaddr = { 0 };
 	NrfReg_SETUP_AW setup_aw = { 0 };
@@ -923,73 +924,105 @@ private void ResetDevice(NrfDevice_ptr device_ptr)
 	NrfReg_DYNPD dynpd = { 0 };
 	NrfReg_FEATURE feature = { 0 };
 	
-	configuration.EN_CRC = 0;
+	// Set CONFIG reg defaults
+	config.EN_CRC = 1;
 	
-	en_aa.ENAA_P0 = 1;
-	en_aa.ENAA_P1 = 1;
-	en_aa.ENAA_P2 = 1;
-	en_aa.ENAA_P3 = 1;
-	en_aa.ENAA_P4 = 1;
+	// Set EN_AA reg defaults
 	en_aa.ENAA_P5 = 1;
+	en_aa.ENAA_P4 = 1;
+	en_aa.ENAA_P3 = 1;
+	en_aa.ENAA_P2 = 1;
+	en_aa.ENAA_P1 = 1;
+	en_aa.ENAA_P0 = 1;
+	
+	// Set EN_RXADDR reg defaults
 
 	en_rxaddr.ERX_P0 = 1;
 	en_rxaddr.ERX_P1 = 1;
 	
+	// Set SETUP_AW reg defaults
 	setup_aw.AW = 3;
 	
-	setup_retr.ARC = 0x0F;
-	setup_retr.ARD = 0x0F;
+	// Set SETUP_RETR reg defaults
+	setup_retr.ARD = 0x00;
+	setup_retr.ARC = 0x03;
+	
+	// Set RF_CH reg defaults
 	rf_ch.RF_CH = 2;
 	
+	// Set RF_SETUP reg defaults
 	rf_setup.RF_DR_HIGH = 1;
-	rf_setup.RF_PWR = 2;
+	rf_setup.RF_PWR = 3;
 	
+	// Set STATUS defaults
+	
+	status.RX_DR = 0;
+	status.TX_DS = 0;
+	status.MAX_RT = 0;
+	
+	// Registers OBSERVE_TX and RPD are read only on every bit.
+	
+	// Set RX_ADDR_P0 - RX_ADDR_P1 reg defaults
+	rx_addr_long_p0.value[0] = E7;
+	rx_addr_long_p0.value[1] = E7;
+	rx_addr_long_p0.value[2] = E7;
+	rx_addr_long_p0.value[3] = E7;
+	rx_addr_long_p0.value[4] = E7;
+	rx_addr_long_p0.value[5] = E7;
+	
+	rx_addr_long_p1.value[0] = C2;
+	rx_addr_long_p1.value[1] = C2;
+	rx_addr_long_p1.value[2] = C2;
+	rx_addr_long_p1.value[3] = C2;
+	rx_addr_long_p1.value[4] = C2;
+	rx_addr_long_p1.value[5] = C2;
+
+	// Set RX_ADDR_P2 - RX_ADDR_P5 reg defaults
 	rx_addr_short_p2.value = C3;
 	rx_addr_short_p3.value = C4;
 	rx_addr_short_p4.value = C5;
 	rx_addr_short_p5.value = C6;
 	
-	nrf24_package.Action.PowerDown(device_ptr);
+	// Set TX_ADDR reg defaults
+	tx_addr_long.value[0] = E7;
+	tx_addr_long.value[1] = E7;
+	tx_addr_long.value[2] = E7;
+	tx_addr_long.value[3] = E7;
+	tx_addr_long.value[4] = E7;
+	tx_addr_long.value[5] = E7;
 	
-	nrf24_package.Write.CONFIG(device_ptr, configuration, &status);
+	// FIFO_STATUS has no user settable bits
+	
+	nrf24_package.Action.PowerDown(device_ptr);
+	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 	nrf24_package.Write.EN_AA(device_ptr, en_aa, &status);
 	nrf24_package.Write.EN_RXADDR(device_ptr, en_rxaddr, &status);
 	nrf24_package.Write.SETUP_AW(device_ptr, setup_aw, &status);
 	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status);
 	nrf24_package.Write.RF_CH(device_ptr, rf_ch, &status);
 	nrf24_package.Write.RF_SETUP(device_ptr, rf_setup, &status);
-	nrf24_package.Write.OBSERVE_TX(device_ptr, observe_tx, &status);
-	nrf24_package.Write.RPD(device_ptr, rpd, &status);
+	nrf24_package.Write.STATUS(device_ptr, status, &status);
+
 	nrf24_package.Write.RX_ADDR_LONG(device_ptr, rx_addr_long_p0, 0, &status);
 	nrf24_package.Write.RX_ADDR_LONG(device_ptr, rx_addr_long_p1, 1, &status);
 	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, rx_addr_short_p2, 2, &status);
 	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, rx_addr_short_p3, 3, &status);
 	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, rx_addr_short_p4, 4, &status);
 	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, rx_addr_short_p5, 5, &status);
+	
 	nrf24_package.Write.TX_ADDR_LONG(device_ptr, tx_addr_long, &status);
+	
 	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 0, &status);
 	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 1, &status);
 	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 2, &status);
 	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 3, &status);
 	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 4, &status);
 	nrf24_package.Write.RX_PW(device_ptr, rx_pw, 5, &status);
-	nrf24_package.Write.FIFO_STATUS(device_ptr, fifo_status, &status);
+	
 	nrf24_package.Command.FLUSH_TX(device_ptr, &status);
 	nrf24_package.Command.FLUSH_RX(device_ptr, &status);
 	nrf24_package.Write.DYNPD(device_ptr, dynpd, &status);
 	nrf24_package.Write.FEATURE(device_ptr, feature, &status);
-	
-	NrfReg_STATUS reset_status = { 0 };
-	
-	reset_status.RX_P_NO = 7;
-	
-	// Setting these to 1 is how we clerar them.
-	
-	reset_status.RX_DR	= 1;
-	reset_status.TX_DS = 1;
-	reset_status.MAX_RT = 1;
-	
-	nrf24_package.Write.STATUS(device_ptr, reset_status, &status);
 	
 }
 private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus)

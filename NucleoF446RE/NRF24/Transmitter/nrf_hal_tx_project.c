@@ -68,6 +68,10 @@ int main(void)
 	/// Force all registers into their hardware reset state.
 	
 	nrf24_package.Action.ResetDevice(&device);
+	
+	nrf24_package.Action.DumpRegisters(&device);
+
+	
 	nrf24_package.Action.InitializeDevice(&device);
 	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(9), HIGH_POWER, MAX_RATE, false);
 	nrf24_package.Action.ClearInterruptFlags(&device, true, true, true); // clear all three flags
