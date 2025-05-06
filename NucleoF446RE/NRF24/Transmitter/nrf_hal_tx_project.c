@@ -40,6 +40,9 @@ int arr[4][3] = { { 2, 3, 1 }, { 19, 12, 7 }, { 10, 9, 8 }, { 3, 11, 5 } };
 
 int msgs_tx = 0;
 
+uint32_t failcount = 0;
+uint32_t workcount = 0;
+
 int main(void)
 {
 	NrfSpiSetup spi_setttings = NRF_SPI_NUCLEO_F446RE;
@@ -69,7 +72,7 @@ int main(void)
 	
 	nrf24_package.Action.ResetDevice(&device);
 	
-	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(9), HIGH_POWER, MAX_RATE, false);
+	nrf24_package.Action.ConfigureRadio(&device, CHANNEL(9), LOW_POWER, MED_RATE, false);
 	nrf24_package.Action.ClearInterruptFlags(&device, true, true, true); // clear all three flags
 	nrf24_package.Action.MaskInterrupts(&device, 1, 0, 0);
 	nrf24_package.Action.SetPipeState(&device, PIPE(0), true);
@@ -88,9 +91,6 @@ int main(void)
 			/// Set these to be the same when expecting auto acks
 			nrf24_package.Action.SetReceiveAddressLong(&device, radio_01, PIPE(0));
 			nrf24_package.Action.SetTransmitAddress(&device, radio_01);
-			
-			nrf24_package.Action.DumpRegisters(&device);
-//
 			nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
 			nrf24_package.Action.SpinForTxInterrupt(&device,50000);
 		
@@ -98,16 +98,17 @@ int main(void)
 		
 			HAL_Delay(50);
 		
-//			nrf24_package.Action.SetTransmitAddress(&device, radio_02);
-//			nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
-//			nrf24_package.Action.SpinForTxInterrupt(&device, 50000);
-//		
-//			pulse_led(1);
-//		
-//			HAL_Delay(50);
+			nrf24_package.Action.SetReceiveAddressLong(&device, radio_02, PIPE(0));
+			nrf24_package.Action.SetTransmitAddress(&device, radio_02);
+			nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
+			nrf24_package.Action.SpinForTxInterrupt(&device, 50000);
+		
+			pulse_led(1);
+		
+			HAL_Delay(50);
 		}
 		
-		HAL_Delay(5000);
+		HAL_Delay(1000);
 	}
 
 	return(0);
@@ -117,7 +118,6 @@ int main(void)
 void EXTI0_IRQHandler(void)
 {
 	NrfReg_STATUS status_irq;
-	uint32_t counter = 0;
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 	
 	//nrf24_package.Action.DumpRegisters(&device);
@@ -134,11 +134,12 @@ void EXTI0_IRQHandler(void)
 	
 	if (status_irq.MAX_RT == 1)
 	{
+		failcount++;
 		nrf24_package.Command.FLUSH_TX(&device, &status_irq);
 	}
 	else
 	{
-		counter++;
+		workcount++;
 	}
 	
 	if (status_irq.TX_DS || status_irq.MAX_RT)
