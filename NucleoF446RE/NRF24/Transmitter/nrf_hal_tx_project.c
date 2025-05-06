@@ -73,11 +73,12 @@ int main(void)
 	nrf24_package.Action.ClearInterruptFlags(&device, true, true, true); // clear all three flags
 	nrf24_package.Action.MaskInterrupts(&device, 1, 0, 0);
 	nrf24_package.Action.SetPipeState(&device, PIPE(0), true);
-	nrf24_package.Action.SetTransmitMode(&device);
+	nrf24_package.Action.SetPipeState(&device, PIPE(1), false);
+
 	nrf24_package.Action.SetAutoAck(&device, PIPE(0), true);
+	nrf24_package.Action.SetTransmitMode(&device);
+	nrf24_package.Action.SetCRC(&device, 1, 1);
 	
-
-
 	nrf24_package.Action.PowerUpDevice(&device);
 	
 	while (1)
@@ -88,7 +89,7 @@ int main(void)
 			nrf24_package.Action.SetReceiveAddressLong(&device, radio_01, PIPE(0));
 			nrf24_package.Action.SetTransmitAddress(&device, radio_01);
 			
-			//nrf24_package.Action.DumpRegisters(&device);
+			nrf24_package.Action.DumpRegisters(&device);
 //
 			nrf24_package.Action.SendPayload(&device, payload, 8); // Literature indicates that reducing the size of the payload can improve range.
 			nrf24_package.Action.SpinForTxInterrupt(&device,50000);

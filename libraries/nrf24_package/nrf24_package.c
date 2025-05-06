@@ -143,6 +143,7 @@ private void SetReceiveMode(NrfDevice_ptr device_ptr);
 private void SetTransmitMode(NrfDevice_ptr device_ptr);
 private void MaskInterrupts(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_DS, bool MAX_RT);
 private void SetPayloadSize(NrfDevice_ptr device_ptr, uint8_t pipe, uint8_t payload_size);
+private void SetCRC(NrfDevice_ptr device_ptr, bool enable, bool size);
 
 
 // Declare the global library interface with same name as library
@@ -234,6 +235,7 @@ public const nrf24_package_struct nrf24_package =
 		.SetTransmitMode = SetTransmitMode,
 		.MaskInterrupts = MaskInterrupts,
 		.SetPayloadSize = SetPayloadSize,
+		.SetCRC = SetCRC,
 
 	},
 	.Command =
@@ -265,7 +267,6 @@ private void SetReceiveAddressLong(NrfDevice_ptr device_ptr, uint8_t address[5],
 	
 	nrf24_package.Write.RX_ADDR_LONG(device_ptr, rx_addr, pipe, &status);
 }
-
 private void SetReceiveAddressShort(NrfDevice_ptr device_ptr, uint8_t address, uint8_t pipe)
 {
 	NrfReg_STATUS status;
@@ -274,7 +275,6 @@ private void SetReceiveAddressShort(NrfDevice_ptr device_ptr, uint8_t address, u
 	rx_addr.value = address;
 	nrf24_package.Write.RX_ADDR_SHORT(device_ptr, rx_addr, pipe, &status);
 }
-
 private void SetAutoAck(NrfDevice_ptr device_ptr, uint8_t pipe, bool state)
 {
 	NrfReg_STATUS status;
@@ -312,7 +312,6 @@ private void SetAutoAck(NrfDevice_ptr device_ptr, uint8_t pipe, bool state)
 	
 	nrf24_package.Update.EN_AA(device_ptr, en_aa,mask, &status);
 }
-
 private void SetPipeState(NrfDevice_ptr device_ptr, uint8_t pipe, bool state)
 {
 	NrfReg_STATUS status;
@@ -350,7 +349,6 @@ private void SetPipeState(NrfDevice_ptr device_ptr, uint8_t pipe, bool state)
 	
 	nrf24_package.Update.EN_RXADDR(device_ptr, en_rxaddr, mask, &status);
 }
-
 private void SetTransmitAddress(NrfDevice_ptr device_ptr, uint8_t address[5])
 {
 	NrfReg_STATUS status;
@@ -365,7 +363,6 @@ private void SetTransmitAddress(NrfDevice_ptr device_ptr, uint8_t address[5])
 	nrf24_package.Write.TX_ADDR_LONG(device_ptr, tx_addr, &status);
 
 }
-
 private void DumpRegisters(NrfDevice_ptr device_ptr)
 {
 	NrfReg_ALL_REGISTERS all = { 0 };
@@ -530,28 +527,22 @@ private void GetDefaultAddress(uint8_t address[5])
 	address[1] = (id2 & 0x0000FF00) >> 8;
 	address[0] = (id2 & 0x000000FF) >> 0;
 }
-
-
 private void ConfirmTxInterrupt(NrfDevice_ptr device_ptr)
 {
 	confirm_interrupt(&(device_ptr->tx_interrupt));
 }
-
 private void ConfirmRxInterrupt(NrfDevice_ptr device_ptr)
 {
 	confirm_interrupt(&(device_ptr->rx_interrupt));
 }
-
 private void WaitForRxInterrupt(NrfDevice_ptr device_ptr, int32_t max_spins)
 {
 	wait_for_interrupt(&(device_ptr->rx_interrupt), max_spins);
 }
-
 private void SpinForTxInterrupt(NrfDevice_ptr device_ptr, int32_t max_spins)
 {
 	wait_for_interrupt(&(device_ptr->tx_interrupt), max_spins);
 }
-
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size)
 {
 	NrfReg_STATUS status;
@@ -572,7 +563,6 @@ private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t siz
 	device_ptr->tx_count++;
 
 }
-
 private void PulseCE(NrfDevice_ptr device_ptr)
 {
 	nrf24_hal_support.Activate(device_ptr);
@@ -766,9 +756,6 @@ private void ReadTxAddrRegister(NrfDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG_pt
 	uint8_t bytes_read;
 	ReadMultiBytesRegister(device_ptr, Nrf24Register.TX_ADDR, BYTE_ADDRESS(Value), &bytes_read, NrfStatus);
 }
-
-// TODO This register is actually 5 bytes and so are several others,  so we need to fix this
-
 private void WriteTxAddrRegister(NrfDevice_ptr device_ptr, NrfReg_TX_ADDR_LONG Value, NrfReg_STATUS_ptr NrfStatus)
 {
 	uint8_t bytes_written;
@@ -1034,6 +1021,22 @@ private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr
 	ReadDynpdRegister(device_ptr, &(Value->DYNPD), NrfStatus);
 	ReadFeatureRegister(device_ptr, &(Value->FEATURE), NrfStatus);
 }
+
+private void SetCRC(NrfDevice_ptr device_ptr, bool enable, bool size)
+{
+	NrfReg_STATUS status = { 0 };
+	NrfReg_CONFIG config = { 0 };
+	NrfReg_CONFIG mask = { 0 };
+	
+	config.CRCO = size;
+	config.EN_CRC = enable;
+	
+	mask.CRCO = 1;
+	mask.EN_CRC = 1;
+	
+	nrf24_package.Update.CONFIG(device_ptr, config, mask, &status); // Zeroize the config register
+
+}
 private void InitializeDevice(NrfDevice_ptr device_ptr)
 {
 	// Do generic configuration that is independent of whether we are 
@@ -1081,11 +1084,6 @@ private void InitializeDevice(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Write.FEATURE(device_ptr, ftr, &status);
 	
-	config.CRCO = 1;
-	config.EN_CRC = 1;
-	
-	nrf24_package.Write.CONFIG(device_ptr, config, &status); // Zeroize the config register
-
 	en_aa.ENAA_P0 = 1;
 	en_aa.ENAA_P1 = 0;
 	en_aa.ENAA_P2 = 0;
@@ -1149,7 +1147,6 @@ private void PowerDown(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Write.CONFIG(device_ptr, config, &status);
 }
-
 private void ClearInterruptFlags(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_DS, bool MAX_RT)
 {
 	NrfReg_STATUS status = { 0 };
@@ -1163,7 +1160,6 @@ private void ClearInterruptFlags(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_D
 	nrf24_package.Update.STATUS(device_ptr, status, status);
 	
 }
-
 private void SetReceiveMode(NrfDevice_ptr device_ptr)
 {
 	NrfReg_CONFIG config = { 0 };
@@ -1176,7 +1172,6 @@ private void SetReceiveMode(NrfDevice_ptr device_ptr)
 	nrf24_package.Update.CONFIG(device_ptr, config, mask, &status);
 	nrf24_hal_support.Activate(device_ptr);
 }
-
 private void SetTransmitMode(NrfDevice_ptr device_ptr)
 {
 	NrfReg_CONFIG config = { 0 };
@@ -1188,8 +1183,6 @@ private void SetTransmitMode(NrfDevice_ptr device_ptr)
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, mask, &status);
 }
-
-
 private void ConfigureTransmitter(NrfDevice_ptr device_ptr, bool auto_ack)
 {
 	NrfReg_STATUS status;
@@ -1227,14 +1220,6 @@ private void ConfigureTransmitter(NrfDevice_ptr device_ptr, bool auto_ack)
 	
 	config.PRIM_RX = 0;
 	
-	if (auto_ack)
-	{
-		bits_to_change.EN_CRC = 1;
-		bits_to_change.CRCO = 1;
-		
-		config.CRCO = 1;
-		config.EN_CRC = 1;
-	}
 	
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 	
@@ -1254,7 +1239,6 @@ private void PowerUpDevice(NrfDevice_ptr device_ptr)
 	HAL_Delay(2); // 1.5 mS min delay after powerup.
 	
 }
-
 private void ConfigureRadio(NrfDevice_ptr device_ptr, uint8_t channel, uint8_t power, uint8_t rate, bool auto_ack)
 {
 	NrfReg_STATUS status;
@@ -1472,7 +1456,6 @@ private void W_TX_PAYLOAD(NrfDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t 
 	nrf24_hal_support.WriteBytes(device_ptr, buffer, data_len + 1);
 	nrf24_hal_support.Deselect(device_ptr);
 }
-
 private void R_RX_PAYLOAD(NrfDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus)
 {
 
@@ -1482,7 +1465,6 @@ private void R_RX_PAYLOAD(NrfDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t 
 	nrf24_hal_support.Deselect(device_ptr);
 	
 }
-
 private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max_spins)
 {
 	state_ptr->spins = 0;
@@ -1502,7 +1484,6 @@ private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max
 	state_ptr->count++;
 	state_ptr->complete = 0;
 }
-
 private void confirm_interrupt(volatile NrfInterrupt_ptr state_ptr)
 {
 	state_ptr->complete = 1;

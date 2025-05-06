@@ -58,18 +58,21 @@ int main(void)
 	nrf24_package.Action.ClearInterruptFlags(&device, true, true, true); // clear all three flags
 	nrf24_package.Action.MaskInterrupts(&device, 0, 1, 1);
 	nrf24_package.Action.SetPipeState(&device, PIPE(0), true);
+	nrf24_package.Action.SetPipeState(&device, PIPE(1), false);
+
 	nrf24_package.Action.SetReceiveMode(&device);
 	nrf24_package.Action.SetPayloadSize(&device, PIPE(0), payload_size);
 	nrf24_package.Action.SetReceiveAddressLong(&device, this_boards_address, PIPE(0));
 	nrf24_package.Action.SetAutoAck(&device, PIPE(0), true);
-	
+	nrf24_package.Action.SetCRC(&device, 1, 1);
+
 
 
 	/// Power up the device.
 	
 	nrf24_package.Action.PowerUpDevice(&device);
 	
-	//nrf24_package.Action.DumpRegisters(&device);
+	nrf24_package.Action.DumpRegisters(&device);
 
 	
 	while (1)
