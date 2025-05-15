@@ -141,8 +141,10 @@ private void ClearInterruptFlags(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_D
 private void SetReceiveMode(NrfDevice_ptr device_ptr);
 private void SetTransmitMode(NrfDevice_ptr device_ptr);
 private void MaskInterrupts(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_DS, bool MAX_RT);
-private void SetPayloadSize(NrfDevice_ptr device_ptr, uint8_t pipe, uint8_t payload_size);
+private void SetReceivePayloadSize(NrfDevice_ptr device_ptr, uint8_t payload_size, uint8_t pipe);
 private void SetCRC(NrfDevice_ptr device_ptr, bool enable, bool size);
+private void SetAutoAckRetries(NrfDevice_ptr device_ptr, uint8_t delay, uint8_t max);
+private void SetAddressWidth(NrfDevice_ptr device_ptr, uint8_t width);
 
 
 // Declare the global library interface with same name as library
@@ -232,8 +234,10 @@ public const nrf24_package_struct nrf24_package =
 		.SetReceiveMode = SetReceiveMode,
 		.SetTransmitMode = SetTransmitMode,
 		.MaskInterrupts = MaskInterrupts,
-		.SetPayloadSize = SetPayloadSize,
+		.SetReceivePayloadSize = SetReceivePayloadSize,
 		.SetCRC = SetCRC,
+		.SetAutoAckRetries = SetAutoAckRetries,
+		.SetAddressWidth = SetAddressWidth,
 
 	},
 	.Command =
@@ -966,14 +970,12 @@ private void ResetDevice(NrfDevice_ptr device_ptr)
 	rx_addr_long_p0.value[2] = E7;
 	rx_addr_long_p0.value[3] = E7;
 	rx_addr_long_p0.value[4] = E7;
-	rx_addr_long_p0.value[5] = E7;
 	
 	rx_addr_long_p1.value[0] = C2;
 	rx_addr_long_p1.value[1] = C2;
 	rx_addr_long_p1.value[2] = C2;
 	rx_addr_long_p1.value[3] = C2;
 	rx_addr_long_p1.value[4] = C2;
-	rx_addr_long_p1.value[5] = C2;
 
 	// Set RX_ADDR_P2 - RX_ADDR_P5 reg defaults
 	rx_addr_short_p2.value = C3;
@@ -987,7 +989,6 @@ private void ResetDevice(NrfDevice_ptr device_ptr)
 	tx_addr_long.value[2] = E7;
 	tx_addr_long.value[3] = E7;
 	tx_addr_long.value[4] = E7;
-	tx_addr_long.value[5] = E7;
 	
 	// FIFO_STATUS has no user settable bits
 	
@@ -1053,6 +1054,25 @@ private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr
 	ReadFeatureRegister(device_ptr, &(Value->FEATURE), NrfStatus);
 }
 
+private void SetAddressWidth(NrfDevice_ptr device_ptr, uint8_t width)
+{
+	NrfReg_STATUS status = { 0 };
+	NrfReg_SETUP_AW setup_aw = { 0 };
+	
+	setup_aw.AW = width;
+	
+	nrf24_package.Write.SETUP_AW(device_ptr, setup_aw, &status);
+}
+
+private void SetAutoAckRetries(NrfDevice_ptr device_ptr, uint8_t delay, uint8_t max)
+{
+	NrfReg_STATUS status = { 0 };
+	NrfReg_SETUP_RETR setup_retr = { 0 };
+	
+	setup_retr.ARD = delay;
+	setup_retr.ARC = max;
+	nrf24_package.Write.SETUP_RETR(device_ptr, setup_retr, &status);
+}
 private void SetCRC(NrfDevice_ptr device_ptr, bool enable, bool size)
 {
 	NrfReg_STATUS status = { 0 };
@@ -1224,7 +1244,7 @@ private void MaskInterrupts(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_DS, bo
 	nrf24_package.Update.CONFIG(device_ptr, config, bits_to_change, &status);
 	
 }
-private void SetPayloadSize(NrfDevice_ptr device_ptr, uint8_t pipe, uint8_t payload_size)
+private void SetReceivePayloadSize(NrfDevice_ptr device_ptr, uint8_t payload_size, uint8_t pipe)
 {
 	NrfReg_RX_PW rx_pw = { 0 };
 	NrfReg_STATUS status;

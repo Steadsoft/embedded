@@ -395,8 +395,10 @@ struct nrf_action_interface
 	void(* SetReceiveMode)(NrfDevice_ptr device_ptr);
 	void(* SetTransmitMode)(NrfDevice_ptr device_ptr);
 	void(* MaskInterrupts)(NrfDevice_ptr device_ptr, bool RX_DR, bool TX_DS, bool MAX_RT);
-	void(* SetPayloadSize)(NrfDevice_ptr device_ptr, uint8_t pipe, uint8_t payload_size);
+	void(* SetReceivePayloadSize)(NrfDevice_ptr device_ptr, uint8_t payload_size, uint8_t pipe);
 	void(* SetCRC)(NrfDevice_ptr device_ptr, bool enable, bool size);
+	void(* SetAutoAckRetries)(NrfDevice_ptr device_ptr, uint8_t delay, uint8_t max);
+	void(* SetAddressWidth)(NrfDevice_ptr device_ptr, uint8_t width);
 };
 
 // These represent the documented commands
