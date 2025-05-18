@@ -147,7 +147,8 @@ private void SetReceivePayloadSize(NrfDevice_ptr device_ptr, uint8_t payload_siz
 private void SetCRC(NrfDevice_ptr device_ptr, bool enable, bool size);
 private void SetAutoAckRetries(NrfDevice_ptr device_ptr, uint8_t delay, uint8_t max);
 private void SetAddressWidth(NrfDevice_ptr device_ptr, uint8_t width);
-
+private void SetDynamicPayloads(NrfDevice_ptr device_ptr, bool state);
+private void SetDynamicPipe(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
 
 // Declare the global library interface with same name as library
 
@@ -240,6 +241,8 @@ public const nrf24_package_struct nrf24_package =
 		.SetCRC = SetCRC,
 		.SetAutoAckRetries = SetAutoAckRetries,
 		.SetAddressWidth = SetAddressWidth,
+		.SetDynamicPayloads = SetDynamicPayloads,
+		.SetDynamicPipe = SetDynamicPipe
 
 	},
 	.Command =
@@ -1380,6 +1383,47 @@ private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uin
 	nrf24_hal_support.Activate(device_ptr);
 
 	
+}
+private void SetDynamicPayloads(NrfDevice_ptr device_ptr, bool state)
+{
+	NrfReg_FEATURE feature = { 0 };
+	NrfReg_STATUS status = { 0 };
+	
+	nrf24_package.Read.FEATURE(device_ptr, &feature, &status);
+	feature.EN_DPL = state;
+	nrf24_package.Write.FEATURE(device_ptr, feature, &status);
+}
+
+private void SetDynamicPipe(NrfDevice_ptr device_ptr, uint8_t pipe, bool state)
+{
+	NrfReg_DYNPD dynpd = { 0 };
+	NrfReg_STATUS status = { 0 };
+	
+	nrf24_package.Read.DYNPD(device_ptr, &dynpd, &status);
+	
+	switch (pipe)
+	{
+	case 0:
+		dynpd.DPL_P0 = state;
+		break;
+	case 1:
+		dynpd.DPL_P1 = state;
+		break;
+	case 2:
+		dynpd.DPL_P2 = state;
+		break;
+	case 3:
+		dynpd.DPL_P3 = state;
+		break;
+	case 4:
+		dynpd.DPL_P4 = state;
+		break;
+	case 5:
+		dynpd.DPL_P5 = state;
+		break;
+	}
+	
+	nrf24_package.Write.DYNPD(device_ptr, dynpd, &status);
 }
 private void FLUSH_TX(NrfDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus)
 {

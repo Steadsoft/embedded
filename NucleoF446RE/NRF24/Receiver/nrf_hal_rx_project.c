@@ -67,23 +67,11 @@ int main(void)
 	nrf24_package.Action.SetAutoAck(&device, PIPE(0), true);
 	nrf24_package.Action.SetCRC(&device, 1, 1);
 	
-	NrfReg_FEATURE ftr = { 0 };
+	/// Enable dyammic paylaods on pipe 0
 	
-	// enable dynamic payload
-	nrf24_package.Read.FEATURE(&device, &ftr, &status);
-	ftr.EN_DPL = 1;
-	nrf24_package.Write.FEATURE(&device, ftr, &status);
-	nrf24_package.Read.FEATURE(&device, &ftr, &status);
+	nrf24_package.Action.SetDynamicPayloads(&device, true);
+	nrf24_package.Action.SetDynamicPipe(&device, PIPE(0), true);
 	
-	// enable dynamic payload for pipe 0
-	
-	NrfReg_DYNPD dyn = { 0 };
-
-	nrf24_package.Read.DYNPD(&device, &dyn, &status);
-	dyn.DPL_P0 = 1;
-	nrf24_package.Write.DYNPD(&device, dyn, &status);
-	nrf24_package.Read.DYNPD(&device, &dyn, &status);
-
 	/// Power up the device.
 	
 	nrf24_package.Action.PowerUpDevice(&device);

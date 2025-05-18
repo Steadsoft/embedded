@@ -399,6 +399,9 @@ struct nrf_action_interface
 	void(* SetCRC)(NrfDevice_ptr device_ptr, bool enable, bool size);
 	void(* SetAutoAckRetries)(NrfDevice_ptr device_ptr, uint8_t delay, uint8_t max);
 	void(* SetAddressWidth)(NrfDevice_ptr device_ptr, uint8_t width);
+	void(* SetDynamicPayloads)(NrfDevice_ptr device_ptr, bool state);
+	void(* SetDynamicPipe)(NrfDevice_ptr device_ptr, uint8_t pipe, bool state);
+
 };
 
 // These represent the documented commands
