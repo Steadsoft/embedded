@@ -39,7 +39,8 @@ int main(void)
 	uint8_t buffer[32];
 	NrfReg_ALL_REGISTERS all = { 0 };
 	uint8_t payload_size = 8;
-	
+	uint8_t width;
+
 	HAL_Init();
 	
 	board_led_init();
@@ -61,12 +62,27 @@ int main(void)
 	nrf24_package.Action.SetPipeState(&device, PIPE(1), false);
 
 	nrf24_package.Action.SetReceiveMode(&device);
-	nrf24_package.Action.SetPayloadSize(&device, PIPE(0), payload_size);
+	nrf24_package.Action.SetReceivePayloadSize(&device, 0, PIPE(0)); // must be zero when using dynamic payloads
 	nrf24_package.Action.SetReceiveAddressLong(&device, this_boards_address, PIPE(0));
 	nrf24_package.Action.SetAutoAck(&device, PIPE(0), true);
 	nrf24_package.Action.SetCRC(&device, 1, 1);
+	
+	NrfReg_FEATURE ftr = { 0 };
+	
+	// enable dynamic payload
+	nrf24_package.Read.FEATURE(&device, &ftr, &status);
+	ftr.EN_DPL = 1;
+	nrf24_package.Write.FEATURE(&device, ftr, &status);
+	nrf24_package.Read.FEATURE(&device, &ftr, &status);
+	
+	// enable dynamic payload for pipe 0
+	
+	NrfReg_DYNPD dyn = { 0 };
 
-
+	nrf24_package.Read.DYNPD(&device, &dyn, &status);
+	dyn.DPL_P0 = 1;
+	nrf24_package.Write.DYNPD(&device, dyn, &status);
+	nrf24_package.Read.DYNPD(&device, &dyn, &status);
 
 	/// Power up the device.
 	
@@ -78,7 +94,8 @@ int main(void)
 	while (1)
 	{
 		nrf24_package.Action.WaitForRxInterrupt(&device, -1);
-		nrf24_package.Command.R_RX_PAYLOAD(&device, buffer, payload_size, &status);
+		nrf24_package.Command.R_RX_PL_WID(&device, &width, &status);
+		nrf24_package.Command.R_RX_PAYLOAD(&device, buffer, width, &status);  // TODO we should not need to pass payload_size
 		pulse_led(1);
 	}
 
