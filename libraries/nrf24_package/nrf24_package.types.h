@@ -408,7 +408,9 @@ struct nrf_command_interface
 	void(* FLUSH_RX)(NrfDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
 	void(* W_TX_PAYLOAD)(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 	void(* R_RX_PAYLOAD)(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
-	void(* ReadRxPayload)(NrfDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
+	void(* R_RX_PL_WID)(NrfDevice_ptr, uint8_t * data_len, NrfReg_STATUS_ptr NrfStatus);
+
+	//void(* ReadRxPayload)(NrfDevice_ptr, NrfReg_STATUS_ptr NrfStatus);
 };
 
 struct nrf_empty

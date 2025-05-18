@@ -116,6 +116,8 @@ private void FLUSH_RX(NrfDevice_ptr device_ptr, NrfReg_STATUS_ptr NrfStatus);
 private void ReadAllRegisters(NrfDevice_ptr device_ptr, NrfReg_ALL_REGISTERS_ptr Value, NrfReg_STATUS_ptr NrfStatus);
 private void W_TX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
 private void R_RX_PAYLOAD(NrfDevice_ptr, uint8_t * data_ptr, uint8_t data_len, NrfReg_STATUS_ptr NrfStatus);
+private void R_RX_PL_WID(NrfDevice_ptr device_ptr, uint8_t * data_len, NrfReg_STATUS_ptr NrfStatus);
+
 private void ConfigureTransmitter(NrfDevice_ptr device_ptr, bool auto_ack);
 private void ConfigureReceiver(NrfDevice_ptr device_ptr, uint8_t address[5], uint8_t pipe, bool auto_ack, uint8_t payload_size);
 private void ConfigureRadio(NrfDevice_ptr device_ptr, uint8_t channel, uint8_t power, uint8_t rate, bool auto_ack);
@@ -246,7 +248,8 @@ public const nrf24_package_struct nrf24_package =
 		.FLUSH_RX = FLUSH_RX,
 		 // TODO add support for REUSE_TX_PL as well.
 		.W_TX_PAYLOAD = W_TX_PAYLOAD,
-		.R_RX_PAYLOAD = R_RX_PAYLOAD
+		.R_RX_PAYLOAD = R_RX_PAYLOAD,
+		.R_RX_PL_WID = R_RX_PL_WID
 	},
 	.EmptyRegister =
 	{ 
@@ -523,7 +526,7 @@ private void GetDefaultAddress(uint8_t address[5])
 	uint32_t id2 = *(uint32_t*)0x1FFF7A14; // Second 32 bits
 	uint32_t id3 = *(uint32_t*)0x1FFF7A18; // Last 32 bits
 
-	address[4] = 0xAA;
+	address[4] = (id3 & 0x000000FF) >> 0;
 	address[3] = (id2 & 0xFF000000) >> 24;
 	address[2] = (id2 & 0x00FF0000) >> 16;
 	address[1] = (id2 & 0x0000FF00) >> 8;
@@ -1419,6 +1422,17 @@ private void R_RX_PAYLOAD(NrfDevice_ptr device_ptr, uint8_t * data_ptr, uint8_t 
 	nrf24_hal_support.Deselect(device_ptr);
 	
 }
+
+private void R_RX_PL_WID(NrfDevice_ptr device_ptr, uint8_t * data_len, NrfReg_STATUS_ptr NrfStatus)
+{
+	uint8_t command = NrfCommand.R_RX_PL_WID;
+	
+	nrf24_hal_support.Select(device_ptr);
+	nrf24_hal_support.WriteBytes(device_ptr, &command, 1);
+	nrf24_hal_support.ReadBytes(device_ptr, data_len, 1);
+	nrf24_hal_support.Deselect(device_ptr);
+}
+
 private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max_spins)
 {
 	state_ptr->spins = 0;
