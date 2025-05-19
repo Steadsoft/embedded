@@ -1481,13 +1481,22 @@ private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max
 {
 	state_ptr->spins = 0;
 	
-	while (state_ptr->complete == 0)
+	if (max_spins < 0)
 	{
-		state_ptr->spins++;
+		while (state_ptr->complete == 0)
+		{
+			state_ptr->spins++; // spin forever, only the complete flag can cause this to terminate
+		}
+	}
+	else
+	{
+		while (state_ptr->complete == 0)
+		{
+			state_ptr->spins++;
 		
-		if (state_ptr->spins >= 0)
 			if (state_ptr->spins >= max_spins)
 				ApplicationFaultHandler(LIBNAME, "missing interrupt");
+		}
 	}
 	
 	if (state_ptr->spins > state_ptr->max_so_far)

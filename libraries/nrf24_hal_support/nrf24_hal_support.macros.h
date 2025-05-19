@@ -8,7 +8,7 @@
 
 #define ENCODE_PIN(B,P) ((uint64_t)(((uint64_t)(B) << 16) | (uint16_t)(P)))
 #define DECODE_PIN(P)   ((uint16_t)((uint64_t)(P) & 0xFFFF))
-#define DECODE_BASE(P)  ((void*)((uint64_t)(P) >> 16))
+#define DECODE_PORT(P)  ((void*)((uint64_t)(P) >> 16))
 
 #define PA0 ENCODE_PIN(GPIOA_BASE,GPIO_PIN_0)
 #define PA1 ENCODE_PIN(GPIOA_BASE,GPIO_PIN_1)

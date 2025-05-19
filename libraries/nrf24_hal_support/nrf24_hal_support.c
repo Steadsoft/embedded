@@ -65,7 +65,7 @@ private void enable_clock_from_pin(uint64_t pin)
 {
 	// Enable the GPIO clock for the pin
 	
-	uint32_t base = (uint32_t)(DECODE_BASE(pin));
+	uint32_t base = (uint32_t)(DECODE_PORT(pin));
 	
 	switch (base)
 	{
@@ -160,13 +160,13 @@ private void ConfigureHardware(NrfDevice_ptr device_ptr, NrfSpiSetup_ptr spi_set
 	GPIO_InitStruct_spi.Speed     = GPIO_SPEED_HIGH;
 		
 	GPIO_InitStruct_spi.Pin = DECODE_PIN(spi_setup->sck_pin); 
-	HAL_GPIO_Init(DECODE_BASE(spi_setup->sck_pin), &GPIO_InitStruct_spi);
+	HAL_GPIO_Init(DECODE_PORT(spi_setup->sck_pin), &GPIO_InitStruct_spi);
 		
 	GPIO_InitStruct_spi.Pin = DECODE_PIN(spi_setup->miso_pin); 
-	HAL_GPIO_Init(DECODE_BASE(spi_setup->miso_pin), &GPIO_InitStruct_spi);
+	HAL_GPIO_Init(DECODE_PORT(spi_setup->miso_pin), &GPIO_InitStruct_spi);
 		
 	GPIO_InitStruct_spi.Pin = DECODE_PIN(spi_setup->mosi_pin); 
-	HAL_GPIO_Init(DECODE_BASE(spi_setup->mosi_pin), &GPIO_InitStruct_spi);
+	HAL_GPIO_Init(DECODE_PORT(spi_setup->mosi_pin), &GPIO_InitStruct_spi);
 	
 	device_ptr->spi.Instance = spi_setup->spi;
 	device_ptr->spi.Init.Mode = SPI_MODE_MASTER; 
@@ -200,7 +200,7 @@ private void ConfigureHardware(NrfDevice_ptr device_ptr, NrfSpiSetup_ptr spi_set
 		GPIO_InitStruct_irq.Mode = GPIO_MODE_IT_FALLING;
 		GPIO_InitStruct_irq.Pull = GPIO_PULLUP;
 		GPIO_InitStruct_spi.Speed = GPIO_SPEED_FAST;
-		HAL_GPIO_Init(DECODE_BASE(aux_setup->nrf_int_pin), &GPIO_InitStruct_irq);
+		HAL_GPIO_Init(DECODE_PORT(aux_setup->nrf_int_pin), &GPIO_InitStruct_irq);
 		/* EXTI interrupt init*/
 		HAL_NVIC_SetPriority(aux_setup->nrf_int_type, 0, 0);
 		HAL_NVIC_EnableIRQ(aux_setup->nrf_int_type); 
@@ -213,16 +213,16 @@ private void ConfigureHardware(NrfDevice_ptr device_ptr, NrfSpiSetup_ptr spi_set
 	GPIO_InitStruct_ctrl.Pull  = GPIO_PULLUP;
 	GPIO_InitStruct_ctrl.Speed = GPIO_SPEED_LOW;
 
-	HAL_GPIO_Init(DECODE_BASE(aux_setup->nrf_ce_pin), &GPIO_InitStruct_ctrl);
-	HAL_GPIO_WritePin(DECODE_BASE(aux_setup->nrf_ce_pin), DECODE_PIN(aux_setup->nrf_ce_pin), GPIO_PIN_RESET);
+	HAL_GPIO_Init(DECODE_PORT(aux_setup->nrf_ce_pin), &GPIO_InitStruct_ctrl);
+	HAL_GPIO_WritePin(DECODE_PORT(aux_setup->nrf_ce_pin), DECODE_PIN(aux_setup->nrf_ce_pin), GPIO_PIN_RESET);
 	
 	GPIO_InitStruct_ctrl.Pin   = DECODE_PIN(spi_setup->cs_pin); 
 	GPIO_InitStruct_ctrl.Mode  = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct_ctrl.Pull  = GPIO_PULLUP;
 	GPIO_InitStruct_ctrl.Speed = GPIO_SPEED_LOW;
 
-	HAL_GPIO_Init(DECODE_BASE(spi_setup->cs_pin), &GPIO_InitStruct_ctrl);
-	HAL_GPIO_WritePin(DECODE_BASE(spi_setup->cs_pin), DECODE_PIN(spi_setup->cs_pin), GPIO_PIN_SET);
+	HAL_GPIO_Init(DECODE_PORT(spi_setup->cs_pin), &GPIO_InitStruct_ctrl);
+	HAL_GPIO_WritePin(DECODE_PORT(spi_setup->cs_pin), DECODE_PIN(spi_setup->cs_pin), GPIO_PIN_SET);
 	
 	// Init the pulse timer for pulsing CE (a bit more than 10uS)
 	
@@ -262,19 +262,19 @@ private void ConfigureHardware(NrfDevice_ptr device_ptr, NrfSpiSetup_ptr spi_set
 }
 private void spi_set_ce_lo(NrfDevice_ptr ptr)
 {
-	HAL_GPIO_WritePin(DECODE_BASE(ptr->ce_pin), DECODE_PIN(ptr->ce_pin), GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DECODE_PORT(ptr->ce_pin), DECODE_PIN(ptr->ce_pin), GPIO_PIN_RESET);
 }
 private void spi_set_ce_hi(NrfDevice_ptr ptr)
 {
-	HAL_GPIO_WritePin(DECODE_BASE(ptr->ce_pin), DECODE_PIN(ptr->ce_pin), GPIO_PIN_SET);
+	HAL_GPIO_WritePin(DECODE_PORT(ptr->ce_pin), DECODE_PIN(ptr->ce_pin), GPIO_PIN_SET);
 }
 private void spi_set_csn_lo(NrfDevice_ptr ptr)
 {
-	HAL_GPIO_WritePin(DECODE_BASE(ptr->cs_pin), DECODE_PIN(ptr->cs_pin), GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DECODE_PORT(ptr->cs_pin), DECODE_PIN(ptr->cs_pin), GPIO_PIN_RESET);
 }
 private void spi_set_csn_hi(NrfDevice_ptr ptr)
 {
-	HAL_GPIO_WritePin(DECODE_BASE(ptr->cs_pin), DECODE_PIN(ptr->cs_pin), GPIO_PIN_SET);
+	HAL_GPIO_WritePin(DECODE_PORT(ptr->cs_pin), DECODE_PIN(ptr->cs_pin), GPIO_PIN_SET);
 }
 private void exchange_bytes(NrfDevice_ptr ptr, uint8_t bytes_out_ptr[], uint8_t bytes_in_ptr[], uint8_t count)
 {
