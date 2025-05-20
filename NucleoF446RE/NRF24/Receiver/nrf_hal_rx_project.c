@@ -81,10 +81,20 @@ int main(void)
 	
 	while (1)
 	{
-		nrf24_package.Action.WaitForRxInterrupt(&device, -1);
-		nrf24_package.Command.R_RX_PL_WID(&device, &width, &status);
-		nrf24_package.Command.R_RX_PAYLOAD(&device, buffer, width, &status);  // TODO we should not need to pass payload_size
-		pulse_led(1);
+		nrf24_package.Action.WaitForInterrupt(&(device.rx_interrupt), -1);
+		
+		nrf24_package.Read.STATUS(&device, &status); 
+	
+		if (status.RX_DR)
+		{
+			status.TX_DS = 0;
+			status.MAX_RT = 0;
+			nrf24_package.Write.STATUS(&device, status, &status);
+			nrf24_package.Command.R_RX_PL_WID(&device, &width, &status);
+			nrf24_package.Command.R_RX_PAYLOAD(&device, buffer, width, &status);  // TODO we should not need to pass payload_size
+			pulse_led(1);
+		}
+
 	}
 
 	return(0);
@@ -92,19 +102,8 @@ int main(void)
 
 void EXTI0_IRQHandler(void)
 {
-	NrfReg_STATUS status;
-	
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
-	
-	nrf24_package.Read.STATUS(&device, &status);
-	
-	if (status.RX_DR)
-	{
-		status.TX_DS = 0;
-		status.MAX_RT = 0;
-		nrf24_package.Write.STATUS(&device, status, &status);
-		nrf24_package.Action.ConfirmRxInterrupt(&device);
-	}
+    nrf24_package.Action.ConfirmRxInterrupt(&(device.rx_interrupt));
 } 
 
 void pulse_led(uint32_t interval)
