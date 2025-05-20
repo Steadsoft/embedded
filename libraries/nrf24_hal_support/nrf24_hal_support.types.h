@@ -57,8 +57,8 @@ struct nrf_device
 	nrf_fault_handler FaultHandler;
 	uint32_t tx_count;
 	uint32_t rx_count;
-	volatile NrfInterrupt tx_interrupt;
-	volatile NrfInterrupt rx_interrupt;
+	NrfInterrupt tx_interrupt;
+	NrfInterrupt rx_interrupt;
 };
 
 struct nrf_spi_setup

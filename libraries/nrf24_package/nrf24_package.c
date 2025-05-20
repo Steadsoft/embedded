@@ -124,13 +124,12 @@ private void ConfigureRadio(NrfDevice_ptr device_ptr, uint8_t channel, uint8_t p
 private void PulseCE(NrfDevice_ptr device_ptr);
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size);
 private void PowerUpDevice(NrfDevice_ptr device_ptr);
-private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max_spins);
-private void confirm_interrupt(volatile NrfInterrupt_ptr state_ptr);
+private void wait_for_interrupt(NrfInterrupt_ptr state_ptr, int32_t max_spins);
+private void confirm_interrupt(NrfInterrupt_ptr state_ptr);
 
-private void SpinForTxInterrupt(NrfDevice_ptr, int32_t);
 private void ConfirmTxInterrupt(NrfDevice_ptr);
-private void WaitForRxInterrupt(NrfDevice_ptr, int32_t);
-private void ConfirmRxInterrupt(NrfDevice_ptr);
+private void WaitForInterrupt(NrfInterrupt_ptr int_ptr, int32_t max_spins);
+private void ConfirmInterrupt(NrfInterrupt_ptr);
 
 private void GetDefaultAddress(uint8_t address[5]);
 private void DumpRegisters(NrfDevice_ptr device_ptr);
@@ -222,10 +221,9 @@ public const nrf24_package_struct nrf24_package =
 		.ConfigureRadio = ConfigureRadio,
 		.PulseCE = PulseCE,
 		.SendPayload = SendPayload,
-		.SpinForTxInterrupt = SpinForTxInterrupt,
 		.ConfirmTxInterrupt = ConfirmTxInterrupt,
-		.WaitForRxInterrupt = WaitForRxInterrupt,
-		.ConfirmRxInterrupt = ConfirmRxInterrupt,
+		.WaitForInterrupt = WaitForInterrupt,
+		.ConfirmRxInterrupt = ConfirmInterrupt,
 		.GetDefaultAddress = GetDefaultAddress,
 		.DumpRegisters = DumpRegisters,
 		.SetTransmitAddress = SetTransmitAddress,
@@ -539,17 +537,13 @@ private void ConfirmTxInterrupt(NrfDevice_ptr device_ptr)
 {
 	confirm_interrupt(&(device_ptr->tx_interrupt));
 }
-private void ConfirmRxInterrupt(NrfDevice_ptr device_ptr)
+private void ConfirmInterrupt(NrfInterrupt_ptr int_ptr)
 {
-	confirm_interrupt(&(device_ptr->rx_interrupt));
+	confirm_interrupt(int_ptr);
 }
-private void WaitForRxInterrupt(NrfDevice_ptr device_ptr, int32_t max_spins)
+private void WaitForInterrupt(NrfInterrupt_ptr int_ptr, int32_t max_spins)
 {
-	wait_for_interrupt(&(device_ptr->rx_interrupt), max_spins);
-}
-private void SpinForTxInterrupt(NrfDevice_ptr device_ptr, int32_t max_spins)
-{
-	wait_for_interrupt(&(device_ptr->tx_interrupt), max_spins);
+	wait_for_interrupt(int_ptr, max_spins);
 }
 private void SendPayload(NrfDevice_ptr device_ptr, uint8_t * buffer, uint8_t size)
 {
@@ -1477,7 +1471,7 @@ private void R_RX_PL_WID(NrfDevice_ptr device_ptr, uint8_t * data_len, NrfReg_ST
 	nrf24_hal_support.Deselect(device_ptr);
 }
 
-private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max_spins)
+private void wait_for_interrupt(NrfInterrupt_ptr state_ptr, int32_t max_spins)
 {
 	state_ptr->spins = 0;
 	
@@ -1505,7 +1499,7 @@ private void wait_for_interrupt(volatile NrfInterrupt_ptr state_ptr, int32_t max
 	state_ptr->count++;
 	state_ptr->complete = 0;
 }
-private void confirm_interrupt(volatile NrfInterrupt_ptr state_ptr)
+private void confirm_interrupt(NrfInterrupt_ptr state_ptr)
 {
 	state_ptr->complete = 1;
 }

@@ -380,10 +380,9 @@ struct nrf_action_interface
 	void(* PowerUpDevice)(NrfDevice_ptr);
 	void(* PulseCE)(NrfDevice_ptr device_ptr);
 	void(* SendPayload)(NrfDevice_ptr device_ptr,  uint8_t * buffer, uint8_t size);
-	void(* SpinForTxInterrupt)(NrfDevice_ptr device_ptr, int32_t max_spins);
-	void(* WaitForRxInterrupt)(NrfDevice_ptr device_ptr, int32_t max_spins);
+	void(* WaitForInterrupt)(NrfInterrupt_ptr rx_interrupt, int32_t max_spins);
 	void(* ConfirmTxInterrupt)(NrfDevice_ptr device_ptr);
-	void(* ConfirmRxInterrupt)(NrfDevice_ptr device_ptr);
+	void(* ConfirmRxInterrupt)(NrfInterrupt_ptr device_ptr);
 	void(* GetDefaultAddress)(uint8_t address[5]);
 	void(* DumpRegisters)(NrfDevice_ptr device_ptr);
 	void(* SetTransmitAddress)(NrfDevice_ptr device_ptr, uint8_t address[5]);
